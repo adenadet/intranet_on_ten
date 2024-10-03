@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -11,6 +12,15 @@ Route::get('/test/{id}', function () {return view('certificates.new2');});
 Route::resources([
     'certificates' => 'App\Http\Controllers\CertificateController',
 ]); 
+
+Route::get('/clear-cache', function() {
+    //$exitCode = Artisan::call('cache:clear');
+    $exitCode = Artisan::call('config:cache');
+    //$exitCode = Artisan::call('route:cache');
+    $exitCode = Artisan::call('cache:clear');
+    
+    return "All done boss, anything else";
+});
 
 Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['auth','role:Staff'],], function () {    
     Route::get('/',                 'ModulesController@dashboard')->name('home');
