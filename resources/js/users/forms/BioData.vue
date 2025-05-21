@@ -2,7 +2,6 @@
 <div class="overlay-wrapper p-0">
     <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
     <form>
-        {{ editMode ? 'True' : 'False' }}
         <alert-error :form="BioData"></alert-error> 
         <div class="row">
             <div class="col-sm-4">
@@ -107,6 +106,7 @@
 export default {
     data(){
         return  {
+            areas: [],
             BioData: new Form({
                 alt_phone:'', 
                 area_id:'', 
@@ -133,9 +133,10 @@ export default {
                 unique_id: '', 
             }),
             loading: false,
+            states: [],
         }
     },
-    emits:['Reload'],
+    emits:['reloadUser'],
     mounted() {
         this.getAllInitials();
     },
@@ -188,7 +189,7 @@ export default {
             this.BioData.put('/api/ums/users/'+ this.BioData.id)
             .then(response =>{
                 this.loading = false;
-                this.$emit('Reload', response);
+                this.$emit('reloadUser', response);
                 $this.swal.fire({
                     icon: 'success',
                     title: 'The User '+ response.data.user.first_name+' '+  response.data.user.last_name+' has been updated',

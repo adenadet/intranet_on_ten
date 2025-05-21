@@ -105,15 +105,9 @@ export default {
             }),
         }
     },
+    emits:['refreshAppointments'],
     mounted() {
         this.getInitials();
-            
-        Fire.$on('RescheduleDataFill', user =>{
-            this.RescheduleData.fill(user);
-        });
-        Fire.$on('AfterCreation', ()=>{
-            
-        });
     },
     methods:{
         callback: function(response){

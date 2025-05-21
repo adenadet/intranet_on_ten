@@ -1,7 +1,7 @@
 <template>
 <section>
     <div class="row overlay-wrapper">
-        <div class="overlay dark"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
+        <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
         <div class="col-md-12" v-if="appointment != null">
             <div class="invoice p-3 mb-3">
                 <div class="row">
@@ -15,7 +15,7 @@
                     <div class="col-sm-4 invoice-col">
                         From
                         <address>
-                            <strong v-if="appointment.patient != null">{{ appointment.patient | fullName }}</strong>
+                            <strong v-if="appointment.patient != null">{{ FullName(appointment.patient)}}</strong>
                             <br>
                             Phone: {{ appointment.patient != null ? appointment.patient.phone : '0000000000' }}<br>
                             Email: {{ appointment.patient != null ? appointment.patient.email : '0000000000' }}
@@ -82,15 +82,11 @@
 export default {
     data() {
         return {
+            loading: false,
             user: {},
         }
     },
-    mounted() {
-        /*Fire.$on('refreshPayment', response => {
-            this.refreshAppointments(response);
-            this.closeModals();
-        });*/
-    },
+    mounted() {},
     methods: {
         addApplicant(){
             this.$Progress.start();

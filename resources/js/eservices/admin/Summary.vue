@@ -14,6 +14,7 @@
                                     <select class="form-control" id="report_type" name="report_type" v-model="reportData.report_type" required>
                                         <option value="">--Select Type of Detailed Report--</option>
                                         <option value="all">All Appointments</option>
+                                        <option value="payments">All Payments</option>
                                         <option value="pending">Pending Appointments</option>
                                     </select>
                                 </div>
@@ -40,7 +41,8 @@
             <div class="col-12">
                 <div class="card card-success">
                     <div class="card-header"><h3 class="card-title">Report</h3></div>
-                    <div class="card-body table-responsive p-0">
+                    <div class="card-body table-responsive p-0 overlay-wrapper">
+                        <div class="overlay" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
                         <table class="table table-hover text-nowrap">
                             <thead v-if="report_type == 'all' || report_type == ''">
                                 <tr>
@@ -73,8 +75,8 @@
                             </tbody>
                             <tbody v-else-if="report_type == 'all' && reports != null">
                                 <tr v-for="(report, index) in reports" :key="index">
-                                    <td>{{index | addOne}}</td>
-                                    <td>{{report.date | excelDate}}</td>
+                                    <td>{{addOne(index)}}</td>
+                                    <td>{{ExcelDate(report.date) }}</td>
                                     <td>{{report.total}}</td>
                                     <td>{{report.x_ray}}</td>
                                     <td>{{report.sputum}}</td>
@@ -85,16 +87,16 @@
                             </tbody>
                             <tbody v-else-if="report_type == 'pending' && reports != null">
                                 <tr v-for="(report, index) in reports" :key="index">
-                                    <td>{{index | addOne}}</td>
+                                    <td>{{addOne(index)}}</td>
                                     <td>{{report.end_date}}</td>
                                     <td>{{report.total_no}}</td>
-                                    <td>{{report.total_amount | currency}}</td>
+                                    <td>{{currency(report.total_amount)}}</td>
                                     <td>{{report.no_kids}}</td>
-                                    <td>{{report.total_kids | currency}}</td>
+                                    <td>{{currency(report.total_kids)}}</td>
                                     <td>{{report.no_adult}}</td>
-                                    <td>{{report.total_adult | currency}}</td>
+                                    <td>{{currency(report.total_adult)}}</td>
                                     <td>{{report.no_strange}}</td>
-                                    <td>{{report.total_strange | currency}}</td>
+                                    <td>{{currency(report.total_strange)}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -120,24 +122,22 @@ export default {
         }
     },
     mounted() {
-        //this.getInitials();
-        Fire.$on('refreshReport', response => {
+        /*Fire.$on('refreshReport', response => {
             this.refreshReport(response);
-        });
+        });*/
     },
-    methods: {
-        
+    methods: { 
         searchAppointment(){
-            this.$Progress.start();
+            this.loading = true;
             this.reportData.post('/api/emr/admin/summary_report')
             .then(response => {
                 this.appointments = response.data.appointments;
                 this.reports = response.data.reports;
                 this.report_type = response.data.report_type;
-                this.$Progress.finish();
+                this.loading = false;
             })
             .close(()=>{
-                Swal.fire({
+                this.$swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Something went wrong!',

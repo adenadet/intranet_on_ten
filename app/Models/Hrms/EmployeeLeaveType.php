@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\HRMS;
+namespace App\Models\Hrms;
 
 use App\Models\Structure;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,13 +10,13 @@ class EmployeeLeaveType extends Structure
 {
     protected $primaryKey = 'id';
     protected $table = 'hrms_employee_leave_types';
-    protected $fillable = array('employee_id', 'leave_type_id', 'days_used', 'pending_days', 'created_at', 'updated_at', 'deleted_at');
+    protected $fillable = array('employee_id', 'leave_type_id', 'balance', 'days_used', 'pending_days', 'created_by', 'updated_by', 'deleted_by', 'created_at', 'updated_at', 'deleted_at');
 
     public function employee(){
-        return $this->belongsTo('App\Models\HRMS\Employee', 'employee_id', 'id');
+        return $this->belongsTo('App\Models\Hrms\Employee', 'employee_id', 'id');
     }
 
     public function leave_type(){
-        return $this->belongsTo('App\Models\HRMS\LeaveType', 'leave_type_id', 'id');
+        return $this->belongsTo('App\Models\Hrms\LeaveType', 'leave_type_id', 'id');
     }
 }

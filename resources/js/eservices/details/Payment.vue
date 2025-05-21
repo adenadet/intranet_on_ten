@@ -82,11 +82,12 @@
 export default {
     data() {
         return {
+            loading: false,
             user: {},
         }
     },
     mounted() {},
     methods: {},
-    props: {appointment: Object}
+    props: {appointment: Object},
 }
 </script>

@@ -6,7 +6,7 @@
         <div class="card-body" style="height:400px; overflow-y: scroll;">
             <div class="callout callout-danger" v-for="notice in notices.data" :key="notice.id">
                 <h5>{{notice.topic}}</h5>
-                <p>{{readMore(notice.content, 50, '...')}}</p>
+                <p v-html="readMore(notice.content, 50, '...')"></p>
                 <a :href="'/notices/'+notice.id"><button class="btn btn-sm btn-primary"> Details</button></a>
             </div>
         </div>

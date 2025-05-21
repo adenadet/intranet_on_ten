@@ -14,6 +14,9 @@
             <li class="nav-item">
                 <router-link to="/eservices/doctor/reviews" class="nav-link"><i class="fa fa-file"></i> Review Results</router-link>
             </li>
+            <li class="nav-item">
+                <router-link to="/eservices/doctor/upload_lab_reports" class="nav-link"><i class="fa fa-upload"></i> Upload Multiple Lab Reports</router-link>
+            </li>
           	@endif
         </ul>
     </div>

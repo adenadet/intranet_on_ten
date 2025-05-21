@@ -94,7 +94,7 @@ class ModulesController extends Controller
             'page_title' => 'Policies',
             'policy' => Policy::where('id', '=', $id)->first(),
         ];
-        return view('policies.reader')->with($params);
+        return view('app')->with($params);
     }
 
     public function profile()

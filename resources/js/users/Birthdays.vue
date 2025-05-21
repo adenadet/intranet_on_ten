@@ -5,7 +5,7 @@
             <ul class="users-list clearfix">
                 <li v-for="user in birthdays" :key="user.id">
                     <img style="height: 50px;" :src="(user.image) ? '/img/profile/'+user.image : '/img/profile/default.png'" :alt="user ? user.first_name+' '+user.middle_name+' '+user.last_name : 'Default Image' " :title="user ? user.first_name+' '+user.middle_name+' '+user.last_name : 'Celebrant\'s  Image' ">
-                    <router-link :to="'/users/staff/'+user.id" class="users-list-name" href="#">{{user.first_name}} {{user.last_name}}</router-link>
+                    <router-link :to="'/contacts/'+user.id" class="users-list-name" href="#">{{user.first_name}} {{user.last_name}}</router-link>
                     <span class="users-list-date">{{user.dob | ExcelDateMonth}}</span>
                 </li>
             </ul>

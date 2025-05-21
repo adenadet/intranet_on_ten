@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models\HRMS;
+namespace App\Models\Hrms;
 
+use App\Models\Structure;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

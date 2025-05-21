@@ -3,7 +3,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Auth::routes();
 Route::get('/uk-tb-screening', function () {return view('welcome');});
 Route::get('/uk-tb-cancellation', function () {return view('welcome');});
 Route::get('/uk-tb-reschedules', function () {return view('welcome');});
@@ -25,6 +24,7 @@ Route::get('/clear-cache', function() {
 Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['auth','role:Staff'],], function () {    
     Route::get('/',                 'ModulesController@dashboard')->name('home');
     Route::get('/contacts',         'ModulesController@contacts')->name('contacts');
+    Route::get('/home',             'ModulesController@dashboard')->name('dashboard');
     Route::get('/dashboard',        'ModulesController@dashboard')->name('dashboard');
     Route::get('/departments',      'ModulesController@departments')->name('departments');
     Route::get('/hrms',             'ModulesController@hrms')->name('hrms');
@@ -32,15 +32,16 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['auth','ro
         Route::get('/hrms/admin',                       'ModulesController@hrms_admin')->name('hrms.admin');
         Route::get('/hrms/admin/{any}',                 'ModulesController@hrms_admin')->where('any', '.*'); 
     });    
-    Route::get('/internet',         'ModulesController@internet')->name('internet');
-    Route::get('/inventory',        'ModulesController@inventory')->name('inventory');
-    Route::get('/notices',          'ModulesController@notices')->name('notices');
-    Route::get('/policies',         'ModulesController@policies')->name('policies');
-    Route::get('/profile',          'ModulesController@profile')->name('profile');
-    Route::get('/settings',         'ModulesController@settings')->name('settings');
-    Route::get('/staff_month',      'ModulesController@staff_month')->name('staff_month');
-    Route::get('/ticketing',        'ModulesController@ticketing')->name('ticketing');
-    Route::get('/users',            'ModulesController@users')->name('users');
+    Route::get('/internet',             'ModulesController@internet')->name('internet');
+    Route::get('/inventory',            'ModulesController@inventory')->name('inventory');
+    Route::get('/notices',              'ModulesController@notices')->name('notices');
+    Route::get('/policies',             'ModulesController@policies')->name('policies');
+    
+    Route::get('/profile',              'ModulesController@profile')->name('profile');
+    Route::get('/settings',             'ModulesController@settings')->name('settings');
+    Route::get('/staff_month',          'ModulesController@staff_month')->name('staff_month');
+    Route::get('/ticketing',            'ModulesController@ticketing')->name('ticketing');
+    Route::get('/users',                'ModulesController@users')->name('users');
     
     //Auto Redirect
     Route::get('/chats/{any}',              'ModulesController@chats')->where('any', '.*');
@@ -75,6 +76,7 @@ Route::group(['middleware' => ['auth', 'role:Staff', 'role:E-Services'],'namespa
     Route::get('/doctor/{any}',                             'ServiceController@medical')->where('any', '.*');
     Route::get('/radiologist/{any}',                        'ServiceController@radiologist')->where('any', '.*'); 
 });
+Auth::routes();
 Route::get('/{pathMatch}', function () {return view('app');})->where('pathMatch', '.*');
 
 

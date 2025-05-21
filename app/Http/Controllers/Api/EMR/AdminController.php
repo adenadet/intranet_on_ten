@@ -3,18 +3,79 @@
 namespace App\Http\Controllers\Api\EMR;
 
 use App\Http\Controllers\Controller;
-use App\Http\Traits\Eservice\AppointmentTrait;
+use App\Http\Traits\EService\AppointmentTrait;
 use App\Models\EMR\Appointment;
 use App\Models\EMR\Consultation;
+use App\Models\EMR\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
     use AppointmentTrait;
+
+    public function dashboard(){
+        $start_date = date('Y-m-d', strtotime(date('Y-m-01'). ' -1 MONTH'));
+        $end_date = date('Y-m-t', strtotime(date('Y-m-01'). ' -1 MONTH'));
+        return response()->json([
+            'all' => $this->appointment_admin_summary_report('all', $start_date, $end_date, false),
+            'child' => $this->appointment_admin_summary_report('child', $start_date, $end_date, false),
+            'missed' => $this->appointment_admin_summary_report('missed', $start_date, $end_date, false),
+            'postponed' => $this->appointment_admin_summary_report('postponed', $start_date, $end_date, false),
+            'reports' => $this->appointment_admin_summarized_report('all', $start_date, $end_date, false),
+            'sputum' => $this->appointment_admin_summary_report('sputum', $start_date, $end_date, false),
+            'started' => $this->appointment_admin_summary_report('started', $start_date, $end_date, false), 
+            'xray' => $this->appointment_admin_summary_report('xray', $start_date, $end_date, false),
+        ]);
+    }
+
     public function destroy($id)
     {
         
+    }
+
+    public function detailed_report(Request $request){
+        $this->validate($request, [
+            'report_type' => 'required',
+            'date' => 'required | date',
+        ]);
+
+        $appointments = [];
+        switch ( $request->input('report_type')){
+            case "all":
+                $appointments = Appointment::where('date', '=', $request->input('date'))
+                    ->where('status', '>', 1)
+                    ->orderBy('unique_id', 'ASC')
+                    ->with(['consultation', 'issuing_officer', 'laboratory', 'medical_officer', 'patient', 'radiologist', 'report.findings'])
+                    ->get();
+                break;
+            case "started":
+                $appointments = Appointment::where('date', '=', $request->input('date'))
+                    ->where('status', '>', 1)
+                    ->orderBy('unique_id', 'ASC')
+                    ->with(['consultation', 'issuing_officer', 'laboratory', 'medical_officer', 'patient', 'radiologist', 'report.findings'])
+                    ->get();
+                break;
+            case "completed":
+                $appointments = Appointment::where('date', '=', $request->input('date'))
+                    ->where('status', '=', 10)
+                    ->orderBy('unique_id', 'ASC')
+                    ->with(['consultation', 'issuing_officer', 'laboratory', 'medical_officer', 'patient', 'radiologist', 'report.findings'])
+                    ->get();
+                break;
+            case "missed":
+                $appointments = Appointment::where('date', '=', $request->input('date'))
+                    ->where('status', '=', 1)
+                    ->orderBy('unique_id', 'ASC')
+                    ->with(['consultation', 'issuing_officer', 'laboratory', 'medical_officer', 'patient', 'radiologist', 'report.findings'])
+                    ->get();
+                break;
+            default:
+                $appointment = [];
+        }
+        return response()->json([
+            'appointments' => $appointments,
+        ]);
     }
 
     public function home_office_report(Request $request){
@@ -32,6 +93,43 @@ class AdminController extends Controller
     public function index()
     {
         
+    }
+
+    public function radiologist_report(Request $request){
+        $this->validate($request, [
+            'report_type' => 'required',
+            'start_date' => 'required | date',
+            'end_date' => 'required | date',
+        ]);
+
+        switch ( $request->input('report_type')){
+            case "all":
+                $sub_query = Consultation::where('decision', '=', 6)->pluck('appointment_id');
+                break;
+            case "sputum":
+                $sub_query = Report::where('summary', '=', 'suggestive')->pluck('appointment_id');
+                break;
+            case "not suggestive":
+                $sub_query = Report::where('summary', '=', 'not suggestive')->pluck('appointment_id');
+                break;
+            case "normal":
+                $sub_query = Report::where('summary', '=', 'normal')->pluck('appointment_id');
+                break;
+        }
+
+        $appointments = Appointment::where('date', '>=', $request->input('start_date'))
+                        ->where('date', '<=', $request->input('end_date'))
+                        ->where('status', '>', 5)
+                        ->orderBy('unique_id', 'ASC')
+                        ->with(['consultation', 'laboratory', 'patient', 'radiologist', 'report.findings'])
+                        ->whereIn('id', $sub_query)
+                        ->get();
+                
+        
+
+        return response()->json([
+            'appointments' => $appointments,
+        ]);
     }
 
     public function store(Request $request)
@@ -106,90 +204,6 @@ class AdminController extends Controller
         return response()->json([
             'reports' => $reports,
             'report_type' => $request->input('report_type'),
-        ]);
-    }
-
-    public function detailed_report(Request $request){
-        $this->validate($request, [
-            'report_type' => 'required',
-            'date' => 'required | date',
-        ]);
-
-        $appointments = [];
-        switch ( $request->input('report_type')){
-            case "all":
-                $appointments = Appointment::select('emr_appointments.*',
-                    DB::raw('(select (CASE 
-                    WHEN emr_consultations.decision = 6 THEN "Xray" 
-                    WHEN emr_consultations.decision = 7 THEN "Sputum"
-                    WHEN emr_consultations.decision = 8 THEN "Kid under 11"
-                    WHEN emr_consultations.decision = 10 THEN "Postponed_or_cancelled"
-                    WHEN emr_consultations.decision IS NULL THEN "Missed_appointment"
-                    ELSE "Missed Appointment" END
-                    ) as decision 
-                    from emr_consultations where emr_consultations.appointment_id = emr_appointments.id  and emr_consultations.deleted_at IS NULL order by id asc limit 1) as decision') )
-                    ->where('date', '=', $request->input('date'))
-                    //->where('status', '>', 1)
-                    ->orderBy('unique_id', 'ASC')
-                    ->with(['medical_officer', 'radiologist', 'patient', 'laboratory', 'report', 'issuing_officer'])
-                    ->get();
-                break;
-            case "started":
-                $appointments = Appointment::select('emr_appointments.*',
-                    DB::raw('(select (CASE 
-                    WHEN emr_consultations.decision = 6 THEN "Xray" 
-                    WHEN emr_consultations.decision = 7 THEN "Sputum"
-                    WHEN emr_consultations.decision = 8 THEN "Kid under 11"
-                    WHEN emr_consultations.decision = 10 THEN "Postponed_or_cancelled"
-                    WHEN emr_consultations.decision IS NULL THEN "Missed_appointment"
-                    ELSE "Missed Appointment" END
-                    ) as decision 
-                    from emr_consultations where emr_consultations.appointment_id = emr_appointments.id  and emr_consultations.deleted_at IS NULL order by id asc limit 1) as decision') )
-                    ->where('date', '=', $request->input('date'))
-                    ->where('status', '>', 1)
-                    ->orderBy('unique_id', 'ASC')
-                    ->with(['medical_officer', 'radiologist', 'patient', 'laboratory', 'report', 'issuing_officer'])
-                    ->get();
-                break;
-            case "completed":
-                $appointments = Appointment::select('emr_appointments.*',
-                    DB::raw('(select (CASE 
-                    WHEN emr_consultations.decision = 6 THEN "Xray" 
-                    WHEN emr_consultations.decision = 7 THEN "Sputum"
-                    WHEN emr_consultations.decision = 8 THEN "Kid under 11"
-                    WHEN emr_consultations.decision = 10 THEN "Postponed_or_cancelled"
-                    WHEN emr_consultations.decision IS NULL THEN "Missed_appointment"
-                    ELSE "Missed Appointment" END
-                    ) as decision 
-                    from emr_consultations where emr_consultations.appointment_id = emr_appointments.id  and emr_consultations.deleted_at IS NULL order by id asc limit 1) as decision') )
-                    ->where('date', '=', $request->input('date'))
-                    ->where('status', '=', 10)
-                    ->orderBy('unique_id', 'ASC')
-                    ->with(['medical_officer', 'radiologist', 'patient', 'laboratory', 'report', 'issuing_officer'])
-                    ->get();
-                break;
-            case "missed":
-                $appointments = Appointment::select('emr_appointments.*',
-                    DB::raw('(select (CASE 
-                    WHEN emr_consultations.decision = 6 THEN "Xray" 
-                    WHEN emr_consultations.decision = 7 THEN "Sputum"
-                    WHEN emr_consultations.decision = 8 THEN "Kid under 11"
-                    WHEN emr_consultations.decision = 10 THEN "Postponed_or_cancelled"
-                    WHEN emr_consultations.decision IS NULL THEN "Missed_appointment"
-                    ELSE "Missed Appointment" END
-                    ) as decision 
-                    from emr_consultations where emr_consultations.appointment_id = emr_appointments.id  and emr_consultations.deleted_at IS NULL order by id asc limit 1) as decision') )
-                    ->where('date', '=', $request->input('date'))
-                    ->where('status', '=', 1)
-                    ->orderBy('unique_id', 'ASC')
-                    ->with(['medical_officer', 'radiologist', 'patient', 'laboratory', 'report', 'issuing_officer'])
-                    ->get();
-                break;
-            default:
-                $appointment = [];
-        }
-        return response()->json([
-            'appointments' => $appointments,
         ]);
     }
 }

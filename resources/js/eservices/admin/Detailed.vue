@@ -1,8 +1,8 @@
 <template>
 <section class="content-header">
     <div class="container-fluid">
-        <section class="card card-primary">
-            <div class="card-header">Report Query</div>
+        <section class="card">
+            <div class="card-header bg-navy">Report Query</div>
             <div class="card-body">
                 <div class="col-md-12">
                     <form @submit.prevent="searchAppointment()">
@@ -34,38 +34,91 @@
         </section>
         <div class="row">
             <div class="col-12">
-                <div class="card card-success">
-                    <div class="card-header"><h3 class="card-title">Report</h3></div>
+                <div class="card">
+                    <div class="card-header bg-navy"><h3 class="card-title">Report</h3></div>
                     <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
+                        <table class="table table-hover text-nowrap table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th>Date</th>
-                                    <th>Applicant</th>
-                                    <th>Consultant</th>
-                                    <th>Radiologist</th>
-                                    <th>Laboratory</th>
-                                    <th>Issuing Officer</th>
-                                    <th>Decision</th>
-                                    <th>Certificate Type</th>
-                                    <th></th>
+                                    <th>Applicant ID</th>
+                                    <th colspan=3>Examination Date</th>
+                                    <th>Chest X-Ray </th>
+                                    <th>CXR Result</th>
+                                    <th>Reason why CXR was not done?</th>
+                                    <th>Sputum Smear Result (1)</th>
+                                    <th>Sputum Smear Result (2)</th>
+                                    <th>Sputum Smear Result (3)</th>
+                                    <th>Sputum Culture Result (1)</th>
+                                    <th>Sputum Culture Result (2)</th>
+                                    <th>Sputum Culture Result (3)</th>
+                                    <th>Drug Sensitivity</th>
+                                    <th>Drug Sensitivity Test Details</th>
+                                    <th>Signs/Symptoms of TB</th>
+                                    <th>Contact to Person with TB</th>
+                                    <th>TB Suspected</th>
+                                    <th>TB Suspected based on</th>
+                                    <th>TB Confirmed</th>
+                                    <th>Treatment Started</th>
+                                    <th>Reason for certificate not issued</th>
+                                    <th>Certificate Number</th>
+                                    <th>Clinic Reference Number</th>
+                                    <th>Medical Certificate Issued</th>
+                                    <th colspan=3>Issue date of Certificate</th>
+                                    <th>Country of Screening</th>
+                                    <th>Name of Clinic</th>
+                                    <th>Screening Physician's X-Ray Coding</th>
+                                    <th>Comments from Screening Physician</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="appointments == null">
-                                <tr><td colspan="6" class="text-center">You have not made any appointments yet</td></tr>
+                            <tbody v-if="appointments.length == 0">
+                                <tr><td colspan="33" class="text-justify">You have not made any appointments yet</td></tr>
                             </tbody>
                             <tbody v-else>
                                 <tr v-for="(appointment, index) in appointments" :key="index">
-                                    <td>{{index | addOne}}</td>
-                                    <td>{{appointment.date | excelDate}}</td>
-                                    <td>{{appointment.patient_id != null && appointment.patient != null ? appointment.patient.first_name+' '+appointment.patient.middle_name+' '+appointment.patient.last_name:'Deleted User'}} <br /><small>{{appointment.unique_id}}</small></td>
-                                    <td>{{appointment.medical_officer != null ? appointment.medical_officer.first_name+' '+appointment.medical_officer.last_name: 'Not yet seen by consultant'}}</td>
-                                    <td>{{appointment.radiologist != null ? appointment.radiologist.first_name+' '+appointment.radiologist.last_name : 'No Xray was done'}}</td>
-                                    <td>{{appointment.laboratory != null ? appointment.laboratory.first_name+' '+appointment.laboratory.last_name : 'No Sputum Test was done'}}</td>
-                                    <td>{{appointment.issuing_officer != null ? 'Dr. '+appointment.issuing_officer.first_name+' '+appointment.issuing_officer.last_name : 'Not Yet Issued'}}</td>
-                                    <td>{{appointment.decision}}</td>
-                                    <td><span class="tag tag-success">{{appointment.issue_action == 'certificate' ? 'Certificate' :(appointment.issue_action == 'cert+ref' ? 'Certificate & Referral' :(appointment.issue_action == 'referral' ? 'Referral Only' :(appointment.issue_action == null ? 'Error/Not yet Issued' : 'Something Strange')))}}</span></td>
+                                    <td>{{ addOne(index)}}</td>
+                                    <td>{{ appointment.patient_id != null && appointment.patient != null ? appointment.patient.passport_no: 'Deleted User' }}</td>
+                                    <td>{{ dateDay(appointment.date)}}</td>
+                                    <td>{{ dateMonth(appointment.date)}}</td>
+                                    <td>{{ dateYear(appointment.date)}}</td>
+                                    <td>{{ appointment.consultation != null ? (appointment.consultation.decision == 6 ? 'Done' : 'Not Done') : 'No Consultation Done' }}</td>
+                                    <td>{{ appointment.consultation != null ? (appointment.consultation.decision == 6 ? (appointment.report != null ? (appointment.report.summary == 'normal' ? 'Normal' : (appointment.report.summary == 'not suggestive' ? 'Abnormal without TB' : 'Abnormal with TB')) : 'Pending'): 'N/A') : 'No Consultation Done' }}</td>
+                                    <td>{{ appointment.consultation != null ? (appointment.consultation.decision == 6 ? 'CXR Done' : (appointment.consultation.decision != 6 ? (appointment.consultation.decision == 7 ? 'Applicant Declined: Sputum Smear or Culture Done' : (appointment.consultation.decision == 8 ? 'Child < 11 years old' : 'Pregnant, CXR Deferred: Sputum Smear or Culture Not Done')) : 'Unknown')) : 'No Consultation Done' }}</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>{{ appointment.consultation != null ? (appointment.consultation.decision == 8 ? 'N/A' : (appointment.laboratory != null ? appointment.laboratory.summary : (appointment.report != null && appointment.report.summary != 'suggestive' ? 'N/A' : 'Pending')) ) : 'No Consultation Done' }}</td>
+                                    <td>{{ appointment.consultation != null ? (appointment.consultation.decision == 8 ? 'N/A' : (appointment.laboratory != null ? appointment.laboratory.summary : (appointment.report != null && appointment.report.summary != 'suggestive' ? 'N/A' : 'Pending')) ) : 'No Consultation Done' }}</td>
+                                    <td>{{ appointment.consultation != null ? (appointment.consultation.decision == 8 ? 'N/A' : (appointment.laboratory != null ? appointment.laboratory.summary : (appointment.report != null && appointment.report.summary != 'suggestive' ? 'N/A' : 'Pending')) ) : 'No Consultation Done' }}</td>
+                                    <td>{{ appointment.laboratory != null ? 'Sensitivity Not Done' : 'N/A'  }}</td>
+                                    <td>&nbsp;</td>
+                                    <td>{{ appointment.consultation != null && appointment.consultation.all_previous_tb ? 'Yes' : 'No' }}</td>
+                                    <td>{{ appointment.consultation != null && appointment.consultation.all_household_tb ? 'Yes' : 'No' }}</td>
+                                    <td>{{ appointment.consultation != null ? ( appointment.consultation.decision == 7 && !(appointment.consultation.women_pregnant) ? 'History/Examination' : ( appointment.report !=null && appointment.report.summary == 'suggestive' ? 'CXR' : 'N/A')) : 'No Consultation Done' }}</td>
+                                    <td>{{ appointment.consultation != null ? (appointment.consultation.decision == 7 && !(appointment.consultation.women_pregnant) ? 'History/Examination' : ( appointment.report !=null && appointment.report.summary == 'suggestive' ? 'CXR' : 'N/A')) : 'No Consultation Done' }}</td>
+                                    <td>{{ appointment.laboratory != null ?  (appointment.laboratory.summary == normal ? 'No'  :'Yes') : (
+                                        appointment.consultation.decision == 8 ? 'No' :
+                                        (((appointment.consultation.decision == 7) || (appointment.consultation.decision == 6 && appointment.report != null && appointment.report.summary == 'suggestive')) ? 'Pending' : 'No'))}}
+                                    </td>
+                                    <td>{{ appointment.laboratory != null && appointment.laboratory.summary != normal ? 'Unknown'  : 'N/A'}}</td>
+                                    <td>{{appointment.issuer != null ? 'N/A' : (
+                                        appointment.consultation.women_pregnant ? 'Pregnancy-related' : (
+                                        appointment.consultation.decision == 10 && !appointment.consultation.woman_pregnant ? 'Declined to participate in screening' : (    
+                                        appointment.report != null && appointment.report.summary == 'suggestive' && appointment.laboratory != null && appointment.laboratory.summary == 'suggestive' ? 'Referred for treatment' :
+                                        (appointment.report != null && appointment.report.summary == 'suggestive' && appointment.laboratory == null ? 'Pending Sputum Smear ot Sputum Culture' : 'Unknown')))
+                                    )}}</td>
+                                    <td>{{appointment.unique_id}}</td>
+                                    <td>&nbsp;</td>
+                                    <td>{{appointment.issuer != null ? 'Issued' : 'Not Issued'}}</td>
+                                    <td>{{ dateDay(appointment.issue_at)}}</td>
+                                    <td>{{ dateMonth(appointment.issue_at)}}</td>
+                                    <td>{{ dateYear(appointment.issue_at)}}</td>
+                                    <td>Nigeria</td>
+                                    <td>St. Nicholas Hospital</td>
+                                    <td v-if="appointment.report != null && appointment.report.findings.length > 0"><span v-for="finding in appointment.report.findings">{{ finding.code }} - {{ finding.name }}</span></td>
+                                    <td v-else>&nbsp;</td>
+                                    <td v-if="appointment.report != null && appointment.report.findings.length > 0"><div v-html="appointment.report.details"></div></td>
+                                    <td v-else>&nbsp;</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -87,33 +140,28 @@ export default {
             }),
         }
     },
-    mounted() {
-        //this.getInitials();
-        Fire.$on('refreshReport', response => {
-            this.refreshReport(response);
-        });
-    },
+    mounted() {},
     methods: {
         refreshAppointment(response) {
             this.appointments = response.data.appointments;
         },
         searchAppointment(){
-            this.$Progress.start();
+            this.loading = true;
             this.reportData.post('/api/emr/admin/detailed_report')
             .then(response => {
-                this.appointments = response.data.appointments;
-                //this.refreshAppointment(response);
-                this.$Progress.finish();
+                this.refreshAppointment(response);
+                this.loading = false;
             })
             .close(()=>{
-                Swal.fire({
+                this.$swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Something went wrong!',
                     footer: 'Please try again later!'
                     });
-                this.$Progress.fail();
-            });
+                this.loading = false;
+                }
+            );
         }
     },
 

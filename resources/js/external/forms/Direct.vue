@@ -12,7 +12,7 @@
     </div>
     <div class="card-header bg-navy">Schedule An Appointment</div>
     <div class="card-body">
-        <form class="overlay-wrapper" method="POST" @submit.prevent="processAppointment">
+        <!--form class="overlay-wrapper" method="POST"-->
             <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
             <alert-error :form="ApplicantData"></alert-error> 
             <div class="row">
@@ -28,7 +28,7 @@
                 <div class="col-md-4 col-sm-12">
                     <div class="form-group">
                         <label>Appointment Date</label>
-                        <input class="form-control" type="date" name="date" id="date" :min="today" v-model="ApplicantData.date" @change="searchSchedule()"/>
+                        <input class="form-control" type="date" name="date" id="date" :min="tomorrow" v-model="ApplicantData.date" @change="searchSchedule()"/>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-12">
@@ -144,8 +144,25 @@
                     </div>
                 </div>
             </div>
-            <paystack class="btn btn-primary" v-html="'PAY NGN '+ApplicantData.amount+' Online'" buttonClass="'btn btn-primary'" currency="NGN" :publicKey="PUBLIC_KEY" :email="ApplicantData.email" :amount="ApplicantData.amount*100" :reference="genRef()" :onSuccess="processAppointment" :onCancel="processAppointment" :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''"></paystack>
-        </form>
+            <NairafyButton type="button" class="btn btn-success mr-1" 
+            v-html="'PAY NGN '+ApplicantData.amount+' with Nairafy'" 
+            buttonClass="'btn btn-primary'" 
+            :amount="ApplicantData.amount"
+            :phone="(ApplicantData.phone).toString()" 
+            :first_name="ApplicantData.first_name" 
+            :last_name="ApplicantData.last_name" 
+            :product="'Unknown Product'" 
+            vendor_id="47c3ac1b-361c-488e-b8bb-0c56da0411df" 
+            :unique_id="genRef()"
+            :email="ApplicantData.email" 
+            :reference="genRef()" 
+            :onSuccess="nairafyAppointment" 
+            :onFail="nairafyErrorAppointment"
+            :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''" />
+            <!--NairafyButton type="button" class="btn btn-success mr-1" v-html="'PAY NGN '+ApplicantData.amount+' with Nairafy'" :businessId="alatKey" :phoneNumber="(ApplicantData.phone).toString()" :firstName="ApplicantData. first_name" :lastName="ApplicantData.last_name" :product="'Unknown Product'" 
+            :onTransaction="nairafyAppointment" :onFailure="nairafyErrorAppointment" :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''"/>            
+            <paystack type="button" class="btn btn-primary mr-5" v-html="'PAY NGN '+ApplicantData.amount+' with Paystack'" buttonClass="'btn btn-primary'" currency="NGN" :publicKey="PUBLIC_KEY" :email="ApplicantData.email" :amount="ApplicantData.amount*100" :reference="genRef()" :onSuccess="processAppointment" :onCancel="processErrorAppointment" :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''"></paystack>
+        </form-->
     </div>
     <div class="card-footer">
         Kindly note that terms 
@@ -154,6 +171,7 @@
 </template>
 <script>
 import paystack from 'vue3-paystack';
+import NairafyButton from '../../plugins/nairafy-button.vue';
 export default {
     components: {
         paystack
@@ -162,6 +180,7 @@ export default {
         return  {
             terms: 0,
             today: '',
+            tomorrow: '',
             PUBLIC_KEY: "pk_live_9e3c92567f7ad310ae7c28e248b8edb67ca2661a",
             amount: 0,
             loading: false,
@@ -194,6 +213,9 @@ export default {
                 payment_reference: '',
                 payment_transaction: '',
             }),
+            publicKey: "pk_live_c2fded4469321ca5e78eeb29437b0e0be724daf4", 
+            alatKey: "ecea8c7f-3663-44c9-455b-08dcf53d02a7",
+            alatProd: "f230b3d136b24599a8db7c01e8afd51b",
         }
     },
     mounted() {
@@ -236,13 +258,17 @@ export default {
             .then(response => {;
                 var today = new Date();
                 var dd = today.getDate();
-                var mm = today.getMonth()+1; 
+                var dt = dd + 1;
+                var mm = today.getMonth()+1;
+                 
                 var yyyy = today.getFullYear();
                 if(dd<10){dd='0'+dd;} 
+                if(dt<10){dt='0'+dt;} 
                 if(mm<10){mm='0'+mm;} 
                 today = yyyy+'-'+mm+'-'+dd;
-                console.log(today);
+                var tomorrow = yyyy+'-'+mm+'-'+dt;
             this.today = today;
+            this.tomorrow = tomorrow
             this.refreshScheduler(response)
             this.loading = false;
             })
@@ -261,11 +287,30 @@ export default {
             console.log(cast.getDay() === 6 || cast.getDay() === 0);
             return cast.getDay() === 6 || cast.getDay() === 0;
         },
+        nairafyAppointment(){
+            alert('Working');
+        },
+        nairafyErrorAppointment(){
+            alert('There is an error');
+        },
         refreshScheduler(response){
             this.services = response.data.services;
             this.nations = response.data.nations;
         },
         processAppointment(response){
+            if (response.message == "Approved"){
+                alert("Payment was successful");
+                this.ApplicantData.payment_method = "Paystack";
+                this.ApplicantData.payment_reference= response.reference;
+                this.ApplicantData.payment_transaction = response.transaction;
+
+                this.createApplicant();
+            }
+            else{
+                alert("Payment has to be made to confirm booking");
+            }
+        },
+        processErrorAppointment(response){
             if (response.message == "Approved"){
                 alert("Payment was successful");
                 this.ApplicantData.payment_method = "Paystack";

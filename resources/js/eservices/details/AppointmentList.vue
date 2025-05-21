@@ -48,7 +48,7 @@
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModals()"><span class="text-white" aria-hidden="true">&times;</span></button>
                         </div>
                         <div class="modal-body">
-                            <EServicePayment :appointment.sync="appointment" /> 
+                            <EServicePayment :appointment.sync="appointment" @refreshPatient="refreshAppointments" /> 
                         </div>
                     </div>
                 </div>
@@ -61,8 +61,8 @@
                     <button class="btn btn-sm btn-primary" @click="addAppointment" v-if="source == 'front_admin'"><i class="fa fa-calendar-plus"></i> Book Appointment</button>
                 </div>
             </div>
-            <div class="card-body table-responsive p-0">
-                <table class="table table-hover text-nowrap">
+            <div class="card-body table-responsive p-0" style="height: 600px;">
+                <table class="table table-hover table-head-fixed text-nowrap">
                     <thead>
                         <tr>
                             <th></th>
@@ -139,7 +139,7 @@ export default {
             user: {},
         }
     },
-    emits:[],
+    emits:['refreshAppointment'],
     mounted() {},
     methods: {
         addApplicant(){

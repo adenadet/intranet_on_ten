@@ -66,7 +66,7 @@
             </p>
         </div>
         <div class="col-1 mt-3">
-            {!! QrCode::size(50)->generate('https://intranet.saintnicholashospital.com/certificates/'.$appointment->id) !!}
+            {!! QrCode::size(50)->generate('https://intranet.saintnicholashospital.com/certificates/'.$appointment->id.'?f='.$appointment->patient->first_name.'&p='.$appointment->patient->passport_no) !!}
         </div>
     </div>
     @include('certificates.signature')

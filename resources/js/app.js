@@ -35,6 +35,18 @@ app.component(AlertError.name, AlertError)
 app.component(AlertErrors.name, AlertErrors)
 app.component(AlertSuccess.name, AlertSuccess)
 
+import Multiselect from 'vue-multiselect';
+app.component(Multiselect, Multiselect)
+
+/*import NairafyButtonPlugin from './plugins/alatpay-nairafy';
+app.use(NairafyButtonPlugin);*/
+
+//import NairafyButton from './plugins/nairafy-button.vue';
+//app.use(NairafyButton);
+
+import NairafyButton from 'vue-nairafy'
+app.use(NairafyButton);
+
 import Pagination from 'v-pagination-3';
 app.component('pagination', Pagination);
 
@@ -47,6 +59,11 @@ app.component('QuillEditor', QuillEditor);
 import { ModelListSelect } from 'vue-search-select';
 import "vue-search-select/dist/VueSearchSelect.css";
 app.component('ModelListSelect', ModelListSelect);
+
+//PDF Reader
+import PDFViewer from 'pdf-viewer-vue';
+app.component('PDFViewer', PDFViewer);
+
 //Signature Pad
 import VueSignaturePad from 'vue-signature-pad';
 app.use(VueSignaturePad);

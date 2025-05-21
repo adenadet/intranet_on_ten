@@ -13,7 +13,7 @@ use App\Models\State;
 use App\Models\User;
 
 use App\Models\EMR\Patient;
-use App\Models\HRMS\Employee;
+use App\Models\Hrms\Employee;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,9 +22,9 @@ use Spatie\Permission\Models\Role;
 
 trait UserTrait{
     use FileTrait, FileManagerTrait;
-
+    /*
     public function user_create_new_staff($request){
-        $user = $this->user_create_new_user($request, null);
+        $user = $this->user_create_new_user($request);
         $staff = Employee::create([
             'user_id' => $user->id,
             'supervisor_id' => $request->supervisor_id,
@@ -40,32 +40,31 @@ trait UserTrait{
             'updated_at' => auth('api')->id(),
         ]);
     }
-
-    public function user_create_new_user($request, $image_url){
-        $image_url = $this->file_upload_to_location($request->input('image'), 'image', 'img/profile', null);
-        $image_url = (!is_null($request->input('image'))) ? $this->file_upload($request->input('image'), 'image', 'img/profile/', null) : 'default.png';
+    */
+    public function user_create_new_user($data){
+        $image_url = (!is_null($data['image'])) ? $this->file_upload($data['image'], 'image', 'img/profile/', null) : 'default.png';
         $user = User::create([
-            'email' => $request['email'],
-            'first_name' => $request['first_name'],
-            'middle_name' => $request['middle_name'],
-            'last_name' => $request['last_name'],
-            'street' => $request['street'],
-            'street2' => $request['street2'],
-            'city' => $request['city'],
-            'state_id' => $request['state_id'],
-            'area_id' => $request['area_id'],
-            'personal_email' => $request['personal_email'],
-            'phone' => $request['phone'],
-            'alt_phone' => $request['alt_phone'],
-            'branch_id' => $request['branch_id'],
-            'department_id' => $request['department_id'],
-            'sex' => $request['sex'],
-            'dob' => $request['dob'],
+            'email' => $data['email'],
+            'first_name' => $data['first_name'],
+            'middle_name' => $data['middle_name'],
+            'last_name' => $data['last_name'],
+            'street' => $data['street'],
+            'street2' => $data['street2'],
+            'city' => $data['city'],
+            'state_id' => $data['state_id'],
+            'area_id' => $data['area_id'],
+            'personal_email' => $data['personal_email'],
+            'phone' => $data['phone'],
+            'alt_phone' => $data['alt_phone'],
+            'branch_id' => $data['branch_id'],
+            'department_id' => $data['department_id'],
+            'sex' => $data['sex'],
+            'dob' => $data['dob'],
             'image' => $image_url,
             'updated_at' => date('Y-m-d H:i:s'),
-            'joined_at' => $request['joined_at'],
-            'unique_id' => $request['unique_id'],
-            'password' => bcrypt('asdfasdf'),
+            'joined_at' => $data['joined_at'] ??  $data['date_of_joining'] ?? date('Y-m-d'),
+            'unique_id' => $data['username'] ?? $data['unique_id'],
+            'password' => password_hash('asdfasdf', PASSWORD_DEFAULT),
         ]);
         return $user;
     }

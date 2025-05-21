@@ -53,12 +53,15 @@
                                 </td>
                             </tr>
                         </tbody>
-                        <tbody>
+                        <tbody v-else>
                             <tr>
                                 <td colspan=6>No Leave Type has been created</td>
                             </tr>
                         </tbody>
                         </table>
+                    </div>
+                    <div class="card-footer">
+                        <pagination v-model="current_page" @paginate="getAllInitials" :per-page="leave_types.per_page != null ? leave_types.per_page : 52" :records="leave_types.total != null ? leave_types.total : 550" ></pagination>
                     </div>
                 </div>
             </div>
@@ -69,6 +72,7 @@
 export default {
     data(){
         return {
+            current_page: 1,
             editMode: false,
             form: new Form({}),
             leave_types: {},

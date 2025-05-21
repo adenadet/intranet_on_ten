@@ -28,20 +28,6 @@ return [
     'key' => env('APP_KEY'),
     'cipher' => 'AES-256-CBC',
     
-    'first_central_url' => "https://online.firstcentralcreditbureau.com/firstcentralrestv2",
-    'first_central_user' => "GLAZE-CREDITAPI",
-    'first_central_password' => "glazecredit@100&",
-    'first_central_url_test' => "https://uat.firstcentralcreditbureau.com/firstcentralrestv2",
-    'first_central_user_test' => "demo",
-    'first_central_password_test' => "demo@123",
-
-    'gemini_url' => 'https://glazecredit.geminiapp.net/service/Request.svc/api',
-    'gemini_strain' => 'yP5lnti7wDChJxwmBYz7dpbgbzGqQRG1dyvAZihesrA=',
-
-    'periculum_url' => 'https://api.insights-periculum.io',
-    'periculum_user' => 'insights-glazecredit-api',
-    'periculum_client_strain' => 'anewSQqfl9X1eMda4OUVGUHeqbm7bQ2X',
-    
     'maintenance' => [
         'driver' => 'file',
         // 'store' => 'redis',
@@ -55,11 +41,13 @@ return [
 
         Intervention\Image\ImageServiceProvider::class,
         //Kodegrenade\NaijaFaker\OtpServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
     ])->toArray(),
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Image' => Intervention\Image\Facades\Image::class,
         // 'NaijaFaker' => Kodegrenade\NaijaFaker\NaijaFaker::class,
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,

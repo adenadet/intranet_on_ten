@@ -71,6 +71,7 @@ export default {
             }),
         }
     },
+    emits:['refreshPayment'],
     mounted() {},
     methods:{
         makePayment(){

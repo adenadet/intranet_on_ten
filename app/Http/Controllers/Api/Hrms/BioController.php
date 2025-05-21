@@ -76,7 +76,7 @@ class BioController extends Controller
             'branches' => Branch::all(),
             'states' => State::where('country_id', 1)->get(),
             'nok' => NextOfKin::where('user_id', auth('api')->id())->get(),
-            ]);
+        ]);
     }
 
     public function show($id)

@@ -37,7 +37,6 @@
                         </form>
                     </div>
                 </div>
-                
             </div>
             <div class="col-md-12">
                 <div class="card">
@@ -200,6 +199,7 @@ export default {
     data() {
         return {
             appointments:[],
+            loading: false,
             reportData: new Form({
                 end_date: "",
                 report_type: "",
@@ -207,31 +207,26 @@ export default {
             }),
         }
     },
-    mounted() {
-        //this.getInitials();
-        Fire.$on('refreshReport', response => {
-            this.refreshReport(response);
-        });
-    },
+    mounted() {},
     methods: {
         refreshAppointment(response) {
             this.appointments = response.data.appointments;
         },
         searchAppointment(){
-            this.$Progress.start();
+            this.loading = true;
             this.reportData.post('/api/emr/admin/home_office_report')
             .then(response => {
                 this.appointments = response.data.appointments;
-                this.$Progress.finish();
+                this.loading = false;
             })
             .close(()=>{
-                Swal.fire({
+                this.$swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Something went wrong!',
                     footer: 'Please try again later!'
                     });
-                this.$Progress.fail();
+                this.loading = false;
             });
         }
     },

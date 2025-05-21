@@ -3,10 +3,10 @@
     <div class="row clearfix">
         <div class="col-lg-12">
             <div class="card">
-                <EServiceFormSearch  search_type="radiologist"/>
+                <EServiceFormSearch search_type="radiologist" @searchedAppointments="refresh"/>
                 <div class="card overlay-wrapper">
                     <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-                    <EServiceDetailAppointmentList source="radiologist" :appointments.sync="reports" />
+                    <EServiceDetailAppointmentList source="radiologist" :appointments.sync="reports" @refreshAppointments="getAllInitials(current_page)" />
                     <div class="card-footer">
                         <pagination v-model="current_page" @paginate="getAllInitials" :per-page="reports.per_page != null ? reports.per_page : 52" :records="reports.total != null ? reports.total : 550" ></pagination>
                     </div>
@@ -17,20 +17,6 @@
 </section>
 </template>
 <script>
-import Form from 'vform';
-import Swal from 'sweetalert2/dist/sweetalert2.js';
-import 'sweetalert2/src/sweetalert2.scss';
-const toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-    }
-});
 export default {
     data(){
         return {
@@ -40,9 +26,10 @@ export default {
         }
     },
     methods:{
-        getAllInitials(){
+        getAllInitials(page=1){
             this.loading = true;
-            axios.get('/api/emr/radiologists').then(response =>{
+            axios.get('/api/emr/radiologists?page='+page)
+            .then(response =>{
                 this.refresh(response);
                 this.loading = false;
                 this.$toast.fire({
@@ -60,6 +47,12 @@ export default {
         },
         refresh(response){
             this.reports = response.data.reports;
+        },
+        refreshAppointments(response) {
+            this.appointments = response.data.appointments;
+            this.services = response.data.services;
+            this.nations = response.data.nations;
+            this.patients = response.data.patients;
         },
     },
     mounted() {

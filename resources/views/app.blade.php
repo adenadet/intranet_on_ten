@@ -36,7 +36,7 @@
                 </div>
                 <div class="content">
                     <div class="row">
-                    @if (in_array($page_title,  ['Notice Board', 'E-Services | Administrator', 'E-Services | Front Admin', 'E-Services | Front Office', 'E-Services | Medical Officer', 'E-Services | Radiologist', 'Staff of the Month']))
+                    @if (in_array($page_title,  ['Notice Board', 'E-Services | Administrator', 'E-Services | Front Admin', 'E-Services | Front Office', 'E-Services | Medical Officer', 'E-Services | Radiologist', 'Policies', 'Staff of the Month' ]))
                         @if( $page_title == 'Notice Board')
                         <div class="col-md-3">
                             <div class="card">
@@ -47,6 +47,27 @@
                                         @if(Auth::user()->hasRole('Policy Admin') || Auth::user()->hasRole('Super Admin') || Auth::user()->can('policy_administer')) 
                                         <li class="nav-item">
                                             <router-link to="/notices/admin" class="nav-link"><i class="fas fa-cog"></i> Administrator</router-link>
+                                        </li>
+                                        @endif
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        @elseif( $page_title == 'Policies')
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-header bg-navy"><h3 class="card-title">Sub Menus</h3></div>
+                                <div class="card-body p-0">
+                                    <ul class="nav nav-pills flex-column">
+                                        <li class="nav-item">
+                                            <a href="/policies/departmental" class="nav-link"><i class="fa fa-file"></i> My Departmental Policies</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/policies/general" class="nav-link"><i class="fas fa-file-alt"></i> General Policies</a>
+                                        </li>
+                                        @if(Auth::user()->hasRole('Policy Admin') || Auth::user()->hasRole('Super Admin') || Auth::user()->can('policy_administer')) 
+                                        <li class="nav-item">
+                                            <a href="/policies/admin" class="nav-link"><i class="fas fa-cog"></i> Administrator</a>
                                         </li>
                                         @endif
                                     </ul>
@@ -81,9 +102,20 @@
                             @endif
                         </div>
                         @endif
+                        @if(isset($policy))
+                        <div class="col-md-9">
+                            <div class="card">
+                                <div class="card-header bg-navy"><h3 class="card-title">{{$policy->name}}</h3></div>
+                                <div class="card-body">
+                                    <iframe src="{{ asset($policy->file) }}" class="col-12" style="min-height: 1000px"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        @else
                         <div class="col-md-9 mt-0">
                             <router-view></router-view>
                         </div>
+                        @endif
                     @else
                     <div class="col-md-12">
                         <router-view></router-view>

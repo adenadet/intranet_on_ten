@@ -10,24 +10,26 @@ use Illuminate\Queue\SerializesModels;
 class RejectMail extends Mailable
 {
     use Queueable, SerializesModels;
+    
+    public $leave_request;
+    public $employee;
+    public $line_manager;
+    public $days;
 
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public $message;
+
+    public function __construct($leave_request, $employee, $line_manager, $days, $message)
     {
-        //
+        $this->leave_request = $leave_request;
+        $this->employee = $employee;
+        $this->line_manager = $line_manager;
+        $this->message = $message;
+        $this->days = $days;
     }
 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
     public function build()
     {
-        return $this->view('view.name');
+        return $this->subject('Leave Request Rejected')
+        ->view('mails.leaves.reject');
     }
 }

@@ -92,7 +92,6 @@ export default {
     },
     mounted() {
         this.getAllInitials();
-        //Fire.$on('reloadNotice', response =>{this.reset(response); console.log("Updated")});
     }   
 }
 </script>

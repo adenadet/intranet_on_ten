@@ -2,10 +2,11 @@ import {createRouter, createWebHistory} from 'vue-router';
 
 import DashboardMain        from '../dashboard/Main.vue';
 
-import EServiceAdminDashboard        from '../eservices/admin/Dashboard.vue';
-import EServiceAdminReportDetailed   from '../eservices/admin/Detailed.vue';
-import EServiceAdminReportHomeOffice from '../eservices/admin/HomeOffice.vue';
-import EServiceAdminReportSummary    from '../eservices/admin/Summary.vue';
+import EServiceAdminDashboard               from '../eservices/admin/Dashboard.vue';
+import EServiceAdminReportDetailed          from '../eservices/admin/Detailed.vue';
+import EServiceAdminReportHomeOffice        from '../eservices/admin/HomeOffice.vue';
+import EServiceAdminReportRadiologist       from '../eservices/admin/Radiologist.vue';
+import EServiceAdminReportSummary           from '../eservices/admin/Summary.vue';
 
 import EServiceCertificate           from '../eservices/certificates/Certificate.vue';
 import EServiceCertificateBioData    from '../eservices/certificates/BioData.vue';
@@ -46,19 +47,20 @@ import EServiceRadReport             from '../eservices/radiologist/Report.vue';
 import EServiceRadReports            from '../eservices/radiologist/Reports.vue';
 import EServiceRadReviews            from '../eservices/radiologist/Reviews.vue';
 
-    import EServiceDetailAppointment        from '../eservices/details/Appointment.vue';
-    import EServiceDetailAppointmentList    from '../eservices/details/AppointmentList.vue';
-    import EServiceDetailIssueView          from '../eservices/details/IssueView.vue';
-    import EServiceDetailPaymentList        from '../eservices/details/PaymentList.vue';
-    import EServiceDetailReferral           from '../eservices/details/Referral.vue';
-    import EServiceDetailReport             from '../eservices/details/Report.vue';
+    import EServiceDetailAppointment            from '../eservices/details/Appointment.vue';
+    import EServiceDetailAppointmentList        from '../eservices/details/AppointmentList.vue';
+    import EServiceDetailIssueView              from '../eservices/details/IssueView.vue';
+    import EServiceDetailPaymentList            from '../eservices/details/PaymentList.vue';
+    import EServiceDetailReferral               from '../eservices/details/Referral.vue';
+    import EServiceDetailReport                 from '../eservices/details/Report.vue';
 
-    import EServiceFormAppointment      from '../eservices/forms/Appointment.vue';
-    import EServiceFormArrival          from '../eservices/forms/Arrival.vue';
-    import EServiceFormPatient          from '../eservices/forms/Patient.vue';
-    import EServiceFormPayment          from '../eservices/forms/Payment.vue';
-    import EServiceFormReport           from '../eservices/forms/Report.vue';
-    import EServiceFormSearch           from '../eservices/forms/Search.vue';
+    import EServiceFormAppointment              from '../eservices/forms/Appointment.vue';
+    import EServiceFormArrival                  from '../eservices/forms/Arrival.vue';
+    import EServiceFormLabReportImport          from '../eservices/forms/LabReportImport.vue';
+    import EServiceFormPatient                  from '../eservices/forms/Patient.vue';
+    import EServiceFormPayment                  from '../eservices/forms/Payment.vue';
+    import EServiceFormReport                   from '../eservices/forms/Report.vue';
+    import EServiceFormSearch                   from '../eservices/forms/Search.vue';
 
     import EServiceDocFormConsent              from '../eservices/doctor/forms/Consent.vue';
     import EServiceDocFormConsentPad           from '../eservices/doctor/forms/ConsentPad.vue';
@@ -72,20 +74,41 @@ import ExternalDone                         from '../external/Done.vue';
     import ExternalFormDirect                   from '../external/forms/Direct.vue';
     import ExternalFormReschedule               from '../external/forms/Reschedule.vue';
 
+import HrmsDesignations                 from '../hrms/Designations.vue';
 import HrmsEmployee                     from '../hrms/Employee.vue';
+import HrmsEmployeeContact              from '../hrms/EmployeeContact.vue';
 import HrmsEmployees                    from '../hrms/Employees.vue';
+import HrmsLeaveAllowanceMine           from '../hrms/leaves/AllowanceMine.vue';
+import HrmsLeaveAllowances              from '../hrms/leaves/Allowances.vue';
 import HrmsLeaveRequest                 from '../hrms/leaves/Request.vue';
-import HrmsLeaveRequestAdmin            from '../hrms/leaves/RequestAdmin.vue';
 import HrmsLeaveRequests                from '../hrms/leaves/Requests.vue';
+import HrmsLeaveRequestsAdmin           from '../hrms/leaves/RequestsAdmin.vue';
+import HrmsLeaveRequestsTeam            from '../hrms/leaves/RequestsTeam.vue';
 import HrmsLeaveType                    from '../hrms/leaves/Type.vue';
 import HrmsLeaveTypes                   from '../hrms/leaves/Types.vue';
-    
-    import HrmsDetailAssignedEmployeeLeaveType  from '../hrms/details/AssignedEmployeeLeaveType.vue';     
-    import HrmsDetailEmployee                   from '../hrms/details/Employee.vue';
-    import HrmsDetailLeaveRequest               from '../hrms/details/LeaveRequest.vue';
-    import HrmsDetailLeaveRequestList           from '../hrms/details/LeaveRequestList.vue';       
+import HrmsLeaveUserLeaveTypes          from '../hrms/leaves/UserLeaveTypes.vue';
 
+    import HrmsDetailAssignedEmployeeLeaveType  from '../hrms/details/AssignedEmployeeLeaveType.vue';
+    import HrmsDetailDesignation                from '../hrms/details/Designation.vue';
+    import HrmsDetailEmployee                   from '../hrms/details/Employee.vue';
+    import HrmsDetailEmployeeLeaveType          from '../hrms/details/EmployeeLeaveType.vue';
+    import HrmsDetailEmployeeList               from '../hrms/details/EmployeeList.vue';
+    import HrmsDetailLeaveRequest               from '../hrms/details/LeaveRequest.vue';
+    import HrmsDetailLeaveRequestList           from '../hrms/details/LeaveRequestList.vue';
+    import HrmsDetailLeaveAllowanceList         from '../hrms/details/LeaveAllowanceList.vue';         
+
+    import HrmsFormAssignLeaveTypeMultipleEmployee from '../hrms/forms/LeaveTypeAssignMultipleEmployee.vue';  
+    import HrmsFormDesignation                  from '../hrms/forms/Designation.vue';
+    import HrmsFormEmployee                     from '../hrms/forms/Employee.vue';
+    import HrmsFormEmployeeAssignManager        from '../hrms/forms/EmployeeAssignManager.vue';
+    import HrmsFormEmployeeImport               from '../hrms/forms/EmployeeImport.vue';
+    import HrmsFormEmployeeLeaveType            from '../hrms/forms/EmployeeLeaveType.vue';
+    import HrmsFormEmployeeStatus               from '../hrms/forms/EmployeeStatus.vue';
+    import HrmsFormLeaveAllowance               from '../hrms/forms/LeaveAllowance.vue';
+    import HrmsFormLeaveAllowanceConfirm        from '../hrms/forms/LeaveAllowanceConfirm.vue';
+    import HrmsFormLeaveRequestImport           from '../hrms/forms/LeaveRequestImport.vue';
     import HrmsFormLeaveRequest                 from '../hrms/forms/LeaveRequest.vue';
+    import HrmsFormLeaveRequestConfirm          from '../hrms/forms/LeaveRequestConfirm.vue';
     import HrmsFormLeaveType                    from '../hrms/forms/LeaveType.vue';
 
 import NoticeAdmin                  from '../notices/Admin.vue';
@@ -96,6 +119,15 @@ import NoticeSingle                 from '../notices/Single.vue';
     import NoticeDetailList             from '../notices/details/List.vue';    
 
     import NoticeForm    from '../notices/forms/New.vue';
+
+import PoliciesAdmin                from '../policies/Admin.vue';
+import PoliciesDepartmental         from '../policies/Departmental.vue';
+import PoliciesGeneral              from '../policies/General.vue';
+import PoliciesSingle               from '../policies/Single.vue';
+
+    import PoliciesDetailList       from '../policies/details/List.vue';
+    import PoliciesFormAssign       from '../policies/forms/Assign.vue';
+    import PoliciesFormNew          from '../policies/forms/New.vue';
 
 import SOMAdmin             from '../som/Admin.vue';
 import SOMCloseNominations  from '../som/CloseNominations.vue';
@@ -153,16 +185,17 @@ import Error404 from '../general/errors/404.vue';
 import component from 'vue3-paystack';
 
 const routes = [
-    {path: '/',             component: DashboardMain},
-    {path: '/contacts',     component: UserContacts},
-    {path: '/contacts/:id', component: UserContact},
-    {path: '/dashboard',    component: DashboardMain},
+    {path: '/',                                             component: DashboardMain},
+    {path: '/contacts',                                     component: UserContacts},
+    {path: '/contacts/:id',                                 component: HrmsEmployeeContact},
+    {path: '/dashboard',                                    component: DashboardMain},
     
     //EServices
     {path: '/eservices/administrator',                      component:EServiceAdminDashboard},
     {path: '/eservices/administrator/dashboard',            component:EServiceAdminDashboard},
     {path: '/eservices/administrator/detailed_reports',     component:EServiceAdminReportDetailed},
     {path: '/eservices/administrator/home_office_reports',  component:EServiceAdminReportHomeOffice},
+    {path: '/eservices/administrator/radiologist_reports',  component:EServiceAdminReportRadiologist},
     {path: '/eservices/administrator/summary_reports',      component:EServiceAdminReportSummary},
     {path: '/eservices/administrator/dashboard',            component:EServiceAdminDashboard},
 
@@ -173,6 +206,7 @@ const routes = [
     {path: '/eservices/doctor/consultation/:id',            component:EServiceDocConsultation},
     {path: '/eservices/doctor/pending',                     component:EServiceDocPending},
     {path: '/eservices/doctor/reviews',                     component:EServiceDocReviews},
+    {path: '/eservices/doctor/upload_lab_reports',          component:EServiceFormLabReportImport},
     
     {path: '/eservices/front_admin',                        component:EServiceFrontAdminAppointments},
     {path: '/eservices/front_admin/applicants',             component:EServiceFrontAdminPatients},
@@ -199,15 +233,26 @@ const routes = [
     {path: '/home',                                         component: DashboardMain},
     
     //HRMS
+    {path: '/hrms/admin/designations',                      component: HrmsDesignations},
     {path: '/hrms/admin/employees',                         component: HrmsEmployees},
     {path: '/hrms/admin/employees/:id',                     component: HrmsEmployee},
-    {path: '/hrms/admin/leaves/requests',                   component: HrmsLeaveRequestAdmin},
+    {path: '/hrms/admin/leaves/requests',                   component: HrmsLeaveRequestsAdmin},
     {path: '/hrms/admin/leaves/types',                      component: HrmsLeaveTypes},
     {path: '/hrms/admin/leaves/types/:id',                  component: HrmsLeaveType},
+    {path: '/hrms/admin/leaves_allowances',                 component: HrmsLeaveAllowances},
 
-    {path: '/hrms/leaves/all_requests',                     component: HrmsLeaveRequestAdmin},
+    {path: '/hrms/leaves/allowances',                       component: HrmsLeaveAllowanceMine},
+    {path: '/hrms/leaves/all_requests',                     component: HrmsLeaveRequestsAdmin},
     {path: '/hrms/leaves/requests',                         component: HrmsLeaveRequests},
+    {path: '/hrms/leaves/team_requests',                    component: HrmsLeaveRequestsTeam},
     {path: '/hrms/leaves/types',                            component: HrmsLeaveTypes},
+    {path: '/hrms/leaves/types_assigned',                   component: HrmsLeaveUserLeaveTypes},
+
+    {path: '/policies',                                     component: PoliciesDepartmental},
+    {path: '/policies/admin',                               component: PoliciesAdmin},
+    {path: '/policies/departmental',                        component: PoliciesDepartmental},
+    {path: '/policies/general',                             component: PoliciesGeneral},
+    {path: '/policies/view/:id',                            component: PoliciesSingle},
     
     {path:'/profile',                                       component: UserProfile},
 
@@ -291,6 +336,7 @@ export function registerGlobalComponents(app) {
 
         app.component('EServiceFormAppointment',            EServiceFormAppointment);
         app.component('EServiceFormArrival',                EServiceFormArrival);
+        app.component('EServiceFormLabReportImport',        EServiceFormLabReportImport);
         app.component('EServiceFormPatient',                EServiceFormPatient);
         app.component('EServiceFormPayment',                EServiceFormPayment);
         app.component('EServiceFormReport',                 EServiceFormReport);
@@ -308,21 +354,42 @@ export function registerGlobalComponents(app) {
         app.component('ExternalFormDirect',             ExternalFormDirect);
         app.component('ExternalFormReschedule',         ExternalFormReschedule);
 
+    app.component('HrmsDesignations',           HrmsDesignations);
     app.component('HrmsEmployee',               HrmsEmployee);
+    app.component('HrmsEmployeeContact',        HrmsEmployeeContact);
     app.component('HrmsEmployees',              HrmsEmployees);
+    app.component('HrmsLeaveAllowanceMine',     HrmsLeaveAllowanceMine);
+    app.component('HrmsLeaveAllowances',        HrmsLeaveAllowances);
     app.component('HrmsLeaveRequest',           HrmsLeaveRequest);
-    app.component('HrmsLeaveRequestAdmin',      HrmsLeaveRequestAdmin);
     app.component('HrmsLeaveRequests',          HrmsLeaveRequests);
+    app.component('HrmsLeaveRequestsAdmin',     HrmsLeaveRequestsAdmin);
+    app.component('HrmsLeaveRequestsTeam',      HrmsLeaveRequestsTeam);
     app.component('HrmsLeaveType',              HrmsLeaveType);
     app.component('HrmsLeaveTypes',             HrmsLeaveTypes);
+    app.component('HrmsLeaveUserLeaveTypes',    HrmsLeaveUserLeaveTypes);
+    
         app.component('HrmsDetailAssignedEmployeeLeaveType', HrmsDetailAssignedEmployeeLeaveType);
+        app.component('HrmsDetailDesignation',              HrmsDetailDesignation);
         app.component('HrmsDetailEmployee',                 HrmsDetailEmployee);
+        app.component('HrmsDetailEmployeeLeaveType',        HrmsDetailEmployeeLeaveType);
+        app.component('HrmsDetailEmployeeList',             HrmsDetailEmployeeList);
+        app.component('HrmsDetailLeaveAllowanceList',       HrmsDetailLeaveAllowanceList);
         app.component('HrmsDetailLeaveRequest',             HrmsDetailLeaveRequest);
         app.component('HrmsDetailLeaveRequestList',         HrmsDetailLeaveRequestList);
 
+        app.component('HrmsFormAssignLeaveTypeMultipleEmployee', HrmsFormAssignLeaveTypeMultipleEmployee);
+        app.component('HrmsFormDesignation',                HrmsFormDesignation);
+        app.component('HrmsFormEmployee',                   HrmsFormEmployee);
+        app.component('HrmsFormEmployeeAssignManager',      HrmsFormEmployeeAssignManager);
+        app.component('HrmsFormEmployeeImport',             HrmsFormEmployeeImport);
+        app.component('HrmsFormEmployeeLeaveType',          HrmsFormEmployeeLeaveType);
+        app.component('HrmsFormEmployeeStatus',             HrmsFormEmployeeStatus);
+        app.component('HrmsFormLeaveAllowance',             HrmsFormLeaveAllowance);
+        app.component('HrmsFormLeaveAllowanceConfirm',      HrmsFormLeaveAllowanceConfirm);
         app.component('HrmsFormLeaveRequest',               HrmsFormLeaveRequest);
+        app.component('HrmsFormLeaveRequestConfirm',        HrmsFormLeaveRequestConfirm);
+        app.component('HrmsFormLeaveRequestImport',         HrmsFormLeaveRequestImport);
         app.component('HrmsFormLeaveType',                  HrmsFormLeaveType);
-
 
     app.component('NoticeAll',          NoticeAll);
     app.component('NoticeAdmin',        NoticeAdmin);
@@ -333,6 +400,15 @@ export function registerGlobalComponents(app) {
         
         app.component('NoticeForm',                 NoticeForm);        
 
+    app.component('PoliciesAdmin',          PoliciesAdmin);
+    app.component('PoliciesDepartmental',   PoliciesDepartmental);
+    app.component('PoliciesGeneral',        PoliciesGeneral);
+    app.component('PoliciesSingle',         PoliciesSingle);
+
+        app.component('PoliciesDetailList',     PoliciesDetailList);
+        app.component('PoliciesFormAssign',     PoliciesFormAssign);
+        app.component('PoliciesFormNew',        PoliciesFormNew);
+        
     app.component('SOMAdmin',               SOMAdmin);
     app.component('SOMCloseNominations',    SOMCloseNominations);
     app.component('SOMDetail',              SOMDetail);

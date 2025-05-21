@@ -3,7 +3,7 @@
         <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
         <EServiceFormSearch search_type="front_admin" @searchedAppointments="refreshAppointments"/>
         <div class="card">
-            <EServiceDetailAppointmentList source="front_admin" :appointments.sync="appointments" />
+            <EServiceDetailAppointmentList source="front_admin" :appointments.sync="appointments" @refreshAppointments="getAllInitials(current_page)" />
             <div class="card-footer">
                 <pagination v-model="current_page" @paginate="getAllInitials" :per-page="appointments.per_page != null ? appointments.per_page : 52" :records="appointments.total != null ? appointments.total : 550" >
                 </pagination>
@@ -12,8 +12,6 @@
     </section>
 </template>
 <script>
-import Swal from 'sweetalert2/dist/sweetalert2.js';
-import 'sweetalert2/src/sweetalert2.scss';
 export default {
     data() {
         return {
@@ -59,12 +57,12 @@ export default {
             this.$Progress.start();
             this.editMode = true;
             this.appointment = appointment;
-            Fire.$emit('AppointmentDataFill', this.appointment);
+            //this.$emit('AppointmentDataFill', this.appointment);
             $('#appointmentModal').modal('show');
             this.$Progress.finish();
         },
         resendAppointment(id){
-            Swal.fire({
+            this.$swal.fire({
                 title: 'Are you sure?',
                 text: "The candidate would get a mail with the confirmation letter",
                 icon: 'warning',
@@ -79,11 +77,11 @@ export default {
                     this.form.get('/api/emr/registrations/resend/'+id)
                     .then(response=>{
                         //if (response.data.status == 'error')
-                        Swal.fire(response.data.status, response.data.message, response.data.status);
+                        this.$swal.fire(response.data.status, response.data.message, response.data.status);
                         //this.refreshAppointments(response);   
                     })
                     .catch(()=>{
-                    Swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
+                        this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
                     });
                 }
             });
@@ -91,7 +89,6 @@ export default {
         viewPayment(appointment){
             this.appointment = appointment;
             $('#receiptModal').modal('show');
-            this.$Progress.finish();
         },
     },
     props: {}

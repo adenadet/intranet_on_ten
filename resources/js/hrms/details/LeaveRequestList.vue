@@ -1,14 +1,32 @@
 <template>
 <section class="p-0">
+    <div class="modal fade" id="confirmRequestFormModal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-navy">
+                    <h4 class="modal-title">Line Manager Decision</h4>
+                    <button type="button text-white" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-white"><i class="fa fa-times text-white"></i></span></button>
+                </div>
+                <div class="modal-body row">
+                    <div class="col-md-6">
+                        <HrmsDetailLeaveRequest :leave_request_id.sync="leave_request_id" :source="source" @refreshPage="refreshList"/>
+                    </div>
+                    <div class="col-md-6">
+                        <HrmsFormLeaveRequestConfirm :leave_request_id.sync="leave_request_id" @refreshPage="refreshList"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="requestFormModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-navy">
                     <h4 class="modal-title">Request Detail</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true text-white">&times;</span></button>
+                    <button type="button text-white" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-white"><i class="fa fa-times text-white"></i></span></button>
                 </div>
-                <div class="modal-body">
-                    <HrmsFormLeaveRequest :editMode.sync="editMode" :leave_request.sync="leave_request" :source="source" @refreshPage="refreshPage"/>
+                <div class="modal-body p-0">
+                    <HrmsFormLeaveRequest :editMode.sync="editMode" :leave_request.sync="leave_request" :source="source" @refreshPage="refreshList"/>
                 </div>
             </div>
         </div>
@@ -18,24 +36,17 @@
             <div class="modal-content">
                 <div class="modal-header bg-navy">
                     <h4 class="modal-title">Request Detail</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true text-white">&times;</span></button>
+                    <button type="button text-white" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-white">&times;</span></button>
                 </div>
                 <div class="modal-body p-0">
-                    <HrmsDetailLeaveRequest :leave_request_id.sync="leave_request_id" :source="source" />
+                    <HrmsDetailLeaveRequest :leave_request_id.sync="leave_request_id" :source="source" @refreshPage="refreshList"/>
                 </div>
             </div>
         </div>
     </div>
-    <div class="card-header bg-navy">
-        <h3 class="card-title">All Leave Requests</h3>
-        <div class="card-tools">
-            <button class="btn btn-sm btn-success" @click="requestLeave" v-if="source == 'mine'"><i class="fa fa-plus"></i> Request Leave</button>
-            <button class="btn btn-sm btn-primary" @click="addAppointment" v-if="source == 'front_admin'"><i class="fa fa-calendar-plus"></i> Book Appointment</button>
-        </div>
-    </div>
-    <div class="card-body table-responsive p-0">
-        <table class="table table-hover text-nowrap table-striped">
-            <thead class="bg-dark">
+    <div class="card-body table-responsive p-0" style="height: 600px;">
+        <table class="table table-hover table-head-fixed text-nowrap table-striped">
+            <thead>
                 <tr>
                     <th></th>
                     <th>Staff</th>
@@ -48,9 +59,7 @@
                 </tr>
             </thead>
             <tbody v-if="requests.data == null || requests == null">
-                <tr>
-                    <td colspan="8" class="text-center">You have not made any requests yet</td>
-                </tr>
+                <tr><td colspan="8" class="text-center">You have not made any requests yet</td></tr>
             </tbody>
             <tbody v-else>
                 <tr v-for="(request, index) in requests.data" :key="request.id">
@@ -60,18 +69,24 @@
                     <td>{{ExcelDate(request.from_date) }}</td>
                     <td>{{ExcelDate(request.to_date) }}</td>
                     <td>{{ExcelDate(request.updated_at) }}</td>
-                    <td>{{request.status == 0 ? 'Unapproved' : (request.status == 1 ? 'Approved' : (request.status == 2 ? 'Ongoing' :(request.status == 3 ? 'Completed ': 'Rejected')))}}</td>
+                    <td>{{request.status == 0 ? 'Unapproved' : (request.status == 1 ? (dateGreaterThanToday(request.start_date) ? 'Ongoing' : 'Approved') : (request.status == 2 ? (dateGreaterThanToday(request.to_date) ? 'Ongoing' : 'Completed') : (request.status == 3 ? 'Completed ': 'Rejected')))}}</td>
                     <td>
-                        <button class="nav-link btn btn-sm btn-default" data-toggle="dropdown" type="button">
-                            <i class="fa fa-ellipsis-v"></i>
+                        <button class="nav-link btn btn-sm btn-tool" data-toggle="dropdown" type="button">
+                            <i class="fa fa-ellipsis-v text-dark"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" v-if="source == 'admin'">
                             <button class="dropdown-item btn btn-block btn-sm" @click="viewRequest(request.id)"><i class="fa fa-eye mr-1 text-primary"></i> View request</button>
+                            <button class="dropdown-item btn btn-block btn-sm" @click="createAllowance(request)"><i class="fa fa-eye mr-1 text-warning"></i> Create Allowance request</button>
+                            <button v-if="request.status < 2" class="dropdown-item btn btn-block btn-sm" @click="confirmRequest(request)"><i class="fa fa-check mr-1 text-warning"></i> Confirm request</button>
                         </div>
                         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" v-if="source == 'mine'">
                             <button class="dropdown-item btn btn-block btn-sm" @click="viewRequest(request.id)"><i class="fa fa-eye mr-1 text-primary"></i> View request</button>
+                            <button v-if="request.status < 2 || request.status > 6" class="dropdown-item btn btn-block btn-sm" @click="editRequest(request)"><i class="fa fa-edit mr-1 text-warning"></i> Edit request</button>
                         </div>
-                        
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" v-if="source == 'team'">
+                            <button class="dropdown-item btn btn-block btn-sm" @click="viewRequest(request.id)"><i class="fa fa-eye mr-1 text-primary"></i> View request</button>
+                            <button v-if="request.status < 2" class="dropdown-item btn btn-block btn-sm" @click="confirmRequest(request)"><i class="fa fa-check mr-1 text-warning"></i> Confirm request</button>
+                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -90,16 +105,23 @@ export default {
             user: {},
         }
     },
+    emits:['refreshRequests'],
     mounted() {},
     methods: {
         closeModals(){
-            $('#appointmentModal').modal('hide');
-            $('#patientModal').modal('hide');
+            $('#confirmRequestFormModal').modal('hide');
+            $('#requestFormModal').modal('hide');
+            $('#requestModal').modal('hide');
             $('#applicantModal').modal('hide');
             $('#receiptModal').modal('hide');
         },
+        confirmRequest(request){
+            this.leave_request = request;
+            this.leave_request_id = request.id;
+            $('#confirmRequestFormModal').modal('show');
+        },
         deleteAppointment(id){
-            Swal.fire({
+            this.$swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
@@ -107,64 +129,30 @@ export default {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, delete it!'
-                })
+            })
             .then((result) => {
                 //Send Delete request
                 if(result.value){
                     this.form.delete('/api/emr/appointments/'+id)
-                    .then(response=>{
-                    Swal.fire('Deleted!', 'Appointment has been deleted.', 'success');
-                    this.refreshAppointments(response);   
-                    })
-                    .catch(()=>{
-                    Swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
-                    });
+                    .then(response=>{this.$swal.fire('Deleted!', 'Appointment has been deleted.', 'success');})
+                    .catch(()=>{this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});});
                 }
             });
         },
-        refreshPage(response){
-            this.getAllInitials();
+        editRequest(request){
+            this.leave_request = request;
+            this.editMode = true;
+            $('#requestFormModal').modal('show');
+        },
+        refreshList(){
+            this.closeModals();
+            this.$emit('refreshRequests');
+            $('#requestFormModal').modal('hide');
         },
         requestLeave(){
             this.leave_request = {};
             this.editMode = false;
             $('#requestFormModal').modal('show');
-        },
-        rescheduleAppointment(appointment) {
-            this.editMode = true;
-            this.appointment = appointment;
-            this.$emit('AppointmentDataFill', this.appointment);
-            $('#appointmentModal').modal('show');
-            this.loading = false;
-        },
-        resendAppointment(id){
-            this.$swal.fire({
-                title: 'Are you sure?',
-                text: "The candidate would get a mail with the confirmation letter",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, resend confirmation!'
-                })
-            .then((result) => {
-                //Send Delete request
-                if(result.value){
-                    this.form.get('/api/emr/registrations/resend/'+id)
-                    .then(response=>{
-                        //if (response.data.status == 'error')
-                        this.$swal.fire(response.data.status, response.data.message, response.data.status);
-                        //this.refreshAppointments(response);   
-                    })
-                    .catch(()=>{
-                    this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
-                    });
-                }
-            });
-        },
-        viewPayment(appointment){
-            this.appointment = appointment;
-            $('#receiptModal').modal('show');
         },
         viewRequest(id){
             this.leave_request_id = id;
@@ -177,9 +165,7 @@ export default {
     },
     watch:{
         source(){
-            if (source == 'mine'){
-
-            }
+            if (source == 'mine'){}
         }
     }
 }

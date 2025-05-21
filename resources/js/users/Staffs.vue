@@ -32,8 +32,18 @@
             <div class="card-header bg-dark">
                 <h3 class="card-title">Users</h3>
                 <div class="card-tools">
+                        <div class="input-group input-group" style="width: 400px;">
+                            <input type="text" name="table_search" class="form-control float-right" placeholder="Search" v-model="query">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary mr-1" @click="searchUser()"><i class="fas fa-search"></i></button>
+                                <button type="button" class="btn btn-primary ml-1" @click="addUser()"><i class="fa fa-user-plus"></i></button>
+                                <button type="button" class="btn btn-success ml-1" @click="uploadUsers()"><i class="fa fa-upload"></i></button>
+                            </div>
+                        </div>    
+                    </div>
+                <!--div class="card-tools">
                     <button class="btn btn-sm btn-primary float-sm-right" @click="addUser()">Add New User <i class="fa fa-user-add"></i></button>
-                </div>
+                </div-->
             </div>
             <div class="card-body overlay-wrapper">
                 <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
@@ -121,10 +131,9 @@ export default {
         closeModals(){
             $('#userModal').modal('hide'); 
             $('#roleModal').modal('hide');
-            //this.users = response.data.users;
         },
         deleteUser(id){
-            Swal.fire({
+            this.$swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
@@ -139,12 +148,12 @@ export default {
                     this.loading = true;
                     this.form.delete('/api/ums/staffs/'+id)
                     .then(response=>{
-                        Swal.fire('Deleted!', response.data.message, 'success');
+                        this.$swal.fire('Deleted!', response.data.message, 'success');
                         this.refreshPage(response);
                         this.loading = false;   
                     })
                     .catch(()=>{
-                        Swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
+                        this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
                     });
                 }
             });  
@@ -177,9 +186,11 @@ export default {
             this.closeModals();
         },
         searchUser(){
-            //let query = this.$parent.search;
-            axios.get('/api/ums/users/search?q='+query)
-            .then((response ) => {this.users = response.data.users;})
+            this.loading = true;
+            axios.get('/api/ums/users/search?q='+this.query)
+            .then((response ) => {this.users = response.data.users; this.loading = false;
+
+            })
             .catch(()=>{});
         },
         setUserRole(user){
@@ -188,20 +199,6 @@ export default {
             $('#roleModal').modal('show');
         },
     },
-    mounted(){ 
-        this.getAllInitials();
-        /*Fire.$on('searchInstance', ()=>{
-            let query = this.$parent.search;
-            axios.get('/api/ums/users/search?q='+query)
-            .then((response ) => {this.users = response.data.users;})
-            .catch(()=>{});
-        });
-        Fire.$on('userRoleReload', response =>{});
-        Fire.$on('Reload', response =>{
-            $('#userModal').modal('hide'); 
-            $('#roleModal').modal('hide');
-            this.users = response.data.users;
-        });*/
-    },
+    mounted(){this.getAllInitials();},
 }
 </script>

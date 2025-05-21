@@ -16,11 +16,14 @@ class ConfirmMail extends Mailable
     public $line_manager;
     public $days;
 
-    public function __construct($leave_request, $employee, $line_manager, $days)
+    public $message;
+
+    public function __construct($leave_request, $employee, $line_manager, $days, $message)
     {
         $this->leave_request = $leave_request;
         $this->employee = $employee;
         $this->line_manager = $line_manager;
+        $this->message = $message;
         $this->days = $days;
     }
 

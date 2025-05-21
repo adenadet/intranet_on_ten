@@ -40,7 +40,7 @@
                 <div class="card-body">
                     <div class="tab-content" id="custom-tabs-five-tabContent">
                         <div class="tab-pane fade show active p-0" id="assigned" role="tabpanel" aria-labelledby="assigned-tab">
-                            <HrmsDetailAssignedEmployeeLeaveType :leave_type_id="Number($route.params.id)"/>
+                            <HrmsDetailAssignedEmployeeLeaveType :leave_type_id.sync="Number($route.params.id)" :leave_type.sync="leave_type"/>
                         </div>
                         <div class="tab-pane fade" id="request" role="tabpanel" aria-labelledby="request-tab">
                             <div class="overlay-wrapper">

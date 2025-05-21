@@ -1,50 +1,45 @@
 <template>
-<section class="overlay-wrapper contain-fluid">
-    <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
+<section class="contain-fluid">
+    <div class="modal fade" id="uploadModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-navy">
+                    <h4 class="modal-title">Upload Employees </h4>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-white">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <HrmsFormEmployeeImport :editMode.sync="editMode" @refreshPage="refreshPage"/>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-12">
-            <div class="card p-0">
-                <div class="card-header bg-navy">All Employees</div>
-                <div class="card-body table-responsive p-0">
-                    <table class="table table-hover table-striped text-nowrap">
-                        <thead class="bg-dark">
-                            <tr>
-                                <th>Staff ID</th>
-                                <th>Name</th>
-                                <th>Department</th>
-                                <th>Designation</th>
-                                <th>Supervisor</th>
-                                <th>Line Manager</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="employee in employees.data" :key="employee.id">
-                                <td>SNH-{{ employee.employee_id }}</td>
-                                <td>{{ FullName(employee.user) }}</td>
-                                <td>{{ employee.department != null ? employee.department.name : "No Department" }}</td>
-                                <td>{{ employee.designation != null ? employee.designation.name : "No Designation" }}</td>
-                                <td>{{ employee.supervisor != null ? FullName(employee.supervisor.user) : 'No Supervisor Assigned Yet' }}</td>
-                                <td>{{ employee.line_manager != null ? FullName(employee.line_manager.user) : 'No Supervisor Assigned Yet'  }}</td>
-                                <td>{{ employee.employment_status != null ? 'Active' : 'Undefined' }}</td>
-                                <td>{{ ExcelDate(employee.date_of_joining) }} {{(employee.date_of_leaving != null && employee.date_of_joining != '') ? ' - '+ExcelDate(employee.date_of_leaving) : ' Till Now'  }}</td>
-                                <td>
-                                    <button class="nav-link btn btn-sm btn-default" data-toggle="dropdown" type="button">
-                                        <i class="fa fa-ellipsis-v"></i>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                                        <router-link :to="'/hrms/admin/employees/'+employee.id"><button class="dropdown-item btn btn-block btn-sm"><i class="fa fa-eye mr-1 text-primary"></i> View Employee</button></router-link>
-                                        <button class="dropdown-item btn btn-block btn-sm" @click="assignSupervisor(employee)"><i class="fa fa-user-tag mr-1 text-success"></i> Assign Supervisor/LM</button>
-                                        <button class="dropdown-item btn btn-block btn-sm" @click="modifyEmployee(employee)"><i class="fa fa-edit mr-1 text-success"></i> Update Record</button>
-                                        <button class="dropdown-item btn btn-block btn-sm" @click="deactivateEmployee(employee)"><i class="fa fa-trash mr-1 text-danger"></i> Delete Employee</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="card overlay-wrapper p-0">
+                <div class="card-header bg-navy">
+                    <h3 class="card-title">{{source == 0 ? 'Inactive' : (source == 1 ? 'Active' : (source == 2 ? 'Resigned' : (source == 3 ? 'Terminated' : (source == 4 ? 'Deceased' : (source == 5 ? 'Retired' : 'All')))))}} Employees</h3>
+                    <div class="card-tools">
+                        <div class="input-group input-group" style="width: 400px;">
+                            <input type="text" name="table_search" class="form-control float-right" placeholder="Search" v-model="query">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary mr-1" @click="searchEmployee"><i class="fas fa-search"></i></button>
+                                <select class="form-control" v-model="source" @change="getAllInitials(1)">
+                                    <option value="0">Inactive</option>
+                                    <option value="1">Active</option>
+                                    <option value="2">Resigned</option>
+                                    <option value="3">Terminated</option>
+                                    <option value="4">Deceased</option>
+                                    <option value="5">Retired</option>
+                                    <option value="all">All</option>
+                                </select>
+                                <button type="button" class="btn btn-primary ml-1" @click="addEmployee"><i class="fa fa-user-plus"></i></button>
+                                <button type="button" class="btn btn-success ml-1" @click="uploadEmployees"><i class="fa fa-upload"></i></button>
+                            </div>
+                        </div>    
+                    </div>
                 </div>
+                <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
+                <HrmsDetailEmployeeList :employees.sync="employees.data" :source="source" @refreshPage="getAllInitials(current_page)"/>
                 <div class="card-footer bg-navy">
                     <div class="col-12">
                         <pagination v-model="current_page" @paginate="getAllInitials" :per-page="employees.per_page != null ? employees.per_page : 52" :records="employees.total != null ? employees.total : 550" ></pagination>
@@ -56,52 +51,31 @@
 </section>
 </template>
 <script>
-import Form from 'vform';
-import Swal from 'sweetalert2/dist/sweetalert2.js';
-import 'sweetalert2/src/sweetalert2.scss';
-const toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-    }
-});
-
 export default {
     data(){
         return {
             current_page: 1,
-            areas:[],
-            branches:[],
-            departments:[],
             editMode: false,
+            employee:{},
             employees: {},
             form: new Form({}),
             loading: false,
             query: '',
-            savings:{},
-            states:[],
-            employee:{},
-            users:{},
+            source: '1',
         }
     },
     methods:{
-        addUser(){
+        addEmployee(){
             this.editMode = false;
-            this.user = {};
-            $('#userModal').modal('show');
+            this.employee = {};
+            $('#employeeModal').modal('show');
         },
         closeModals(){
-            $('#userModal').modal('hide'); 
+            $('#employeeModal').modal('hide'); 
             $('#roleModal').modal('hide');
-            //this.users = response.data.users;
         },
         deleteUser(id){
-            Swal.fire({
+            this.$swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
@@ -116,54 +90,35 @@ export default {
                     this.loading = true;
                     this.form.delete('/api/ums/staffs/'+id)
                     .then(response=>{
-                        Swal.fire('Deleted!', response.data.message, 'success');
+                        this.$swal.fire('Deleted!', response.data.message, 'success');
                         this.refreshPage(response);
                         this.loading = false;   
                     })
                     .catch(()=>{
-                        Swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
+                        this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
                     });
                 }
             });  
         },
-        editUser(user){
-            this.editMode = true;
-            this.user = user;
-            $('#userModal').modal('show');
-        },
         getAllInitials(page=1){
             this.loading = true
-            axios.get('/api/ums/staffs?page='+page).then(response =>{
+            axios.get('/api/hrms/employees?page='+page+'&source='+this.source).then(response =>{
                 this.refreshPage(response);
                 this.loading = false;
-                toast.fire({icon: 'success', title: 'Users loaded successfully',
-                });
             })
             .catch(()=>{
                 this.loading = false;
-                toast.fire({icon: 'error', title: 'Users not loaded successfully',})
+                this.$toast.fire({icon: 'error', title: 'Employees not loaded successfully',})
             });
         },
         refreshPage(response){
-            this.areas = response.data.areas;
-            this.branches = response.data.branches;
-            this.current_page = response.data.users.current_page;
-            this.departments = response.data.departments;
             this.employees = response.data.employees;
-            this.states = response.data.states;
-            this.users = response.data.users;
             this.closeModals();
         },
-        searchUser(){
-            //let query = this.$parent.search;
-            axios.get('/api/ums/users/search?q='+query)
-            .then((response ) => {this.users = response.data.users;})
+        searchEmployee(){
+            axios.get('/api/hrms/employees/search/'+this.query)
+            .then((response ) => {this.refreshPage(response);})
             .catch(()=>{});
-        },
-        setUserRole(user){
-            this.user = user;
-            this.editMode = true;
-            $('#roleModal').modal('show');
         },
     },
     mounted(){ 

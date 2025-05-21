@@ -72,7 +72,8 @@ class UserController extends Controller
     public function search()
     {
         if ($search = $_GET['q']){
-            $users = User::orderBy('first_name', 'ASC')->with('area')->with('state')->with('branch')->with('department')->where(function($query) use ($search){
+            $users = User::orderBy('first_name', 'ASC')->with(['area', 'branch', 'department', 'roles', 'state'])
+            ->where(function($query) use ($search){
                 $query->where('first_name', 'LIKE', "%$search%")
                 ->orWhere('middle_name', 'LIKE', "%$search%")
                 ->orWhere('last_name', 'LIKE', "%$search%")
@@ -80,7 +81,7 @@ class UserController extends Controller
                 })->paginate(52);
             }
         else{
-            $users = User::orderBy('first_name', 'ASC')->with('area')->with('state')->with('branch')->with('department')->paginate(52);
+            $users = User::orderBy('first_name', 'ASC')->with(['area', 'branch', 'department', 'roles', 'state'])->paginate(52);
         }
         
         return response()->json(['users' => $users,]);
@@ -218,23 +219,21 @@ class UserController extends Controller
             'area_id' => 'numeric',
             'phone' => 'numeric',
             'alt_phone' => 'nullable|numeric',
-            'branch_id' => 'required|numeric',
+            //'branch_id' => 'required|numeric',
             'sex' => 'required|string',
             'dob' => 'required|date',
         ]);
 
-        $user = $this->user_update_user($request, $id);
-
         return response()->json([
-            'areas' => Area::select('id', 'name')->where('state_id', 25)->orderBy('name', 'ASC')->get(),
-            'branches' => Branch::select('id', 'name')->orderBy('name', 'ASC')->get(),
-            'departments' => Department::select('id', 'name')->orderBy('name', 'ASC')->get(),
-            'nok' => NextOfKin::where('user_id', auth('api')->id())->get(),
-            'states' => State::orderBy('name', 'ASC')->get(),       
-            'users' => $this->user_get_all(),
-            'message' => 'Your password has been changed successfully',
-            'status' => 'success', 
-            'user' => $user,
+            //'areas' => Area::select('id', 'name')->where('state_id', 25)->orderBy('name', 'ASC')->get(),
+            //'branches' => Branch::select('id', 'name')->orderBy('name', 'ASC')->get(),
+            //'departments' => Department::select('id', 'name')->orderBy('name', 'ASC')->get(),
+            //'nok' => NextOfKin::where('user_id', auth('api')->id())->get(),
+            //'states' => State::orderBy('name', 'ASC')->get(),       
+            //'users' => $this->user_get_all(),
+            //'message' => 'Your password has been changed successfully',
+            //'status' => 'success', 
+            'user' => $this->user_update_user($request, $id),
         ]);
     }
 

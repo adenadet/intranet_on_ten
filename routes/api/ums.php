@@ -8,7 +8,7 @@ Route::group(['prefix'=>'ums'], function () {
     Route::post('/details', 'UserController@details')->name('user.details');
     Route::get('/profile/initials', 'ProfileController@initials')->name('profile.initials');
     Route::get('/roles/initials', 'RoleController@initials')->name('roles.initials');
-    Route::get('/staffs/latest', 'StaffCOntroller@latest')->name('staffs.latest');
+    Route::get('/staffs/latest', 'StaffController@latest')->name('staffs.latest');
     Route::get('/users/initials', 'UserController@initials')->name('users.initials');
     Route::post('/users/roles', 'UserController@roles')->name('users.roles');
     Route::get('/users/search', 'UserController@search')->name('users.search');

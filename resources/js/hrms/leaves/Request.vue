@@ -19,16 +19,15 @@ export default {
     },
     methods: {
         getAllInitials(page=1){
+            this.loading = true;
             axios.get('/api/hrms/leaves/requests/?type=mine&page='+page)
             .then(response => {
+                this.loading = false;
                 this.refreshConsultations(response)
             })
             .catch(() => {
-                this.$Progress.fail();
-                toast.fire({
-                    icon: 'error',
-                    title: 'Your consultations did not loaded successfully',
-                })
+                this.loading = false;
+                this.$toast.fire({icon: 'error', title: 'Your consultations did not loaded successfully',})
             });
         },
         refreshConsultations(response) {

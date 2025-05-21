@@ -29,20 +29,24 @@
                     <a href="#" class="nav-link"><i class="nav-icon fas fa-calendar-day"></i><p>Leave Management <i class="right fas fa-angle-left"></i></p></a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item"><a href="/hrms/leaves/requests" class="nav-link"><i class="fas fa-laptop-medical nav-icon"></i><p>My Requests</p></a></li>
-                        <li class="nav-item"><a href="/hrms/leaves/assigned" class="nav-link"><i class="fas fa-user-md nav-icon"></i><p>Assigned Leave Types</p></a></li>
+                        <li class="nav-item"><a href="/hrms/leaves/allowances" class="nav-link"><i class="fas fa-money-check nav-icon"></i><p>Allowances</p></a></li>
+                        <li class="nav-item"><a href="/hrms/leaves/types_assigned" class="nav-link"><i class="fas fa-user-md nav-icon"></i><p>Assigned Leave Types</p></a></li>
                         <li class="nav-item"><a href="/hrms/leaves/team_requests" class="nav-link"><i class="fa fa-users nav-icon"></i><p>Team Requests</p></a></li>
                     </ul>
                 </li>
                 @if(Auth::user()->hasRole('Super Admin') || Auth::user()->can('user_management') || Auth::user()->hasRole('Human Resource'))
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link"><i class="fa fa-cogs nav-icon"></i><p>Human Resources<i class="right fas fa-angle-left"></i></p></a>
+                    <a href="#" class="nav-link"><i class="fa fa-users-cog nav-icon"></i><p>Human Resources<i class="right fas fa-angle-left"></i></p></a>
                     <ul class="nav nav-treeview">
-                        <li class="nav-item"><a href="/hrms/admin/employees" class="nav-link"><i class="far fa-dot-circle nav-icon"></i><p>Employees</p></a></li>
-                        <li class="nav-item"><a href="/hrms/admin/leaves/types" class="nav-link"><i class="far fa-dot-circle nav-icon"></i><p>Leave Types</p></a></li>
-                        <li class="nav-item"><a href="/hrms/admin/leaves/requests" class="nav-link"><i class="far fa-dot-circle nav-icon"></i><p>All Requests</p></a></li>
+                        <li class="nav-item"><a href="/hrms/admin/designations" class="nav-link"><i class="fa fa-user-tag nav-icon"></i><p>Designations</p></a></li>
+                        <li class="nav-item"><a href="/hrms/admin/employees" class="nav-link"><i class="fa fa-users nav-icon"></i><p>Employees</p></a></li>
+                        <li class="nav-item"><a href="/hrms/admin/leaves/types" class="nav-link"><i class="fa fa-copy nav-icon"></i><p>Leave Types</p></a></li>
+                        <li class="nav-item"><a href="/hrms/admin/leaves/requests" class="nav-link"><i class="fa fa-file nav-icon"></i><p>All Requests</p></a></li>
+                        <li class="nav-item"><a href="/hrms/admin/leaves_allowances" class="nav-link"><i class="fa fa-money-check nav-icon"></i><p>Leave Allowances</p></a></li>
                     </ul>
                 </li>
                 @endif
+                <li class="nav-item"><a href="/policies" class="nav-link"><i class="nav-icon fas fa-file-contract"></i><p>Policies</p></a></li>
                 <li class="nav-item"><a href="/staff_month" class="nav-link"><i class="nav-icon fas fa-user-circle"></i><p>Staff of the Month</p></a></li>
                 <li class="nav-item"><a href="/ticketing" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Tickets</p></a></li>
                 <li class="nav-item"><a href="/notices" class="nav-link"><i class="nav-icon fas fa-clipboard"></i><p>Notices</p></a></li>

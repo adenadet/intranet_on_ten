@@ -92,7 +92,7 @@
                 </div>
             </div>
         </div>
-        <button @click="editUser()" type="submit" name="submit" class="submit btn btn-success">Submit</button>
+        <button @click="editUser()" type="submit" name="submit" class="submit btn btn-primary">Edit</button>
     </div>
 </div>
 </template>

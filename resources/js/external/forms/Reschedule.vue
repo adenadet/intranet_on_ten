@@ -64,6 +64,7 @@
                     </div>
                 </div>
             </div>
+            <AlatpayNairafyButton type="button" class="btn btn-success" v-html="'PAY NGN '+RescheduleData.amount+' with Nairafy'" buttonClass="'btn btn-primary'" :apiKey="alatProd" :businessId="alatKey" :firstName="RescheduleData. first_name" :lastName="RescheduleData.last_name" :product="'Unknown Product'" :onTransaction="nairafyAppointment" :onFailure="nairafyErrorAppointment" :email="RescheduleData.email" :amount="RescheduleData.amount" :reference="genRef()" :onSuccess="nairafyAppointment" :disabled="terms == 0 || RescheduleData.email == '' || RescheduleData.first_name == '' || RescheduleData.last_name == '' || RescheduleData.schedule == ''"/>
             <paystack class="btn btn-primary" v-html="'PAY NGN '+RescheduleData.amount+' Online'" buttonClass="'btn btn-primary'" currency="NGN" :publicKey="PUBLIC_KEY" :email="RescheduleData.email" :amount="RescheduleData.amount*100" :reference="genRef()" :onSuccess="processAppointment" :onCancel="processAppointment" :disabled="terms == 0 || RescheduleData.preferred_date == '' || RescheduleData.email == '' || RescheduleData.full_name == ''"></paystack>
         </form>
     </div>
@@ -91,8 +92,11 @@ export default {
             RescheduleData: new Form({
                 tracking_id: '', 
                 appointment_id:'',
+                phone: '07036568933',
+                first_name: '',
+                last_name: '',
                 email: 'adenadet01@gmail.com',
-                amount: '15000',
+                amount: 25000,
                 preferred_date:'', 
                 preferred_time: '',
                 amount: '',
@@ -158,6 +162,12 @@ export default {
             var cast = new Date(date)
             return cast.getDay() === 6 || cast.getDay() === 0;
         },
+        nairafyAppointment(){
+            alert('Working');
+        },
+        nairafyErrorAppointment(){
+            alert('There is an error');
+        },
         processAppointment(response){
             if (response.message == "Approved"){
                 this.$swal.fire({icon: 'success', title: 'Payment was been successful', showConfirmButton: false, timer: 1500});
@@ -191,6 +201,9 @@ export default {
                     else{
                         this.RescheduleData.details = this.appointment.patient.first_name+' '+this.appointment.patient.last_name+' | '+this.appointment.service.name+' scheduled for '+this.appointment.date;
                         this.RescheduleData.full_name = this.appointment.patient.first_name+' '+this.appointment.patient.last_name;
+                        this.RescheduleData.first_name = this.appointment.patient.first_name;
+                        this.RescheduleData.last_name = this.appointment.patient.last_name;
+                        this.RescheduleData.phone = this.appointment.patient.phone;
                         this.RescheduleData.email = Math.random().toString(36).substring(2,3)+this.appointment.patient.email
                         var dob = new Date(this.appointment.patient.dob);
                         var month_diff = Date.now() - dob.getTime();  

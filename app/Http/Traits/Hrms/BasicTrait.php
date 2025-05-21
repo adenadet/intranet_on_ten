@@ -5,13 +5,13 @@ namespace App\Http\Traits\Hrms;
 use App\Http\Traits\LogTrait;
 
 use DB;
-use App\Models\HRMS\AttendanceSummary;
-use App\Models\HRMS\Branch;
-use App\Models\HRMS\Employee;
-use App\Models\HRMS\EmployeeLeaveType;
-use App\Models\HRMS\Leave;
-use App\Models\HRMS\LeaveType;
-use App\Models\HRMS\OrganizationHierarchy;
+use App\Models\Hrms\AttendanceSummary;
+use App\Models\Hrms\Branch;
+use App\Models\Hrms\Employee;
+use App\Models\Hrms\EmployeeLeaveType;
+use App\Models\Hrms\Leave;
+use App\Models\Hrms\LeaveType;
+use App\Models\Hrms\OrganizationHierarchy;
 
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;

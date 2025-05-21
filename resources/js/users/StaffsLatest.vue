@@ -6,7 +6,7 @@
             <ul class="users-list clearfix">
                 <li v-for="user in staffs" :key="user.id">
                     <img style="height: 50px;" :src="(user.image) ? '/img/profile/'+user.image : '/img/profile/default.png'" :title="user.first_name+' '+user.last_name" :alt="user.first_name+' '+user.last_name">
-                    <a :href="'/contacts/staff/'+user.id" class="users-list-name">{{user.first_name+' '+user.last_name}}</a>
+                    <a :href="'/contacts/'+user.id" class="users-list-name">{{user.first_name+' '+user.last_name}}</a>
                     <span class="users-list-date">{{ExcelDateMonth(user.joined_at) }}</span>
                 </li>
             </ul>
@@ -17,20 +17,6 @@
     </div>
 </template>
 <script>
-import Form from 'vform';
-import Swal from 'sweetalert2/dist/sweetalert2.js';
-import 'sweetalert2/src/sweetalert2.scss';
-const toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-    }
-});
 export default {
     data(){
         return {
@@ -47,7 +33,7 @@ export default {
                 this.loading = false;
             })
             .catch(()=>{
-                toast.fire({icon: 'error', title: 'Staff not loaded successfully',});
+                this.$toast.fire({icon: 'error', title: 'Staff not loaded successfully',});
                 this.loading = false;
             });
         },

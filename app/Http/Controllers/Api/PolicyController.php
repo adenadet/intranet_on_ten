@@ -2,69 +2,72 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-use App\Models\Lms\Category;
+use App\Http\Traits\General\FileManagerTrait;
 use App\Models\Department;
 use App\Models\Policy\Policy;
 use App\Models\Policy\PolicyCategory;
 use App\Models\Policy\PolicyDepartment;
 
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 class PolicyController extends Controller
 {
+    use FileManagerTrait;
     public function index()
     {
         $policies = Policy::orderBy('name', 'ASC')->with(['depts.department', 'creator'])->paginate(25);
-        if ($search = \Request::get('query')){$policies = Policy::orderBy('name', 'ASC')->where('name', 'LIKE', "%$search%")->with(['depts.department', 'creator'])->paginate(25);}
-        else{$policies = Policy::orderBy('name', 'ASC')->with(['depts.department', 'creator'])->paginate(25);}
+        if ($search = $_GET['search']){
+            $policies = Policy::orderBy('name', 'ASC')->where('name', 'LIKE', "%$search%")->with(['depts.department', 'creator'])->paginate(25);
+        }
+        else{
+            $policies = Policy::orderBy('name', 'ASC')->with(['depts.department', 'creator'])->paginate(25);
+        }
         return response()->json([
             'policies'      => $policies,       
             'departments'   => Department::all(),       
         ]);
     }
 
+    public function initials()
+    {
+        return response()->json([
+            'departments'   => Department::select('id', 'name')->orderBy('name', 'ASC')->get(),       
+        ]);
+    }
+
     public function store(Request $request)
     {
-        $upload_path = "upload/policies";
-        if((is_null($request->file)) || ($request->file == "")){$file_type = null; $fileName = null;}
-        else{
-            $fileName = time().'.'.$request->file->getClientOriginalExtension();
-            $request->file->move(public_path($upload_path), $fileName);
-        }
-        if ($request->input('id') == null){
-            $data = json_decode($request->input('data'));
-            $policy = Policy::create([
-                'name' =>  $data->name,
-                'file' => $request->file !== null ? '/'.$upload_path.'/'.$fileName : NULL,
-                'category_id' => $data->category_id,
-                'description' => $data->description,
-                'created_by' =>  auth('api')->id(),
-                'updated_by' =>  auth('api')->id(),
-            ]);
-        }
-        else{
-            //Get what was sent back
-            $data = json_decode($request->input('data'));
-            
-            $policy = Policy::find($data->id);
-            $current_file = $policy->file; //Get current file location
-
-            //Update the Policy with new details
-            $policy->name = $data->name;
-            $policy->file = $request->file !== null ? '/'.$upload_path.'/'.$generated_new_name : $current_file;
-            $policy->category_id = $data->category_id;
-            $policy->description = $data->description;
-            $policy->updated_by =  auth('api')->id();
-        }
+        $fileName = (!is_null($request->input('file')))  ? "upload/policies/".$this->file_upload($request->input('file'), 'pdf', "upload/policies", 5) : null;
 
 
-        $policies = Policy::orderBy('name', 'ASC')->with('depts.department')->with('category')->with('creator')->paginate(25);
+        
+        $policy = Policy::create([
+            'name' =>  $request->input('name'),
+            'file' => $fileName ?? NULL,
+            'category_id' => $request->input('category_id'),
+            'description' => $request->input('description'),
+            'created_by' =>  auth('api')->id(),
+            'updated_by' =>  auth('api')->id(),
+        ]);
+
+        if (count($request->input('departments')) > 0){
+            foreach ($request->input('departments') as $department_id){
+                PolicyDepartment::create([
+                    'policy_id'     => $policy->id,
+                    'department_id' => $department_id,
+                    'created_by'    => auth('api')->id(),
+                ]);
+            }
+        }
+
+        $policies = Policy::orderBy('name', 'ASC')->with(['depts.department', 'creator'])->paginate(25);
 
         return response()->json([
-            'policies'      => $policies,       
-            'categories'    => Category::all(),       
-            'departments'   => Department::all(),       
+            'policies'      => $policies,           
         ]);
+
          
     }
 
@@ -87,7 +90,7 @@ class PolicyController extends Controller
             if (!in_array($pol_dept->department_id, $request->input('departments'))){
                 $q = 'DELETE FROM policy_departments where `policy_id` = '.$pol_dept->policy_id.' AND `department_id` = '.$pol_dept->department_id;
                 //echo $q;
-                \DB::delete($q);
+                DB::delete($q);
                 //$pol_dept->delete();
             }
         }
@@ -97,9 +100,7 @@ class PolicyController extends Controller
 
         return response()->json([
             'policies'      => $policies,       
-            'policy'        => $policy,       
-            'categories'    => Category::all(),       
-            'departments'   => Department::all(),       
+            'policy'        => $policy,           
         ]);
          
     }
@@ -108,7 +109,7 @@ class PolicyController extends Controller
     {
         if ($id=='departmental'){
             $policy_id = PolicyDepartment::where('department_id', '=', auth('api')->user()->department_id)->pluck('policy_id');
-            if ($search = \Request::get('query')){
+            if ($search = $_GET['query']){
                 $policies = Policy::whereIn('id', $policy_id)->where('name', 'LIKE', "%$search%")->with(['creator'])->orderBy('name', 'ASC')->paginate(25);
             }
             else{
@@ -116,22 +117,20 @@ class PolicyController extends Controller
             }
         }
         else if ($id=='general'){
-            if ($search = \Request::get('query')){$policies = Policy::where('category_id', '=', 0)->where('name', 'LIKE', "%$search%")->orderBy('name', 'ASC')->paginate(25);}
+            if ($search = $_GET['query']){$policies = Policy::where('category_id', '=', 0)->where('name', 'LIKE', "%$search%")->orderBy('name', 'ASC')->paginate(25);}
             else{$policies = Policy::where('category_id', '=', 0)->orderBy('name', 'ASC')->paginate(25);}
         }
 
         return response()->json([
             'view'          => $id,
             'policies'      => $policies,       
-            'categories'    => Category::all(),       
-            'departments'   => Department::all(),       
         ]);
     }
 
     public function search()
     {
-        if ($search = \Request::get('q')){
-            $policies = Policy::orderBy('name', 'ASC')->with('category')->with('state')->with('branch')->with('department')->where(function($query) use ($search){
+        if ($search = $_GET['search']){
+           $policies = Policy::orderBy('name', 'ASC')->with('category')->with('state')->with('branch')->with('department')->where(function($query) use ($search){
                 $query->where('name', 'LIKE', "%$search%");
                 })->paginate(52);
             }
@@ -149,33 +148,56 @@ class PolicyController extends Controller
 
     public function update(Request $request, $id)
     {
-        print_r($request->input());
-        
-        $policy = Policy::find($id);
+        DB::beginTransaction();
 
-        $current_file = $policy->file;
-        
-        if ($request->file != null){
-            $file_name = $request->file->getClientOriginalName();
-            $generated_new_name = time() . '.' . $request->file->getClientOriginalExtension();
-            $request->file->move($upload_path, $generated_new_name);
+        try{
+            $policy = Policy::find($id);
+
+            if (base64_decode($request->input('file'))){
+                $fileName = $this->file_upload($request->input('file'), 'pdf', "upload/policies", $id);
+                $fileName = "upload/policies/".$fileName;
+            }
+            else{
+                $fileName = $policy->file;
+            }
+            
+            $policy->name = $request->input('name');
+            $policy->file = $fileName;
+            $policy->category_id = $request->input('category_id');
+            $policy->description = $request->input('description');
+            $policy->updated_by =  auth('api')->id();
+
+            $policy->save();
+            //Add New Policy Department
+            foreach ($request->input('departments') as $department){
+                $policy_department = PolicyDepartment::where('policy_id', '=', $request->input('policy_id'))->where('department_id', '=', $department)->first();
+    
+                if ($policy_department === null){
+                    PolicyDepartment::create([
+                        'policy_id'     => $policy->id,
+                        'department_id' => $department,
+                        'created_by'    => auth('api')->id()
+                    ]);
+                }
+            }
+
+            //Remove Policy Departments that are no more in use
+            $policy_departments = PolicyDepartment::where('policy_id', '=', $request->input('policy_id'))->whereNotIn('department_id', $request->input('department_id'))->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'policies' => Policy::where('id', '=', $id)->with(['creator', 'departments.dept'])->first()
+            ], 200);
         }
+        catch(Exception $e){
+            DB::rollBack();
 
-        $pdf = array('pdf');
+            return response()->json([
+                'policies' => $e->getMessage()
+            ], 500);
+        }
         
-        $policy->name = $request->input('data.name');
-        $policy->file = $request->file !== null ? '/'.$upload_path.'/'.$generated_new_name : $current_file;
-        $policy->category_id = $request->input('data.category_id');
-        $policy->description = $request->input('data.description');
-        $policy->updated_by =  auth('api')->id();
-
-        $policy->save();
-
-        return response()->json([
-            'success' => 'You have successfully updated "' . $policy->name . '"',
-            'file' => $upload_path.'/'.$generated_new_name,
-            'file_type' => $file_type
-            ]);
     }
 
     public function destroy($id)
@@ -192,8 +214,6 @@ class PolicyController extends Controller
 
         return response()->json([
             'policies'      => $policies,       
-            'categories'    => Category::all(),       
-            'departments'   => Department::all(),       
         ]);
     }
 }

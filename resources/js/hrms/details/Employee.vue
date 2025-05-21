@@ -1,20 +1,18 @@
 <template>
 <section class="overlay-wrapper">
-    <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-    <div class="modal fade" id="BioDataModal">
+    <div class="modal fade" id="EmployeeModal">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header bg-navy">
-                    <h4 class="modal-title">{{editMode ? 'Update ': 'Create New '}} User</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" class="text-white">&times;</span></button>
+                    <h4 class="modal-title">{{editMode ? 'Update ': 'Create New '}} Employee</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-white">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <HrmsFormEmployee :user.sync="user" :editMode.sync="editMode" @Reload="closeModal"/>
+                    <HrmsFormEmployee :employee.sync="employee" :editMode.sync="editMode" @reloadUser="reloadPage"/>
                 </div>
             </div>
         </div>
     </div>
+    <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
@@ -43,7 +41,13 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label>Employment Status</label>
-                <div class="form-control">{{ (employee.employment_status != null) ? (employee.employment_status == 0 ? 'Inactive' : 'Active') : 'Undetermined'}}</div>
+                <div class="form-control">{{ (employee.employment_status != null) ? (employee.employment_status == 0 ? 'Inactive' : (employee.employment_status == 1 ? 'Active': (employee.employment_status == 2 ? 'Resigned': (employee.employment_status == 3 ? 'Terminated': (employee.employment_status == 4 ? 'Deceased': (employee.employment_status == 5 ? 'Retired': 'Undetermined')))))) : 'Undetermined' }}</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Email </label>
+                <div class="form-control">{{ employee.email}}</div>
             </div>
         </div>
         <div class="col-md-3">
@@ -61,7 +65,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <button class="btn btn-sm btn-primary" @click="editEmployee">Edit</button>
+            <button class="btn btn-sm btn-primary" @click="editEmployee"><i class="fa fa-edit mr-1"></i>Edit</button>
         </div>
     </div>
 </section>
@@ -75,26 +79,30 @@ export default {
             loading: false,
         }
     },
+    emits:['employeeReload'],
     mounted() {},
     methods: {
-        getInitials() {
-            this.loading = true;
-            axios.get('/api/hrms/leaves/'+this.leave_request_id+'?type='+this.source)
-            .then(response => {
-                this.leave_request = response.data.leave_request;
-                this.loading = false;
-            })
-            .catch(() => {
-                this.loading = false;
-                toast.fire({icon: 'error', title: 'Your appointments did not loaded successfully',})
-            });
+        closeModal(){
+            $('#EmployeeModal').modal('hide');
         },
+        editEmployee(){
+            this.loading = true;
+            this.editMode = true;
+            $('#EmployeeModal').modal('show');
+            this.loading = false;
+        },
+        reloadPage(){
+            this.$emit('reloadPage');
+        }
     },
     props: {
         employee: Object,
-        leave_request_id: Number,
         source: String,
     },
-    watch:{}
+    watch:{
+        employee(){
+
+        }
+    }
 }
 </script>

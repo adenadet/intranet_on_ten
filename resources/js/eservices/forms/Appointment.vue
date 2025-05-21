@@ -74,7 +74,7 @@ export default {
         }
     },
     emits:['refreshAppointment'],
-    mounted() {this.getAllInitials();},
+    mounted() {},
     methods:{
         codeAndNameAndDesc(item){
             return `${item.last_name}, ${item.first_name} ${item.middle_name}`
@@ -166,6 +166,7 @@ export default {
     },
     watch:{
         appointment(){
+            this.getAllInitials();
             this.appointmentData.fill(this.appointment);
         }
     }

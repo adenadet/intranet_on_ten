@@ -18,7 +18,7 @@ use App\Models\EMR\Payment;
 
 use App\Mail\RegistrationMail as RegMail;
 use App\Mail\RescheduleMail as ResMail;
-
+use Illuminate\Support\Facades\Mail;
 
 class RegistrationController extends Controller
 {
@@ -88,7 +88,7 @@ class RegistrationController extends Controller
 
         $dayOfWeek = date('w', strtotime($request->input('date')));
         if ($dayOfWeek != 0 || $dayOfWeek != 6) {
-            \Mail::to($patient->email)->send(new RegMail($consultation));
+            Mail::to($patient->email)->send(new RegMail($consultation));
             return response()->json([
                 'areas' => Area::select('id', 'name')->where('state_id', 25)->orderBy('name', 'ASC')->get(),
                 'services' => Service::orderBy('name', 'ASC')->get(),
@@ -99,10 +99,10 @@ class RegistrationController extends Controller
 
         $image_url = $currentPhoto = null;
         $passport_image_url = $currentPassportPhoto = null;
-
+        /*
         if (($request['image'] != $currentPhoto) && ($request['image'] != '')){
             $image = $request['id']."-".time().".".explode('/',explode(':', substr( $request['image'], 0, strpos($request['image'], ';')))[1])[1];
-            \Image::make($request['image'])->save(public_path('img/applicants/').$image);
+            Image::make($request['image'])->save(public_path('img/applicants/').$image);
             $image_url = $image;
             $old_image = public_path('img/applicants/').$currentPhoto;
 
@@ -111,12 +111,12 @@ class RegistrationController extends Controller
 
         if (($request['passport_image'] != $currentPhoto) && ($request['passport_image'] != '')){
             $image = $request['id']."-".time().".".explode('/',explode(':', substr( $request['passport_image'], 0, strpos($request['passport_image'], ';')))[1])[1];
-            \Image::make($request['passport_image'])->save(public_path('img/passports/').$image);
+            Image::make($request['passport_image'])->save(public_path('img/passports/').$image);
             $old_image = public_path('img/passports/').$currentPassportPhoto;
 
             if (file_exists($old_image)){ @unlink($old_image); }
         }
-
+        */
         $patient->image = $image_url;
         
         $patient->save();
@@ -131,6 +131,7 @@ class RegistrationController extends Controller
 
     public function show($id)
     {
+        //echo $id;
         return response()->json([
             'appointment' => Appointment::where('transaction_id', '=', $id)->where('status', '=', 1)->with(['service', 'patient', 'payment'])->first(),
         ]);
@@ -153,7 +154,7 @@ class RegistrationController extends Controller
 
         $consultation = Appointment::where('id', '=', $appointment->id)->with(['service', 'patient', 'payment'])->first();
 
-        \Mail::to($appointment->patient->email)->send(new ResMail($consultation));
+        Mail::to($appointment->patient->email)->send(new ResMail($consultation));
 
         return response()->json([
             'appointment' => Appointment::where('transaction_id', '=', $id)->with(['service', 'patient', 'payment'])->first(),
@@ -188,7 +189,7 @@ class RegistrationController extends Controller
                 'status' => 'error',
             ]);
         }
-        \Mail::to($consultation->patient->email)->send(new RegMail($consultation));
+        Mail::to($consultation->patient->email)->send(new RegMail($consultation));
         return response()->json([
             'message' => 'Mail has been resent successfully',
             'status' => 'success',
@@ -196,12 +197,12 @@ class RegistrationController extends Controller
     }
     public function schedules()
     {
-      	$date = \Request::get('date');
-      	$public_holidays = ['2023-01-02', '2023-06-28', '2023-06-29', '2023-06-30', '2023-07-19', '2023-10-02', '2023-09-23', '2023-09-23', '2023-12-24', '2023-12-25', '2023-12-26', '2023-12-27'];
+      	$date = $_GET['date'];
+      	$public_holidays = ['2023-01-02', '2023-06-28', '2023-06-29', '2023-06-30', '2023-07-19', '2023-10-02', '2023-09-23', '2023-09-23', '2023-12-24', '2023-12-25', '2023-12-26', '2023-12-27', '2025-03-31', '2025-04-01'];
         if (in_array($date, $public_holidays)){
         	$schedules = [];
         }
-        else if (($date = \Request::get('date')) && ($service_id = \Request::get('service_id'))){
+        else if (($date = $_GET['date']) && ($service_id = $_GET['service_id'])){
             $taken = Appointment::select('schedule')->where([['date', '=', $date]])->get();
             $schedules = Schedule::select('schedule')->where('service_id', '=', $service_id)->whereNotIn('schedule', $taken)->get();
             }

@@ -21,12 +21,24 @@ export const globalMethods = {
             return  '₦ '+val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         },
         dateDay(text) {
+            if(text == null){return '';}
             return moment(text).format('DD');
         },
+        dateGreaterThanToday(text){
+            var test_date = new Date(text);
+            var today = new Date();
+            today.setHours(0,0,0,0);
+            return (test_date >= today);
+        },
         dateMonth(text) {
+            if(text == null){return '';}
             return moment(text).format('MM');
         },
+        dateToday(){
+            return new Date().toJSON().slice(0, 10);
+        },
         dateYear(text) {
+            if(text == null){return '';}
             return moment(text).format('YYYY');
         },
         ExcelDate(text) {
@@ -88,11 +100,41 @@ export const globalMethods = {
         shortDate(text) {
             return moment(text).format('MMM Do, YY');
         },
-        timeDifference(start, end, format){
-            var timeBegin = moment(start);
+        timeDifference(start, end, format, category = 'Calendar') {
+            /*var timeBegin = moment(start);
             var timeEnd = moment(end);
 
-            return timeEnd.diff(timeBegin, format)+' '+format;
+            return (timeEnd.diff(timeBegin, format) - 1)+' '+format;*/
+            if (start == null || end == null ){
+                return 0+' '+format;
+            }
+            else if (start == end){
+                return 1+' '+format;
+            }
+            else{
+                let date1 = new Date(start);
+                let date2 = new Date(end);
+                //var leave_type = this.leave_types.find(obj => obj.id === this.leaveRequestData.leave_type_id);
+                //if (leave_type == null || leave_type == undefined){ return 0;}
+                //else{
+                if (category == "Calendar"){
+                    let Difference_In_Time = date2.getTime() - date1.getTime();
+                    let Difference_In_Days = Math.round(Difference_In_Time / (1000 * 3600 * 24));
+                    Difference_In_Days = Difference_In_Days+1;
+                    return Difference_In_Days+' '+format;
+                }
+                else if(category == "Working"){
+                    var day;
+                    var current = date1;
+                    var totalBusinessDays = 0;
+                    while (current <= date2) {
+                        day = current.getDay();
+                        if (day >= 1 && day <= 5) {++totalBusinessDays;}
+                        current.setDate(current.getDate() + 1);
+                    }
+                    return totalBusinessDays+''+format;
+                }
+            }
         },
         treatFont(text) {
             let story = text.replaceAll("font-size: 1rem", "font-size: 2rem");

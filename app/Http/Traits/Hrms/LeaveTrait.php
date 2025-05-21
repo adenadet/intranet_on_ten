@@ -4,21 +4,26 @@ namespace App\Http\Traits\Hrms;
 
 use App\Http\Traits\General\LogTrait;
 use App\Http\Traits\General\FileManagerTrait;
-
-use App\Models\HRMS\AttendanceSummary;
+use App\Http\Traits\Hrms\LeaveAllowanceTrait;
+use App\Models\Hrms\AttendanceSummary;
 use App\Models\Branch;
-use App\Models\HRMS\Employee;
-use App\Models\HRMS\EmployeeLeaveType;
-use App\Models\HRMS\PublicHoliday;
-use App\Models\HRMS\LeaveRequest;
-use App\Models\HRMS\LeaveType;
-use App\Models\HRMS\OrganizationHierarchy;
+use App\Models\Hrms\Employee;
+use App\Models\Hrms\EmployeeLeaveType;
+use App\Models\Hrms\PublicHoliday;
+use App\Models\Hrms\LeaveRequest;
+use App\Models\Hrms\LeaveType;
+use App\Models\Hrms\OrganizationHierarchy;
 
 use App\Mail\AdminApplyLeaveMail;
 use App\Mail\ApplyLeaveMail;
+use App\Mail\Leave\ConfirmMail;
+use App\Mail\Leave\RejectMail;
 use App\Mail\Leave\RequestMail;
+use App\Mail\Leave\SupervisorConfirmMail;
+use App\Mail\Leave\SupervisorInfoMail;
 use App\Mail\LeaveStatusMail;
 
+use App\Notifications\Leave\Created;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use DateTime;
@@ -29,7 +34,12 @@ use Illuminate\Support\Facades\Mail;
 use Session;
 
 trait LeaveTrait{
-    use FileManagerTrait, LogTrait;
+    use FileManagerTrait, LeaveAllowanceTrait, LogTrait;
+    /*public function hrms_leave_employee_assigned_leave_types($employee_id){
+        DB::beginTransaction();
+
+        $leave_types = 
+    }*/
     public function hrms_leave_employee_assign_leave_types($employee_id, $leave_types){
         DB::beginTransaction();
 
@@ -60,59 +70,114 @@ trait LeaveTrait{
             DB::rollBack();
         } 
     }
-    public function hrms_leave_request_confirm_leave($id){
+
+    public function hrms_leave_request_confirm_leave($data, $id){
         DB::beginTransaction();
         try{
-            //Update the leave request to confirmed 
-            $leave_request = LeaveRequest::where('id', '=', $id)->with(['user.employee', 'leave_type'])->first();
-            $leave_request->status = 3;
-            $leave_request->approved_by = auth('api')->id();
-            $leave_request->approved_at = date('Y-m-d H:i:s');
-            $leave_request->save();
+            $leave_request = LeaveRequest::where('id', '=', $id)->first();
+            //print($leave_request->status);
+            if ($data['action'] == 'confirm'){
+                //Update the leave request to confirmed 
+                $leave_request->status = 3;
+                $leave_request->approval_remark = $data['remark'];
+                $leave_request->approved_by = auth('api')->id();
+                $leave_request->approved_at = date('Y-m-d H:i:s');
+                $leave_request->save();
 
-            $days = $this->hrms_leave_request_number_of_days($leave_request);
-            
-            //Update Employee Leave Type to ensure the dates are aligned 
-            $employee_leave_type = EmployeeLeaveType::where('user_id', '=', $leave_request->employee_id)->where('leave_type_id', '=', $leave_request->leave_type_id)->first();
-            $employee_leave_type->pending_days -= $days;
-            $employee_leave_type->days_used += $days;
-            $employee_leave_type->save();
-            
-            $this->log_user_activity('leave_request_confirm', $id, true);
-            $complete = true;
-        }
-        catch(Exception $e){
-            $this->log_user_activity('leave_request_confirm', $id, false);
-            $complete = false;
-        }
-        if ($complete){
+                $days = $this->hrms_leave_request_number_of_days($leave_request);
+                
+                $employee_leave_type = EmployeeLeaveType::where('employee_id', '=', $leave_request->employee_id)->where('leave_type_id', '=', $leave_request->leave_type_id)->first();
+                $employee_leave_type->pending_days -= $days;
+                $employee_leave_type->days_used += $days;
+                $employee_leave_type->save();
+
+                $employee = Employee::where('id', '=', $leave_request->employee_id)->with(['user'])->first();
+                //send mail to line manager 
+                $line_manager = Employee::where('user_id', '=', auth('api')->id() ?? Auth::id())->with(['user'])->first();
+                if ($employee){
+                    if (!(is_null($employee->email))){
+                        $mailed = Mail::to($employee->email)->send(new ConfirmMail($leave_request, $employee->user, $line_manager->user, $days, $data['message']));
+                    }
+                
+                    $supervisor = Employee::where('employee_id', '=', $employee->supervisor_id)->with(['user'])->first();
+                    if ($supervisor){
+                        if (!(is_null($supervisor->email))){
+                            $mailed = Mail::to($supervisor->email)->send(new SupervisorConfirmMail($leave_request, $employee, $supervisor->user, $line_manager->user));
+                        }
+                    }
+                }
+                //send mail to supervisor
+                
+                if ($leave_request->leave_allowance) {$this->hrms_leave_allowance_create_request($employee->id, $leave_request->id);}
+                $this->log_user_activity('leave_request_confirm', $id, true);
+            }
+            else if ($data['action'] == 'reject'){
+                $leave_request->status = 10;
+                $leave_request->approval_remark = $data['remark'];
+                $leave_request->approved_by = auth('api')->id();
+                $leave_request->approved_at = date('Y-m-d H:i:s');
+                $leave_request->save();
+
+                $days = $this->hrms_leave_request_number_of_days($leave_request);
+                
+                //Update Employee Leave Type to ensure the dates are aligned 
+                $employee_leave_type = EmployeeLeaveType::where('user_id', '=', $leave_request->employee_id)->where('leave_type_id', '=', $leave_request->leave_type_id)->first();
+                $employee_leave_type->pending_days -= $days;
+                $employee_leave_type->save();
+
+                $employee = Employee::find($leave_request->employee_id);
+                //send mail to line manager 
+                $line_manager = Employee::where('user_id', '=', auth('api')->id() ?? Auth::id())->with(['user'])->first();
+                if ($employee){
+                    if (!(is_null($employee->email))){
+                        $mailed = Mail::to($employee->email)->send(new RejectMail($leave_request, $employee->user, $line_manager->user, $days, $data['message']));
+                    }
+                }
+
+                $this->log_user_activity('leave_request_reject', $id, true);
+            }
+        
             DB::commit();
             return $leave_request;
         }
-        else{
+        catch(Exception $e){
             DB::rollBack();
+            $this->log_user_activity('leave_request_confirm', $id, false);
+            return $e->getMessage();
         }    
     }
-
-    public function hrms_leave_request_create_leave($request){
-        //DB::beginTransaction();
+    public function hrms_leave_request_create_leave($data){
+        DB::beginTransaction();
         try{
-            $employee = Employee::find($request['employee_id'] ?? (Auth::id() ?? auth('api')->id()));
+            if (isset($data['employee_id'])){
+                $employee = Employee::find($data['employee_id']);
+            }
+            else{
+                $employee = Employee::where('user_id', '=', (Auth::id() ?? auth('api')->id()))->first();
+            }
+
+            if (isset($data['leave_type_id'])){
+                $user_leave_type = EmployeeLeaveType::find($data['leave_type_id']);
+            }
+            else{
+                $user_leave_type = EmployeeLeaveType::where('employee_id', '=', $data['employee_id'])->where('leave_type_id', '=', $data['leave_id'])->first();
+            }
+
             //upload leave attachment
-            $leave_attachment = !(is_null($request['leave_attachment'])) ? $this->file_upload($request['pdf'], null, 'uploads/leave_requests', $employee->user_id): null;
+            $leave_attachment = !(is_null($data['leave_attachment'])) ? $this->file_upload($data['pdf'], null, 'uploads/leave_requests', $employee->user_id): null;
+            
             //create a new leave request
             $leave_request = LeaveRequest::create([
-                'employee_id' => (Auth::id() ?? auth('api')->id()),
-                'leave_type_id' => $request['leave_type_id'],
-                'department_id' => $employee->department_id,
-                'from_date' => $request['from_date'], 
-                'to_date' => $request['to_date'], 
-                'applied_on' => $request['applied_on'] ?? date('Y-m-d H:i:s'), 
-                'reason' => $request['reason'], 
-                'remarks' => $request['remarks'], 
-                'status' => $request['status'] ?? 1, 
-                'is_half_day' => $request['is_half_day'], 
-                'is_notify' => 0,
+                'employee_id' => $employee->id,
+                'user_leave_type_id' => $user_leave_type->id, 
+                'leave_type_id' => $user_leave_type->leave_type_id,
+                'from_date' => $data['from_date'], 
+                'to_date' => $data['to_date'], 
+                'leave_allowance' => $data['leave_allowance'] ? 1 : 0,
+                'reason' => $data['reason'], 
+                'remarks' => $data['remarks'], 
+                'status' => $data['status'] ?? 0, 
+                'is_half_day' => $data['is_half_day'] ?? 0, 
                 'leave_attachment' => $leave_attachment ?? NULL, 
                 'created_by' => auth('api')->id(), 
                 'updated_by' => auth('api')->id(), 
@@ -124,37 +189,50 @@ trait LeaveTrait{
                 $this->log_user_activity('leave_request_new', $leave_request->id, true);
                 $days = $this->hrms_leave_request_number_of_days($leave_request);
                 
+                $data = Array();
+                $data['days'] = $days;
                 //send mail to line manager 
-                $supervisor = Employee::where('id', '=', $employee->supervisor_id)->with(['user'])->first();
-                $line_manager = $supervisor->user;
-                //try to send notification to line manager not a breaking issue
-                $mailed = null;
-                if (!(is_null($line_manager->email))){$mailed = Mail::to($line_manager->email)->send(new RequestMail($leave_request, $employee, $line_manager));}
-                $leave_request->is_notify = $mailed ? 1: 0; 
-                $leave_request->save();
-
-                //Update Employee Leave Type 
+                $line_manager = Employee::where('employee_id', '=', $employee->reports_to)->with(['user'])->first();
+                if ($line_manager){
+                    //$line_manager->user->notify(new Created($data, $employee, $leave_request, $line_manager, null));
+                    if (!(is_null($line_manager->email))){
+                        $mailed = Mail::to($line_manager->email)->send(new RequestMail($leave_request, $employee, $line_manager->user));
+                    }
+                }
+                //send mail to supervisor
+                $supervisor = Employee::where('employee_id', '=', $employee->supervisor_id)->with(['user'])->first();
+                if (isset($supervisor)){
+                    if (!(is_null($supervisor->email))){
+                        $mailed = Mail::to($supervisor->email)->send(new SupervisorInfoMail($leave_request, $employee, $supervisor->user, $line_manager->user));
+                    }
+                }
+                
                 $employee_leave_type = EmployeeLeaveType::where('employee_id', '=', $leave_request->employee_id)->where('leave_type_id', '=', $leave_request->leave_type_id)->first();
                 $employee_leave_type->pending_days += $days;
+                
                 $employee_leave_type->save();
 
                 $complete = true;
+
+                $this->log_user_activity('leave_request_new', $leave_request->id, true);
+        
             }
             else{
-                //create a log activity
+                $this->log_user_activity('leave_request_new', $leave_request->id, false);
                 $complete = false;
             }
         }
         catch(Exception $e){
             $this->log_user_activity('leave_request_new', null, false);
             $complete = false;
+            return $e->getMessage();
         }
         if ($complete){
-            //DB::commit();
+            DB::commit();
             return $leave_request;
         }
         else{
-            //DB::rollBack();
+            DB::rollBack();
         }        
     }
     public function hrms_leave_request_delete_leave($id){
@@ -210,14 +288,16 @@ trait LeaveTrait{
             case 'leave_type':
                 $query = LeaveRequest::where('leave_type_id', '=', $specific);
                 break;
-            case 'my_leaves':
-                $employee = Employee::where('user_id', '=', auth('api')->id())->first();
-                $query = EmployeeLeaveType::where('user_id', '=', $employee->id)->orderBy('from_date', 'DESC');
+            case 'mine':
+                $employee = Employee::where('user_id', '=', Auth::id() ?? auth('api')->id())->first();
+                $query = LeaveRequest::where('employee_id', '=', $employee->id)->orderBy('from_date', 'DESC');
                 break; 
-            case 'my_team':
-                $employee = Employee::select('id')->where('user_id', '=', auth('api')->id())->first();
-                $team_members = Employee::where('supervisor_id', '=', $employee->id)->pluck('id');
-                $query = LeaveRequest::whereIn('user_id', $team_members)->whereDate('to_date', '>', date('Y-m-d'))->where('status', '=', 1);
+            case 'team':
+                $employee = Employee::where('user_id', '=', auth('api')->id())->first();
+                $team_members = Employee::where('reports_to', '=', $employee->employee_id)->orWhere('supervisor_id', '=', $employee->employee_id)->pluck('id');
+                $query = LeaveRequest::whereIn('employee_id', $team_members);
+                if ($specific != 'all'){$query = $query->where('status', '=', $specific);}
+                $query = $query->orderBy('status', 'ASC');
                 break;
             case 'pending':
                 $query = LeaveRequest::whereDate('from_date', '<=', date('Y-m-d'))->where('status', '=', 1);
@@ -325,22 +405,29 @@ trait LeaveTrait{
     }
 
     public function hrms_leave_request_show_leave($id, $viewer){
+        /*switch ($viewer){
+            case 'staff':
+            break;
+            case 'team':
+                $query = 
+            break;
+        }*/
         return $leave_request = LeaveRequest::where('id', '=', $id)->with(['approver.user', 'employee.user', 'leave_type'])->first();
     }
 
-    public function hrms_leave_request_update_leave($request, $id){
+    public function hrms_leave_request_update_leave($data, $id){
         DB::beginTransaction();
         try{
             $old_request = $leave_request = LeaveRequest::where('id', '=', $id)->first();
             if ($leave_request){
-                $leave_request->leave_type_id = $request->input('leave_type_id');
-                $leave_request->from_date = $request->input('from_date'); 
-                $leave_request->to_date = $request->input('to_date');
-                $leave_request->applied_on = $request->input('applied_on'); 
-                $leave_request->reason = $request->input('reason'); 
-                $leave_request->remarks = $request->input('remarks'); 
-                $leave_request->status = $request->input('status') ?? 1; 
-                $leave_request->is_half_day = $request->input('is_half_day'); 
+                $leave_request->leave_type_id = $data['leave_type_id'];
+                $leave_request->from_date = $data['from_date']; 
+                $leave_request->to_date = $data['to_date'];
+                $leave_request->applied_on = $data['applied_on']; 
+                $leave_request->reason = $data['reason']; 
+                $leave_request->remarks = $data['remarks']; 
+                $leave_request->status = $data['status'] ?? 1; 
+                $leave_request->is_half_day = $data['is_half_day']; 
                 $leave_request->is_notify = 0;
                 $leave_request->leave_attachment = $leave_attachment ?? NULL; 
                 $leave_request->updated_by = auth('api')->id();
@@ -415,13 +502,16 @@ trait LeaveTrait{
 
     }
 
-    public function hrms_leave_type_get_all($types, $specific, $detailed, $paginated, $page){
+    public function hrms_leave_type_get_all($types, $specific, $detailed, $paginated, $page = 1){
         switch ($types){
             case 'all':
-                $query = LeaveType::orderBy('name', 'ASC');
+                $query = LeaveType::orderBy('start_date', 'DESC');
             break;
             case 'active':
-                $query = LeaveType::whereDate('start_date', '<=', ($specific ?? date('Y-m-d')))->whereDate('end_date', '>=', ($specific ?? date('Y-m-d')))->orderBy('name', 'ASC');
+                $query = LeaveType::whereDate('start_date', '<=', ($specific ?? date('Y-m-d')))->whereDate('end_date', '>=', ($specific ?? date('Y-m-d')))->orderBy('start_date', 'DESC');
+            break;
+            case 'allocate':
+                $query = LeaveType::where('status', '=', 1)->whereDate('end_date', '>=', ($specific ?? date('Y-m-d')))->orderBy('start_date', 'DESC');
             break;
         }
 
@@ -432,13 +522,13 @@ trait LeaveTrait{
         return $query;
     }
 
-    public function hrms_leave_type_get_by_id($id){
+    public function hrms_leave_type_get_by_id($id, $detailed){
         $query = LeaveType::where('id', '=', $id)->with(['creator', 'deleter', 'updater'])->first();
         return $query;
     }
 
-    public function hrms_leave_type_get_assigned_by_id($id){
-        $query = EmployeeLeaveType::where('leave_type_id', '=', $id)->with(['employee.user',])->paginate(52);
+    public function hrms_leave_type_get_assigned_by_id($id, $detailed = true){
+        $query = EmployeeLeaveType::where('leave_type_id', '=', $id)->with(['employee.user', 'leave_type'])->paginate(52);
         return $query;
     }
 
@@ -513,19 +603,16 @@ trait LeaveTrait{
     }
 
     public function hrms_leave_types_get_my_current_leave_types($employee_id, $paginated, $detailed){
+        $active_leaves =  LeaveType::whereDate('start_date', '<=', date('Y-m-d'))->pluck('id');
         if(is_null($employee_id)){
-            $query = EmployeeLeaveType::where('user_id', '=', auth('api')->id());
-            //echo auth('api')->id();
+            $employee = Employee::where('user_id', '=', Auth::id() ?? auth('api')->id())->first();
+            $query = EmployeeLeaveType::where('employee_id', '=', $employee->id);
         }
         else{
-            //echo auth('api')->id();
-            $query = EmployeeLeaveType::where('user_id', '=', $employee_id);
+            $query = EmployeeLeaveType::where('employee_id', '=', $employee_id);
         }
         
-        /*$quest = $query->leftJoin('hrms_leave_types as hlt', function ($join) {
-            $join->on('hlt.id', '=', 'hrms_employee_leave_types.leave_type_id');
-        });*/
-        $query = $detailed ? $query->with(['leave_type']) : $query;
+        $query = $detailed ? $query->select('id', 'days_used', 'balance', 'pending_days', 'leave_type_id')->with(['leave_type']) : $query;
         $employee_leave_types = $paginated ? $query->paginate(20) :$query->get();
         return $employee_leave_types;
     }
