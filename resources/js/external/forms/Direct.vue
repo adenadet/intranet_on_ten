@@ -155,14 +155,12 @@
             vendor_id="47c3ac1b-361c-488e-b8bb-0c56da0411df" 
             :unique_id="genRef()"
             :email="ApplicantData.email" 
-            :reference="genRef()" 
-            :onSuccess="nairafyAppointment" 
+            :reference="genRef('nairafy')" 
+            :onSuccess="response => processPayment('nairafy', response)" 
             :onFail="nairafyErrorAppointment"
-            :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''" />
-            <!--NairafyButton type="button" class="btn btn-success mr-1" v-html="'PAY NGN '+ApplicantData.amount+' with Nairafy'" :businessId="alatKey" :phoneNumber="(ApplicantData.phone).toString()" :firstName="ApplicantData. first_name" :lastName="ApplicantData.last_name" :product="'Unknown Product'" 
-            :onTransaction="nairafyAppointment" :onFailure="nairafyErrorAppointment" :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''"/>            
-            <paystack type="button" class="btn btn-primary mr-5" v-html="'PAY NGN '+ApplicantData.amount+' with Paystack'" buttonClass="'btn btn-primary'" currency="NGN" :publicKey="PUBLIC_KEY" :email="ApplicantData.email" :amount="ApplicantData.amount*100" :reference="genRef()" :onSuccess="processAppointment" :onCancel="processErrorAppointment" :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''"></paystack>
-        </form-->
+            :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''" />          
+            <paystack type="button" class="btn btn-primary ml-3" v-html="'PAY NGN '+ApplicantData.amount+' with Paystack'" buttonClass="'btn btn-primary'" currency="NGN" :publicKey="PUBLIC_KEY" :email="ApplicantData.email" :amount="ApplicantData.amount*100" :reference="genRef('paystack')" :onSuccess="response => processPayment('paystack', response)" :onCancel="processErrorAppointment" :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''"></paystack>
+        <!--/form-->
     </div>
     <div class="card-footer">
         Kindly note that terms 
@@ -249,8 +247,17 @@ export default {
                 this.loading = false;
             });  
         },
-        genRef(){
-            return "Task_"+ new Date().valueOf();
+        genRef(type) {
+            const prefixMap = {
+                nairafy: 'NFY_',
+                paystack: 'PSK_',
+            }
+            const ref = (prefixMap[type] || 'TRX_') + new Date().valueOf()
+
+            if (type === 'nairafy') this.reference_nairafy = ref
+            else if (type === 'paystack') this.reference_paystack = ref
+            
+            return ref
         },
         getInitials(){
             this.loading = true;
@@ -297,7 +304,7 @@ export default {
             this.services = response.data.services;
             this.nations = response.data.nations;
         },
-        processAppointment(response){
+        processAppointment(channel, response){
             if (response.message == "Approved"){
                 alert("Payment was successful");
                 this.ApplicantData.payment_method = "Paystack";
@@ -310,7 +317,7 @@ export default {
                 alert("Payment has to be made to confirm booking");
             }
         },
-        processErrorAppointment(response){
+        processErrorAppointment(channel, response){
             if (response.message == "Approved"){
                 alert("Payment was successful");
                 this.ApplicantData.payment_method = "Paystack";
@@ -364,7 +371,7 @@ export default {
             if (file['size'] < 2000000){
                 reader.onloadend = (e) => {
                     this.ApplicantData.image = reader.result
-                    }
+                }
                 reader.readAsDataURL(file)
             }
             else{

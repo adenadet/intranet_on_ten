@@ -1,5 +1,5 @@
 <template>
-    <button @click="openIframe"><slot>Pay with Nairafy</slot></button>
+    <button @click="openIframe"><slot>Test Pay with Nairafy</slot></button>
 
     <div v-if="showIframe" class="nairafy-iframe-modal">
         <div class="nairafy-iframe-container">

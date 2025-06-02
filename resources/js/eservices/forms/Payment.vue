@@ -38,6 +38,7 @@
                     <option value="Cash">Cash</option>
                     <option value="Transfer">Transfer</option>
                     <option value="Paystack">Paystack</option>
+                    <option value="Nairafy">Nairafy</option>
                 </select>
             </div>
             <div class="form-group">
