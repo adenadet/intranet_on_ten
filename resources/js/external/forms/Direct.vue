@@ -126,13 +126,13 @@
                 <div class="col-md-12 col-sm-12">
                     <div class="form-group">
                         <label>Address in Nigeria*</label>
-                        <QuillEditor rows="5" id="nigerian_address" name="nigerian_address" placeholder="Enter Address *" required v-model="ApplicantData.nigerian_address" :class="{'is-invalid' : ApplicantData.errors.has('nigerian_address') }"></QuillEditor>
+                        <QuillEditor contentType="html" rows="5" id="nigerian_address" name="nigerian_address" placeholder="Enter Address *" required v-model:content="ApplicantData.nigerian_address" :class="{'is-invalid' : ApplicantData.errors.has('nigerian_address') }"></QuillEditor>
                     </div>
                 </div>
                 <div class="col-md-12 col-sm-12">
                     <div class="form-group">
                         <label>Address in the UK*</label>
-                        <QuillEditor rows="5" id="uk_address" name="uk_address" placeholder="Enter Address *" required v-model="ApplicantData.uk_address" :class="{'is-invalid' : ApplicantData.errors.has('uk_address') }"></QuillEditor>
+                        <QuillEditor contentType="html" rows="5" id="uk_address" name="uk_address" placeholder="Enter Address *" required v-model:content="ApplicantData.uk_address" :class="{'is-invalid' : ApplicantData.errors.has('uk_address') }"></QuillEditor>
                     </div>
                 </div>
             </div>
@@ -152,11 +152,11 @@
             :first_name="ApplicantData.first_name" 
             :last_name="ApplicantData.last_name" 
             :product="'Unknown Product'" 
-            vendor_id="47c3ac1b-361c-488e-b8bb-0c56da0411df" 
+            :vendor_id="vendor_id" 
             :unique_id="genRef()"
             :email="ApplicantData.email" 
             :reference="genRef('nairafy')" 
-            :onSuccess="response => processPayment('nairafy', response)" 
+            :onSuccess="response => processAppointment('nairafy', response)" 
             :onFail="nairafyErrorAppointment"
             :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''" />          
             <paystack type="button" class="btn btn-primary ml-3" v-html="'PAY NGN '+ApplicantData.amount+' with Paystack'" buttonClass="'btn btn-primary'" currency="NGN" :publicKey="PUBLIC_KEY" :email="ApplicantData.email" :amount="ApplicantData.amount*100" :reference="genRef('paystack')" :onSuccess="response => processPayment('paystack', response)" :onCancel="processErrorAppointment" :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''"></paystack>
@@ -211,9 +211,8 @@ export default {
                 payment_reference: '',
                 payment_transaction: '',
             }),
-            publicKey: "pk_live_c2fded4469321ca5e78eeb29437b0e0be724daf4", 
-            alatKey: "ecea8c7f-3663-44c9-455b-08dcf53d02a7",
-            alatProd: "f230b3d136b24599a8db7c01e8afd51b",
+            publicKey: "pk_live_c2fded4469321ca5e78eeb29437b0e0be724daf4",
+            vendor_id: "47c3ac1b-361c-488e-b8bb-0c56da0411df", 
         }
     },
     mounted() {
@@ -250,7 +249,7 @@ export default {
         genRef(type) {
             const prefixMap = {
                 nairafy: 'NFY_',
-                paystack: 'PSK_',
+                paystack: 'Task_',
             }
             const ref = (prefixMap[type] || 'TRX_') + new Date().valueOf()
 
@@ -307,10 +306,15 @@ export default {
         processAppointment(channel, response){
             if (response.message == "Approved"){
                 alert("Payment was successful");
-                this.ApplicantData.payment_method = "Paystack";
-                this.ApplicantData.payment_reference= response.reference;
-                this.ApplicantData.payment_transaction = response.transaction;
-
+                this.ApplicantData.payment_method = channel;
+                if (channel == 'nairafy'){
+                    this.ApplicantData.payment_transaction = response.transaction.unique_code;
+                    this.ApplicantData.payment_reference = response.transaction.payment ? response.transaction.payment.description : '';    
+                }
+                else{
+                    this.ApplicantData.payment_reference= response.reference;
+                    this.ApplicantData.payment_transaction = response.transaction;
+                }
                 this.createApplicant();
             }
             else{
@@ -382,7 +386,5 @@ export default {
             $('#termsModal').modal('show');
         }
     },
-    props:{
-    }
 }
 </script>
