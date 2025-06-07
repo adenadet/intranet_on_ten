@@ -11,8 +11,8 @@
         </div>
     </div>
     <div class="card-header bg-navy">Schedule An Appointment</div>
-    <div class="card-body">
-        <!--form class="overlay-wrapper" method="POST"-->
+    <div class="card-body overlay-wrapper">
+        <!--form class="" method="POST"-->
             <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
             <alert-error :form="ApplicantData"></alert-error> 
             <div class="row">
@@ -144,22 +144,8 @@
                     </div>
                 </div>
             </div>
-            <NairafyButton type="button" class="btn btn-success mr-1" 
-            v-html="'PAY NGN '+ApplicantData.amount+' with Nairafy'" 
-            buttonClass="'btn btn-primary'" 
-            :amount="ApplicantData.amount"
-            :phone="(ApplicantData.phone).toString()" 
-            :first_name="ApplicantData.first_name" 
-            :last_name="ApplicantData.last_name" 
-            :product="'Unknown Product'" 
-            :vendor_id="vendor_id" 
-            :unique_id="genRef()"
-            :email="ApplicantData.email" 
-            :reference="genRef('nairafy')" 
-            :onSuccess="response => processAppointment('nairafy', response)" 
-            :onFail="nairafyErrorAppointment"
-            :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''" />          
-            <paystack type="button" class="btn btn-primary ml-3" v-html="'PAY NGN '+ApplicantData.amount+' with Paystack'" buttonClass="'btn btn-primary'" currency="NGN" :publicKey="PUBLIC_KEY" :email="ApplicantData.email" :amount="ApplicantData.amount*100" :reference="genRef('paystack')" :onSuccess="response => processPayment('paystack', response)" :onCancel="processErrorAppointment" :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''"></paystack>
+            <NairafyButton type="button" class="btn btn-success mr-1" v-html="'PAY NGN '+ApplicantData.amount+' with Nairafy'" :amount="ApplicantData.amount" :phone="(ApplicantData.phone).toString()" :first_name="ApplicantData.first_name" :last_name="ApplicantData.last_name" :product="'Unknown Product'" :vendor_id="vendor_id" :unique_id="genRef('nairafy')" :email="ApplicantData.email" :reference="genRef('nairafy')" :onSuccess="response => processAppointment('nairafy', response)" :onFail="nairafyErrorAppointment" :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''" />          
+            <!--paystack type="button" class="btn btn-primary ml-3" v-html="'PAY NGN '+ApplicantData.amount+' with Paystack'" buttonClass="'btn btn-primary'" currency="NGN" :publicKey="PUBLIC_KEY" :email="ApplicantData.email" :amount="ApplicantData.amount*100" :reference="genRef('paystack')" :onSuccess="response => processPayment('paystack', response)" :onCancel="processErrorAppointment" :disabled="terms == 0 || ApplicantData.email == '' || ApplicantData.first_name == '' || ApplicantData.last_name == '' || ApplicantData.schedule == ''"></paystack-->
         <!--/form-->
     </div>
     <div class="card-footer">
@@ -304,22 +290,16 @@ export default {
             this.nations = response.data.nations;
         },
         processAppointment(channel, response){
-            if (response.message == "Approved"){
-                alert("Payment was successful");
-                this.ApplicantData.payment_method = channel;
-                if (channel == 'nairafy'){
-                    this.ApplicantData.payment_transaction = response.transaction.unique_code;
-                    this.ApplicantData.payment_reference = response.transaction.payment ? response.transaction.payment.description : '';    
-                }
-                else{
-                    this.ApplicantData.payment_reference= response.reference;
-                    this.ApplicantData.payment_transaction = response.transaction;
-                }
-                this.createApplicant();
+            this.ApplicantData.payment_method = channel;
+            if (channel == 'nairafy'){
+                this.ApplicantData.payment_transaction = response.transaction.unique_code;
+                this.ApplicantData.payment_reference = response.transaction.payment ? response.transaction.payment.description : '';    
             }
             else{
-                alert("Payment has to be made to confirm booking");
+                this.ApplicantData.payment_reference= response.reference;
+                this.ApplicantData.payment_transaction = response.transaction;
             }
+            this.createApplicant();
         },
         processErrorAppointment(channel, response){
             if (response.message == "Approved"){
