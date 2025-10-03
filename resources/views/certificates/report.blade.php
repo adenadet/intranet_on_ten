@@ -9,7 +9,13 @@
         </div>
         <div class="col-4">
             <div class="d-flex">
-                <i class="mr-1 {{is_null($appointment->laboratory) ? 'far fa-square' : 'fa fa-check'}}"></i>
+                <i class="mr-1 {{(!is_null($appointment->laboratory) && $appointment->laboratory->summary != 'normal') ? 'fa fa-check' : 'far fa-square' }}"></i>
+                <label style="font-weight:normal !important; color: #222;" ><small>Positive</small></label>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="d-flex">
+                <i class="mr-1 {{is_null($appointment->laboratory)  && $appointment->laboratory->summary == 'normal') ? 'far fa-square' : 'fa fa-check'}}"></i>
                 <label style="font-weight:normal !important; color: #222;" ><small>Negative</small></label>
             </div>
         </div>

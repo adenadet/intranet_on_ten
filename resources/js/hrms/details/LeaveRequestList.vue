@@ -58,18 +58,28 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody v-if="requests.data == null || requests == null">
+            <tbody v-if="requests == null">
                 <tr><td colspan="8" class="text-center">You have not made any requests yet</td></tr>
             </tbody>
             <tbody v-else>
-                <tr v-for="(request, index) in requests.data" :key="request.id">
+                <tr v-for="(request, index) in requests" :key="request.id">
                     <td>{{addOne(index)}}</td>
                     <td>{{request.employee != null ? FullName(request.employee.user) : 'Deactivated Staff'}}</td>
                     <td>{{request.leave_type_id != null && request.leave_type != null ? request.leave_type.name : ''}}</td>
                     <td>{{ExcelDate(request.from_date) }}</td>
                     <td>{{ExcelDate(request.to_date) }}</td>
                     <td>{{ExcelDate(request.updated_at) }}</td>
-                    <td>{{request.status == 0 ? 'Unapproved' : (request.status == 1 ? (dateGreaterThanToday(request.start_date) ? 'Ongoing' : 'Approved') : (request.status == 2 ? (dateGreaterThanToday(request.to_date) ? 'Ongoing' : 'Completed') : (request.status == 3 ? 'Completed ': 'Rejected')))}}</td>
+                    <td>{{request.status == 0 ? 'Unapproved' : 
+                            (request.status == 2 ? 'Completed' :
+                            (request.status == 1 ? (
+                                dateCompareToday(request.from_date, '>') ? 'Approved'  
+                                    :(dateCompareToday(request.from_date, '<=') 
+                                        ? (dateCompareToday(request.end_date, '>=') ? 'Ongoing' : 'Completed')
+                                        : 'Completed')
+                                )
+                            :(request.status == 4 ? 'Rejected ': (request.status == 10 ? 'Cancelled ': 'Old Status'))
+                            )
+                        )}}</td>
                     <td>
                         <button class="nav-link btn btn-sm btn-tool" data-toggle="dropdown" type="button">
                             <i class="fa fa-ellipsis-v text-dark"></i>
@@ -77,15 +87,15 @@
                         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" v-if="source == 'admin'">
                             <button class="dropdown-item btn btn-block btn-sm" @click="viewRequest(request.id)"><i class="fa fa-eye mr-1 text-primary"></i> View request</button>
                             <button class="dropdown-item btn btn-block btn-sm" @click="createAllowance(request)"><i class="fa fa-eye mr-1 text-warning"></i> Create Allowance request</button>
-                            <button v-if="request.status < 2" class="dropdown-item btn btn-block btn-sm" @click="confirmRequest(request)"><i class="fa fa-check mr-1 text-warning"></i> Confirm request</button>
+                            <button v-if="request.status < 1" class="dropdown-item btn btn-block btn-sm" @click="confirmRequest(request)"><i class="fa fa-check mr-1 text-warning"></i> Confirm request</button>
                         </div>
                         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" v-if="source == 'mine'">
                             <button class="dropdown-item btn btn-block btn-sm" @click="viewRequest(request.id)"><i class="fa fa-eye mr-1 text-primary"></i> View request</button>
-                            <button v-if="request.status < 2 || request.status > 6" class="dropdown-item btn btn-block btn-sm" @click="editRequest(request)"><i class="fa fa-edit mr-1 text-warning"></i> Edit request</button>
+                            <button v-if="request.status < 1 || request.status > 6" class="dropdown-item btn btn-block btn-sm" @click="editRequest(request)"><i class="fa fa-edit mr-1 text-warning"></i> Edit request</button>
                         </div>
                         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" v-if="source == 'team'">
                             <button class="dropdown-item btn btn-block btn-sm" @click="viewRequest(request.id)"><i class="fa fa-eye mr-1 text-primary"></i> View request</button>
-                            <button v-if="request.status < 2" class="dropdown-item btn btn-block btn-sm" @click="confirmRequest(request)"><i class="fa fa-check mr-1 text-warning"></i> Confirm request</button>
+                            <button v-if="request.status < 1" class="dropdown-item btn btn-block btn-sm" @click="confirmRequest(request)"><i class="fa fa-check mr-1 text-warning"></i> Confirm request</button>
                         </div>
                     </td>
                 </tr>
@@ -160,7 +170,7 @@ export default {
         }
     },
     props: {
-        requests: Object,
+        requests: Array,
         source: String,
     },
     watch:{

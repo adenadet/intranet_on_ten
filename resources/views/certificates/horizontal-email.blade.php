@@ -39,11 +39,11 @@
                 <div class="col-6">
                     <div class="row">
                         <label class="col-4" style="font-weight:normal !important; ">Issue Date:</label>
-                        <div class="col-8"><div width="100%"  class="pl-2 rounded" style="border: 1px solid #222; color: #222;">{{date('d M, Y', strtotime($issue_at))}}</div></div>
+                        <div class="col-8"><div width="100%"  class="pl-2 rounded" style="border: 1px solid #222; color: #222;">{{date('d M, Y', strtotime($appointment->date))}}</div></div>
                     </div>
                     <div class="row">
                         <label for="inputPassword3" class="col-4" style="font-weight:normal !important; ">Expiry Date:</label>
-                        <div class="col-8"><div width="100%"  class="pl-2 rounded" style="border: 1px solid #222; color: #222;">{{date('d M, Y', strtotime("+6 months", strtotime($issue_at)))}}</div></div>
+                        <div class="col-8"><div width="100%"  class="pl-2 rounded" style="border: 1px solid #222; color: #222;">{{date('d M, Y', strtotime("+6 months", strtotime($appointment->date)))}}</div></div>
                     </div>
                     <div class="row">
                         <label for="inputPassword3" class="col-4" style="font-weight:normal !important;">Country:</label>

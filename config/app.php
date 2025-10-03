@@ -43,6 +43,8 @@ return [
         //Kodegrenade\NaijaFaker\OtpServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
+        Unicodeveloper\Paystack\PaystackServiceProvider::class,
+
     ])->toArray(),
 
     'aliases' => Facade::defaultAliases()->merge([
@@ -50,6 +52,7 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Image' => Intervention\Image\Facades\Image::class,
         // 'NaijaFaker' => Kodegrenade\NaijaFaker\NaijaFaker::class,
+        'Paystack' => Unicodeveloper\Paystack\Facades\Paystack::class,
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
     ])->toArray(),
 

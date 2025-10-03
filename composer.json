@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.1",
         "aranyasen/hl7": "^3.2",
+        "digikraaft/laravel-paystack-webhooks": "^2.1",
         "guzzlehttp/guzzle": "^7.2",
         "intervention/image": "2.7.*",
         "kodegrenade/naija-faker-laravel": "^1.0",
@@ -18,7 +19,8 @@
         "maatwebsite/excel": "^3.1",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^6.9",
-        "uhin/hl7-parser": "^2.1"
+        "uhin/hl7-parser": "^2.1",
+        "unicodeveloper/laravel-paystack": "^1.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

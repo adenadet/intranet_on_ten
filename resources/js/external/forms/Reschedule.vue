@@ -64,8 +64,9 @@
                     </div>
                 </div>
             </div>
-            <AlatpayNairafyButton type="button" class="btn btn-success" v-html="'PAY NGN '+RescheduleData.amount+' with Nairafy'" buttonClass="'btn btn-primary'" :apiKey="alatProd" :businessId="alatKey" :firstName="RescheduleData. first_name" :lastName="RescheduleData.last_name" :product="'Unknown Product'" :onTransaction="nairafyAppointment" :onFailure="nairafyErrorAppointment" :email="RescheduleData.email" :amount="RescheduleData.amount" :reference="genRef()" :onSuccess="nairafyAppointment" :disabled="terms == 0 || RescheduleData.email == '' || RescheduleData.first_name == '' || RescheduleData.last_name == '' || RescheduleData.schedule == ''"/>
-            <paystack class="btn btn-primary" v-html="'PAY NGN '+RescheduleData.amount+' Online'" buttonClass="'btn btn-primary'" currency="NGN" :publicKey="PUBLIC_KEY" :email="RescheduleData.email" :amount="RescheduleData.amount*100" :reference="genRef()" :onSuccess="processAppointment" :onCancel="processAppointment" :disabled="terms == 0 || RescheduleData.preferred_date == '' || RescheduleData.email == '' || RescheduleData.full_name == ''"></paystack>
+            <NairafyButton type="button" class="btn btn-success mr-1" v-html="'PAY NGN '+RescheduleData.amount+' with Nairafy'" :amount="RescheduleData.amount" :phone="(RescheduleData.phone).toString()" :first_name="RescheduleData.first_name" :last_name="RescheduleData.last_name" :product="'Unknown Product'" :vendor_id="vendor_id" :unique_id="genRef('nairafy')" :email="RescheduleData.email" :reference="genRef('nairafy')" :onSuccess="response => processAppointment('nairafy', response)" :onFail="nairafyErrorAppointment" :disabled="RescheduleData.email == '' || RescheduleData.first_name == '' || RescheduleData.last_name == '' || RescheduleData.schedule == ''" />
+            <!--AlatpayNairafyButton type="button" class="btn btn-success" v-html="'PAY NGN '+RescheduleData.amount+' with Nairafy'" buttonClass="'btn btn-primary'" :apiKey="alatProd" :businessId="alatKey" :firstName="RescheduleData. first_name" :lastName="RescheduleData.last_name" :product="'Unknown Product'" :onTransaction="nairafyAppointment" :onFailure="nairafyErrorAppointment" :email="RescheduleData.email" :amount="RescheduleData.amount" :reference="genRef()" :onSuccess="nairafyAppointment" :disabled="terms == 0 || RescheduleData.email == '' || RescheduleData.first_name == '' || RescheduleData.last_name == '' || RescheduleData.schedule == ''"/>
+            <paystack class="btn btn-primary" v-html="'PAY NGN '+RescheduleData.amount+' Online'" buttonClass="'btn btn-primary'" currency="NGN" :publicKey="PUBLIC_KEY" :email="RescheduleData.email" :amount="RescheduleData.amount*100" :reference="genRef()" :onSuccess="processAppointment" :onCancel="processAppointment" :disabled="terms == 0 || RescheduleData.preferred_date == '' || RescheduleData.email == '' || RescheduleData.full_name == ''"></paystack-->
         </form>
     </div>
     <div class="card-footer">
@@ -106,6 +107,7 @@ export default {
                 payment_transaction: '',
                 details: '',
             }),
+            vendor_id: "47c3ac1b-361c-488e-b8bb-0c56da0411df", 
         }
     },
     mounted() {this.getInitials();},

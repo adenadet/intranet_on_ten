@@ -66,48 +66,14 @@ class RegistrationController extends Controller
             'patient_id' => $patient->id,
             'service_id' => $request->input('service_id'),
             'date'       => $request->input('date'),
+            'amount'     => $request->input('amount') ?? 0,
             'schedule'   => $request->input('schedule'),
-            'status'     => 1,
+            'status'     => 0,
             'created_by' => 0,
         ]);
 
-        $payment = Payment::create([
-            'service_id' => $request->input('service_id'), 
-            'patient_id' => $patient->id, 
-            'appointment_id' => $appointment->id,
-            'amount' => $request->input('amount'), 
-            'employee_id' => 0,
-            'channel' => $request->input('payment_channel') ?? "Nairafy", 
-            'details' => $request->input('payment_transaction').' | '.$request->input('payment_reference'),    
-        ]);
-
-        $appointment->transaction_id = "SNH-".$appointment->id."-".$payment->id."-".$patient->id;
-        $appointment->save();
-
-        $consultation = Appointment::where('id', '=', $appointment->id)->with(['service', 'patient', 'payment'])->first();
-
-        $dayOfWeek = date('w', strtotime($request->input('date')));
-        if ($dayOfWeek != 0 || $dayOfWeek != 6) {
-            Mail::to($patient->email)->send(new RegMail($consultation));
-            return response()->json([
-                'areas' => Area::select('id', 'name')->where('state_id', 25)->orderBy('name', 'ASC')->get(),
-                //'services' => Service::orderBy('name', 'ASC')->get(),
-                //'nations' => Country::orderBy('name', 'ASC')->get(), 
-                //'patients' => Patient::orderBy('last_name', 'ASC')->get()     
-            ]);
-        }
-
-        $image_url = $currentPhoto = null;
-        $passport_image_url = $currentPassportPhoto = null;
-        $patient->image = $image_url;
-        
-        $patient->save();
-        
         return response()->json([
-            'areas' => Area::select('id', 'name')->where('state_id', 25)->orderBy('name', 'ASC')->get(),
-            //'services' => Service::orderBy('name', 'ASC')->get(),
-            //'nations' => Country::orderBy('name', 'ASC')->get(), 
-            //'patients' => Patient::orderBy('last_name', 'ASC')->get()     
+            'appointment' => $appointment
         ]);
     }
 
@@ -121,27 +87,31 @@ class RegistrationController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'preferred_date' => 'required|date',
-            'preferred_time' => 'required',
-            'tracking_id' => 'required'
+        $appointment = Appointment::where('id', '=', $id)->with(['service', 'patient', 'payment'])->first();
+        $payment = Payment::create([
+            'service_id' => $appointment->service_id, 
+            'patient_id' => $appointment->patient_id, 
+            'appointment_id' => $appointment->id,
+            'amount' => $appointment->amount, 
+            'employee_id' => 0,
+            'channel' => $request->input('payment_channel') ?? "Nairafy", 
+            'details' => $request->input('payment_transaction').' | '.$request->input('payment_reference'),    
         ]);
 
-        $appointment = Appointment::where('transaction_id', '=', $request->input('tracking_id'))->with(['service', 'patient', 'payment'])->first();
-
-        $appointment->date = $request->input('preferred_date');
-        $appointment->schedule = $request->input('preferred_time');
-
+        $appointment->transaction_id = "SNH-".$appointment->id."-".$payment->id."-".$appointment->patient_id;
         $appointment->save();
 
         $consultation = Appointment::where('id', '=', $appointment->id)->with(['service', 'patient', 'payment'])->first();
+        $patient = $appointment->patient;
 
-        Mail::to($appointment->patient->email)->send(new ResMail($consultation));
+        $dayOfWeek = date('w', strtotime($request->input('date')));
+        if ($dayOfWeek != 0 || $dayOfWeek != 6) {
+            Mail::to($patient->email)->send(new RegMail($consultation));
+            return response()->json([
+                'appointment' => $appointment,
+            ]);
+        }
 
-        return response()->json([
-            'appointment' => Appointment::where('transaction_id', '=', $id)->with(['service', 'patient', 'payment'])->first(),
-            'message' => 'Cancelled successfully',
-        ]);
     }
 
     public function destroy($id)
@@ -180,7 +150,7 @@ class RegistrationController extends Controller
     public function schedules()
     {
       	$date = $_GET['date'];
-      	$public_holidays = ['2023-01-02', '2023-06-28', '2023-06-29', '2023-06-30', '2023-07-19', '2023-10-02', '2023-09-23', '2023-09-23', '2023-12-24', '2023-12-25', '2023-12-26', '2023-12-27', '2025-03-31', '2025-04-01'];
+      	$public_holidays = ['2025-01-01', '2025-03-30', '2025-03-31', '2025-04-18', '2025-04-21', '2025-05-01', '2025-06-06', '2025-06-09', '2025-06-12', '2025-09-04', '2025-09-05', '2025-10-10', '2025-12-25', '2025-12-26', '2023-01-02', '2023-06-28', '2023-06-29', '2023-06-30', '2023-07-19', '2023-10-02', '2023-09-23', '2023-09-23', '2023-12-24', '2023-12-25', '2023-12-26', '2023-12-27', '2025-03-31', '2025-04-01'];
         if (in_array($date, $public_holidays)){
         	$schedules = [];
         }

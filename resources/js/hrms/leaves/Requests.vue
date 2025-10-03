@@ -23,7 +23,7 @@
                     </div>
                 </div>            
                 <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-                <HrmsDetailLeaveRequestList source="mine" :requests.sync="requests" @refreshRequests="getAllInitials"/>
+                <HrmsDetailLeaveRequestList source="mine" :requests.sync="requests.data" @refreshRequests="getAllInitials"/>
                 <div class="card-footer">
                     <pagination v-model="current_page" @paginate="getAllInitials" :per-page="requests.per_page != null ? requests.per_page : 52" :records="requests.total != null ? requests.total : 550" ></pagination>
                 </div>

@@ -6,7 +6,7 @@
                 <EServiceFormSearch search_type="radiologist" @searchedAppointments="refresh"/>
                 <div class="card overlay-wrapper">
                     <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-                    <EServiceDetailAppointmentList source="radiologist" :appointments.sync="reports" @refreshAppointments="getAllInitials(current_page)" />
+                    <EServiceDetailAppointmentList source="radiologist" :appointments.sync="reports" @refreshAppointmentPage="getAllInitials(current_page)" />
                     <div class="card-footer">
                         <pagination v-model="current_page" @paginate="getAllInitials" :per-page="reports.per_page != null ? reports.per_page : 52" :records="reports.total != null ? reports.total : 550" ></pagination>
                     </div>

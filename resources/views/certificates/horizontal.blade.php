@@ -11,6 +11,8 @@
     </style>
 </head>
 <body>
+    @if($appointment->status == 10  && $appontment->issue_action == 'referral')
+    @else
     <div class="row m-0">
         <div class="col-2 p-3 pt-0">
             <img src="/img/applicants/{{$appointment->patient->image}}" class="img-fluid" />
@@ -70,5 +72,6 @@
         </div>
     </div>
     @include('certificates.signature')
+    @endif
 </body>
 </html>

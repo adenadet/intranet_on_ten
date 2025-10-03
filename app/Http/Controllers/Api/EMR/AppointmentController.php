@@ -70,7 +70,7 @@ class AppointmentController extends Controller
     {
         $page = $_GET['page'] ?? 1;
         return response()->json([
-            'appointments'  => $this->appointment_get_all(NULL, $page, true, 'ASC'),   
+            'appointments'  => $this->appointment_get_all($_GET['type'] ?? NULL, $page, true, 'ASC'),   
             'patients'      => $this->patient_get_all(),
             'services'      => $this->appointment_get_all_services(),   
         ]);

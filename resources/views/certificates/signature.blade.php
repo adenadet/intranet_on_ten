@@ -6,7 +6,7 @@
         </div>
         <div class="row">
             <label class="col-6" style="font-weight:normal !important; "><small>SP Health Professional Sign:</small></label>
-            <div class="col-6"><div width="100%" class="pl-2 rounded" style="border: 1px solid #222; color: #222;"><img src="https://intranet.saintnicholashospital.com/img/consents/{{$appointment->issuer == 56 ? 'rusman.png' :($appointment->issuer == 57 ? 'rabudah.png' : ($appointment->issuer == 55 ? 'bsalami.png' : ($appointment->issuer.id == 331 ? 'mnwachukwu.png' : 'bsalami.png')))}}" height="30px" width="auto" /></div></div>
+            <div class="col-6"><div width="100%" class="pl-2 rounded" style="border: 1px solid #222; color: #222;"><img src="https://intranet.saintnicholashospital.com/img/consents/{{$appointment->issuer == 56 ? 'rusman.png' :($appointment->issuer == 57 ? 'rabudah.png' : ($appointment->issuer == 55 ? 'bsalami.png' : ($appointment->issuer == 2771 ? 'bakinloye.png' : 'bsalami.png')))}}" height="30px" width="auto" /></div></div>
         </div>
         <div class="row">
             <label class="col-6" style="font-weight:normal !important; "><small>SP Health Professional Date:</small></label>
@@ -15,12 +15,12 @@
     </div>
     <div class="col-6">
         <div class="row">
-            <label class="col-5"  style="font-weight:normal !important; "><small>Applicant's Signature:</small></label>
+            <label class="col-5" style="font-weight:normal !important; "><small>Applicant's Signature:</small></label>
             <div class="col-6"><div class="pl-2 rounded" width="100%" style="border: 1px solid #222; color: #222;"><img src="https://intranet.saintnicholashospital.com/img/consents/{{$appointment->consent->signaturePad}}" height="30px" width="auto"/></div></div>
         </div>
         <div class="row">
             <label class="col-5" style="font-weight:normal !important; "><small>Date:</small></label>
-            <div class="col-6"><div width="100%" class="pl-2 rounded" style="border: 1px solid #222; color: #222;">{{date('d M, Y', strtotime($appointment->consent->created_at))}}</div></div>
+            <div class="col-6"><div width="100%" class="pl-2 rounded" style="border: 1px solid #222; color: #222;">{{date('d M, Y', strtotime($appointment->issue_at))}}</div></div>
         </div>
         <div class="row">
             <label class="col-5" style="font-weight:normal !important; "><small>Visa Category:</small></label>

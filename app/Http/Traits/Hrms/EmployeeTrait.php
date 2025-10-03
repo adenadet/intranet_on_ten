@@ -63,14 +63,18 @@ trait EmployeeTrait{
 
     public function hrms_employee_get_all($type, $specific, $detailed, $paginated, $page){
         $users = User::pluck('id');
+        $query = Employee::query();
         switch($type){
             case 'active':
-                $query = Employee::whereIn('user_id', $users)->where('employment_status', '=', 1)->has('user')->orderBy('username', 'ASC');
+                $query = $query->whereIn('user_id', $users)->where('employment_status', '=', 1)->has('user')->orderBy('username', 'ASC');
             break;
             case 'all':
-                $query = Employee::whereIn('user_id', $users)->orderBy('username', 'ASC');
+                $query = $query->whereIn('user_id', $users)->orderBy('username', 'ASC');
             break;
             case 'my_employee':
+            break;
+            case 'new':
+                $query = $query->whereDate('date_of_joining', '>=', date('Y-m-d'));
             break;
             case 'pending_employee':
             break;
@@ -78,6 +82,8 @@ trait EmployeeTrait{
                 $query = Employee::orderBy('username', 'ASC');
             break;
         }
+
+        $query = $query->orderBy('username', 'ASC');
 
         if ($specific == 'leave'){
             $query = $query->select('id', 'user_id', 'supervisor_id', 'reports_to', 'department_id', 'username')->with(['leave_types.leave_type', 'department', 'user.department']);

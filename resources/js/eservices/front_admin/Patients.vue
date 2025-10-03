@@ -8,7 +8,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-white">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <EServiceFormPatient :editMode="editMode" :nations="nations" :applicant="applicant" /> 
+                    <EServiceFormPatient :editMode="editMode" :nations="nations" :applicant="applicant" @refreshPatient="getAllInitials"/> 
                 </div>
             </div>
         </div>
@@ -102,6 +102,9 @@ methods: {
         this.applicant = {};
         $('#applicantModal').modal('show');
     },
+    closeModals(){
+        $('#applicantModal').modal('hide');
+    },
     deleteApplicant(id){
         Swal.fire({
             title: 'Are you sure?',
@@ -131,16 +134,9 @@ methods: {
         this.applicant = applicant;
         $('#applicantModal').modal('show');
     },
-    addAppointment(){
-        this.$Progress.start();
-        this.editMode = false;
-        this.appointment = {};
-        Fire.$emit('AppointmentDataFill', {});
-        $('#appointmentModal').modal('show');
-        this.$Progress.finish();
-    },
     getAllInitials(page=1) {
         this.loading = true;
+        this.closeModals();
         axios.get('/api/emr/patients?page='+page)
         .then(response => {this.refreshAppointments(response);})
         .catch(() => {

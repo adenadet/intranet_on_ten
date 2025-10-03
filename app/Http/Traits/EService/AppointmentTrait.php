@@ -120,6 +120,9 @@ trait AppointmentTrait{
     }
     public function appointment_get_all($type, $page, $paginated, $sort_order){
         switch ($type){
+            case 'admin':
+                $query = Appointment::whereDate('date', '>=', date('Y-m-d'))->with(['service', 'patient', 'payment']);
+            break;
             case null:
                 $query = Appointment::whereDate('date', '>=', date('Y-m-d'))->with(['service', 'patient', 'payment']);
             break;
@@ -131,6 +134,9 @@ trait AppointmentTrait{
             break;
             case 'missed':
                 $query = Appointment::whereDate('date', '<=', date('Y-m-d'))->whereNull(['front_office_id',])->where('status', '=', 1)->with(['service', 'patient', 'payment']);
+            break;
+            case 'office':
+                $query = Appointment::whereDate('date', '>=', date('Y-m-d'))->where('status', '>=', 1)->with(['service', 'patient', 'payment']);
             break;
             case 'pending':
                 $query = Appointment::whereDate('date', '>=',date('Y-m-d', strtotime('-1 month')))->whereDate('date', '<=', date('Y-m-d'))->whereIn('status', [6, 7, 8])->with(['service', 'patient',]);

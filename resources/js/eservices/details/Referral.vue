@@ -32,7 +32,7 @@
                                 <strong>Yours Sincerely,<br />
                                 For: St. Nicholas Hospital, </strong><br />
 
-                                <img :src="referral.created_by == 56 ? '/img/consents/rusman.png' : (referral.created_by == 57 ? '/img/consents/rabudah.png' :(referral.created_by == 55 ? '/img/consents/bsalami.png' :(referral.created_by == 331 ? '/img/consents/mnwachukwu.png' :'/img/consents/bsalami.png')))" class="img-fluid" />
+                                <img :src="referral.created_by == 56 ? '/img/consents/rusman.png' : (referral.created_by == 57 ? '/img/consents/rabudah.png' :(referral.created_by == 55 ? '/img/consents/bsalami.png' : (referral.created_by == 2771 ? '/img/consents/bakinloye.png' : (referral.created_by == 331 ? '/img/consents/mnwachukwu.png' :'/img/consents/bsalami.png'))))" class="img-fluid" />
                                 <br /><strong>Dr. {{FullName(referral.creator)}}</strong>
                             </div>
                         </div>

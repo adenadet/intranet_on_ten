@@ -22,7 +22,7 @@ use App\Mail\Leave\RequestMail;
 use App\Mail\Leave\SupervisorConfirmMail;
 use App\Mail\Leave\SupervisorInfoMail;
 use App\Mail\LeaveStatusMail;
-
+use App\Models\User;
 use App\Notifications\Leave\Created;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -78,7 +78,7 @@ trait LeaveTrait{
             //print($leave_request->status);
             if ($data['action'] == 'confirm'){
                 //Update the leave request to confirmed 
-                $leave_request->status = 3;
+                $leave_request->status = 1;
                 $leave_request->approval_remark = $data['remark'];
                 $leave_request->approved_by = auth('api')->id();
                 $leave_request->approved_at = date('Y-m-d H:i:s');
@@ -272,52 +272,76 @@ trait LeaveTrait{
         }     
     }
     public function hrms_leave_request_get_all($status, $specific,  $detailed, $paginated, $page){
+        $query = LeaveRequest::query();
+        
         switch ($status){
             case 'active':
-                $query = LeaveRequest::whereDate('from_date', '>=', date('Y-m-d'))->whereDate('to_date', '<=', date('Y-m-d'))->where('status', '=', 3);
+                $query = $query->whereDate('from_date', '>=', date('Y-m-d'))->whereDate('to_date', '<=', date('Y-m-d'))->where('status', '=', 3);
                 break;
             case 'all':
-                $query = LeaveRequest::orderBy('from_date', 'DESC');
+                $query = $query->orderBy('from_date', 'DESC');
                 break;
+            case 'approved':
+                $query = $query->where('status', '=', 1);
+            break;
             case 'cancelled':
-                $query = LeaveRequest::where('status', '=', 2);
-                break;
+                $query = $query->where('status', '=', 10);
+            break;
             case 'completed':
-                $query = LeaveRequest::whereDate('to_date', '>', date('Y-m-d'))->where('status', '=', 3);
+                $query = $query->whereDate('to_date', '<', date('Y-m-d'))
+                ->where('status', '=', 1);
                 break;
             case 'leave_type':
-                $query = LeaveRequest::where('leave_type_id', '=', $specific);
+                $query = $query->where('leave_type_id', '=', $specific);
                 break;
             case 'mine':
                 $employee = Employee::where('user_id', '=', Auth::id() ?? auth('api')->id())->first();
-                $query = LeaveRequest::where('employee_id', '=', $employee->id)->orderBy('from_date', 'DESC');
+                $query = $query->where('employee_id', '=', $employee->id)->orderBy('from_date', 'DESC');
                 break; 
             case 'team':
                 $employee = Employee::where('user_id', '=', auth('api')->id())->first();
                 $team_members = Employee::where('reports_to', '=', $employee->employee_id)->orWhere('supervisor_id', '=', $employee->employee_id)->pluck('id');
-                $query = LeaveRequest::whereIn('employee_id', $team_members);
+                $query = $query->whereIn('employee_id', $team_members);
                 if ($specific != 'all'){$query = $query->where('status', '=', $specific);}
                 $query = $query->orderBy('status', 'ASC');
                 break;
+            case 'ongoing':
+                $query = $query->whereDate('from_date', '>=', date('Y-m-d'))
+                            ->whereDate('to_date', '>=', date('Y-m-d'))
+                            ->where('status', '=', 1);
+            break;
             case 'pending':
-                $query = LeaveRequest::whereDate('from_date', '<=', date('Y-m-d'))->where('status', '=', 1);
-                break;
+                $query = $query->whereDate('from_date', '>=', date('Y-m-d'))
+                ->where('status', '=', 1);
+            break;
             case 'rejected':
-                $query = LeaveRequest::where('status', '=', 4);
-                break;
-            default:
-                $query = null;
+                $query = $query->where('status', '=', 4);
+            break;
+            case 'unapproved':
+                $query = $query->where('status', '=', 0);
+            break;
         }
         
-        if(is_null($query)){
-            return [];
-        }
-        else{
-            $quest = $detailed ? $query->with(['employee.user', 'leave_type', 'approver']) : $query;
-            $leaves = $paginated ? $quest->latest()->paginate(50) : $quest->latest()->get();
+        /*if(!is_null($specific) && !empty($specific)){
+            $users = User::where(function($question) use ($specific){
+                $question->where('first_name', 'LIKE', "%$specific%")
+                ->orWhere('middle_name', 'LIKE', "%$specific%")
+                ->orWhere('last_name', 'LIKE', "%$specific%")
+                ->orWhere('email', 'LIKE', "%$specific%");
+                })
+            ->pluck('id');
+
+            $employees = Employee::whereIn('user_id', $users)->pluck('id');
+
+            $query->whereIn('employee_id', $employees);
+        }*/
+        
+        $quest = $detailed ? $query->with(['employee.user', 'leave_type', 'approver']) : $query;
+        $query->latest();
+        $leaves = $paginated ? $quest->latest()->paginate(50) : $quest->latest()->get();
             
-            return $leaves;
-        }
+        return $leaves;
+        
     }
 
     public function hrms_leave_request_number_of_days($leave_request){

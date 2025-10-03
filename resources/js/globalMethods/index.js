@@ -24,11 +24,28 @@ export const globalMethods = {
             if(text == null){return '';}
             return moment(text).format('DD');
         },
+        dateCompareToday(date, query){
+            var test_date = new Date(date);
+            
+            var today = new Date();
+            today.setHours(0,0,0,0);
+            if (query == '='){return (test_date == today);}
+            else if (query == '<'){return (test_date < today);}
+            else if (query == '<='){return (test_date <= today);}
+            else if (query == '>'){return (test_date > today);}
+            else if (query == '>='){return (test_date >= today);}
+        },
         dateGreaterThanToday(text){
             var test_date = new Date(text);
             var today = new Date();
             today.setHours(0,0,0,0);
             return (test_date >= today);
+        },
+        dateLessThanToday(text){
+            var test_date = new Date(text);
+            var today = new Date();
+            today.setHours(0,0,0,0);
+            return (test_date < today);
         },
         dateMonth(text) {
             if(text == null){return '';}

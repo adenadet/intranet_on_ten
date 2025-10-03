@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 <div class="card-body table-responsive p-0">
-                    <HrmsDetailLeaveRequestList source="team" :requests.sync="requests" @refreshRequests="getAllInitials"/>
+                    <HrmsDetailLeaveRequestList source="team" :requests.sync="requests.data" @refreshRequests="getAllInitials"/>
                 </div>
                 <div class="card-footer"><pagination v-model="current_page" @paginate="getAllInitials" :per-page="requests.per_page != null ? requests.per_page : 52" :records="requests.total != null ? requests.total : 550" ></pagination></div>
             </div>
@@ -48,7 +48,7 @@ export default {
     methods: {
         getAllInitials(page=1){
             this.loading = true;
-            axios.get('/api/hrms/leaves?type=team&page='+page+'&list_type='+this.list_type)
+            axios.get('/api/hrms/leaves?type=team&page='+page+'&query='+this.list_type)
             .then(response => {
                 this.requests = response.data.requests;
                 this.loading = false;

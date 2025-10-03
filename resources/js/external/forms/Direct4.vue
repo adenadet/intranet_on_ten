@@ -1,3 +1,4 @@
+
 <template>
 <div class="card card-primary ">
     <div class="modal fade" id="termsModal">
@@ -144,10 +145,10 @@
                     </div>
                 </div>
             </div>
-            <!--NairafyButton :amount="ApplicantData.amount" :phone="(ApplicantData.phone).toString()" :first_name="ApplicantData.first_name" :last_name="ApplicantData.last_name" :vendor_id="vendor_id" :unique_id="nairafyReference" :email="ApplicantData.email"  
+            <NairafyButton :amount="ApplicantData.amount" :phone="(ApplicantData.phone).toString()" :first_name="ApplicantData.first_name" :last_name="ApplicantData.last_name" :vendor_id="vendor_id" :unique_id="nairafyReference" :email="ApplicantData.email"  
             :beforePay="saveData"
             :onSuccess="response => processAppointment('nairafy', response)" 
-            :onFail="nairafyErrorAppointment" /-->          
+            :onFail="nairafyErrorAppointment" />          
             <button class="btn btn-primary ml-3" :disabled="isButtonDisabled" @click="handleCreateThenPay">PAY NGN {{ ApplicantData.amount }} with Paystack</button>
             <paystack ref="paystackRef" buttonClass="d-none" :publicKey="PUBLIC_KEY" :email="ApplicantData.email" :amount="ApplicantData.amount * 100" :reference="paystackReference" :onSuccess="handlePaystackSuccess" :onCancel="handlePaystackCancel"/>
                 <!--/form-->
@@ -160,303 +161,177 @@
 <script>
 import paystack from 'vue3-paystack';
 import NairafyButton from '../../plugins/nairafy-button.vue';
+
 export default {
     components: {
-        paystack
+        paystack,
+        NairafyButton
     },
     computed: {
         isButtonDisabled() {
-            const a = this.ApplicantData;
-            return (
-                this.loading ||
-                !this.terms ||
-                !a.email ||
-                !a.first_name ||
-                !a.last_name ||
-                !a.schedule
-            );
+        const a = this.ApplicantData;
+        return (
+            this.loading ||
+            !this.terms ||
+            !a.email ||
+            !a.first_name ||
+            !a.last_name ||
+            !a.schedule ||
+            !a.amount ||
+            !a.service_id
+        );
         },
     },
-    data(){
-        return  {
-            ApplicantData: new Form({
-                first_name: '', 
-                middle_name:'', 
-                last_name:'', 
-                amount: 0,
-                dob: '',
-                sex:'',
-                lmp:'', 
-                nationality_id: '',
-                alt_phone:'', 
-                phone:'', 
-                email:'',
-                id:'', 
-                image:'', 
-                nigerian_address:'', 
-                uk_address:'',
-                accompanying_kids: 0,
-                visa_type: '',
-                passport_number: '',
-                schedule: '',
-                service_id: '',
-                date: '',
-                payment_method:'',
-                payment_reference: '',
-                payment_transaction: '',
-            }),
-            today: '',
-            tomorrow: '',
-            PUBLIC_KEY: "pk_live_9e3c92567f7ad310ae7c28e248b8edb67ca2661a",
-            loading: false,
-            nairafyReference: this.genRef('nairafy'),
-            nations: [],
-            paystackReference: this.genRef('paystack'),
-            schedules: [],
-            serverTxnId: null,
-            services: [], 
-            terms: false,
-            vendor_id: "47c3ac1b-361c-488e-b8bb-0c56da0411df", 
-        }
+    data() {
+        return {
+        ApplicantData: new Form({
+            first_name: '',
+            middle_name: '',
+            last_name: '',
+            amount: 0,
+            dob: '',
+            sex: '',
+            lmp: '',
+            nationality_id: '',
+            alt_phone: '',
+            phone: '',
+            email: '',
+            id: '',
+            image: '',
+            nigerian_address: '',
+            uk_address: '',
+            accompanying_kids: 0,
+            visa_type: '',
+            passport_number: '',
+            schedule: '',
+            service_id: '',
+            date: '',
+            payment_method: '',
+            payment_reference: '',
+            payment_transaction: '',
+        }),
+        today: '',
+        tomorrow: '',
+        PUBLIC_KEY: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+        loading: false,
+        reference_nairafy: '',
+        reference_paystack: '',
+        nations: [],
+        schedules: [],
+        serverTxnId: null,
+        services: [],
+        terms: false,
+        vendor_id: import.meta.env.VITE_VENDOR_ID,
+        };
     },
     mounted() {
         this.getInitials();
+        this.reference_nairafy = this.genRef('nairafy');
+        this.reference_paystack = this.genRef('paystack');
     },
-    methods:{
-        closeModal(){
+    methods: {
+        closeModal() {
             $('#termsModal').modal('hide');
         },
-        createApplicant(){
-            this.loading = true;
-            this.ApplicantData.post('/api/scheduler')
-            .then(response =>{
+        async createApplicant() {
+            try {
+                this.loading = true;
+                const response = await this.ApplicantData.post('/api/scheduler');
                 this.loading = false;
                 this.ApplicantData.reset();
-                this.$swal.fire({icon: 'success', title: 'The Profile details has been created', showConfirmButton: false, timer: 1500});
-            })
-            .catch(()=>{
+                this.$swal.fire({
+                    icon: 'success',
+                    title: 'The Profile details has been created',
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            } 
+            catch (error) {
+                this.loading = false;
                 this.$swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
-                    text: 'Something went wrong!',
-                    footer: 'Please try again later!'
+                    title: 'Oops... Something went wrong!',
+                    text: error.response?.data?.message || 'Please try again later!'
                 });
-                this.loading = false;
-            });  
+            }
         },
         genRef(type) {
             const prefixMap = {
                 nairafy: 'Nairafy_',
                 paystack: 'Paystack_',
-            }
-            const ref = (prefixMap[type] || 'TRX_') + new Date().valueOf()
-
-            if (type === 'nairafy') this.reference_nairafy = ref
-            else if (type === 'paystack') this.reference_paystack = ref
-            
-            return ref
+            };
+            return (prefixMap[type] || 'Transaction_') + new Date().valueOf();
         },
-        getInitials(){
-            this.loading = true;
-            axios.get('/api/scheduler')
-            .then(response => {;
-                var today = new Date();
-                var dd = today.getDate();
-                var dt = dd + 1;
-                var mm = today.getMonth()+1;
-                 
-                var yyyy = today.getFullYear();
-                if(dd<10){dd='0'+dd;} 
-                if(dt<10){dt='0'+dt;} 
-                if(mm<10){mm='0'+mm;} 
-                today = yyyy+'-'+mm+'-'+dd;
-                var tomorrow = yyyy+'-'+mm+'-'+dt;
-            this.today = today;
-            this.tomorrow = tomorrow
-            this.refreshScheduler(response)
-            this.loading = false;
-            })
-            .catch(() => {
-                this.loading = false;
-                toast.fire({icon: 'error', title: 'Your appointments did not loaded successfully',})
-            });
-        },
-        async handlePaystackCancel() {
-            axios.delete(`/api/scheduler/${this.serverTxnId}`)  
-        },
-        async handleCreateThenPay() {
+        async getInitials() {
             try {
                 this.loading = true;
-                await this.ApplicantData.post('/api/scheduler')
-                .then(response =>{
-                    this.loading = false;
-                    this.serverTxnId = response.data.appointment.id;
-                    this.$refs.paystackRef.payWithPaystack();
-                })
-                .catch(()=>{
-                    this.$swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Something went wrong!',
-                        footer: 'Please try again later!'
-                    });
-                    this.loading = false;
-                });  
+                const response = await axios.get('/api/scheduler');
+                const today = new Date();
+                const dd = String(today.getDate()).padStart(2, '0');
+                const dt = String(today.getDate() + 1).padStart(2, '0');
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const yyyy = today.getFullYear();
+                this.today = `${yyyy}-${mm}-${dd}`;
+                this.tomorrow = `${yyyy}-${mm}-${dt}`;
+                this.refreshScheduler(response);
             } 
-            catch (err) {
-                if (err.response?.data?.errors) {
-                    this.ApplicantData.errors.record(err.response.data.errors);
-                }
-            } 
-            finally {this.loading = false;}
-        },
-        async handlePaystackSuccess(ps) {
-            try {
-                await axios.put(`/api/scheduler/${this.serverTxnId}`, {
-                    payment_gateway : 'paystack',
-                    reference       : ps.reference,
-                    status          : ps.status,
-                    raw_response    : ps,          // optionally persist full payload
+            catch (error) {
+                toast.fire({
+                    icon: 'error',
+                    title: 'Your appointments did not load successfully',
                 });
-
-                this.ApplicantData.reset();
-                this.$swal.fire({icon: 'success', title: 'The Profile details has been created', showConfirmButton: false, timer: 1500});
             } 
-            catch (err) {
-                // If this fails you may want to flag the appointment for review
-            }
-        },
-        isWeekend(date){
-            var cast = new Date(date)
-            return cast.getDay() === 6 || cast.getDay() === 0;
-        },
-        async nairafyErrorAppointment(response){
-            if (response.message != "Approved"){
-                alert("Payment was unsuccessful");
-                this.ApplicantData.payment_method = "Nairafy";
-                this.ApplicantData.payment_reference= response.reference;
-                this.ApplicantData.payment_transaction = response.transaction;
-            }
-            else{
-                alert("Payment has to be made to confirm booking");
-            }
-        },
-        async nairafyProcessAppointment(response){
-            try {
-                await axios.put(`/api/scheduler/${this.serverTxnId}`, {
-                    payment_gateway : 'nairafy',
-                    reference       : ps.unique_id,
-                    status          : ps.status,
-                    raw_response    : ps,          // optionally persist full payload
-                });
-
-                this.ApplicantData.reset();
-                this.$swal.fire({icon: 'success', title: 'The Profile details has been created', showConfirmButton: false, timer: 1500});
-            } 
-            catch (err) {
-                // If this fails you may want to flag the appointment for review
-            }
-        },
-        refreshScheduler(response){
-            this.services = response.data.services;
-            this.nations = response.data.nations;
-        },
-        processAppointment(channel, response){
-            this.ApplicantData.payment_method = channel;
-            if (channel == 'nairafy'){
-                this.ApplicantData.payment_transaction = response.transaction.unique_code;
-                this.ApplicantData.payment_reference = response.transaction.payment ? response.transaction.payment.description : '';    
-            }
-            else{
-                this.ApplicantData.payment_reference= response.reference;
-                this.ApplicantData.payment_transaction = response.transaction;
-            }
-            this.createApplicant();
-        },
-        processErrorAppointment(channel, response){
-            if (response.message != "Approved"){
-                alert("Payment was unsuccessful");
-                this.ApplicantData.payment_method = "Paystack";
-                this.ApplicantData.payment_reference= response.reference;
-                this.ApplicantData.payment_transaction = response.transaction;
-
-                //this.createApplicant();
-            }
-            else{
-                alert("Payment has to be made to confirm booking");
-            }
-        },
-        processBooking(){
-            this.ApplicantData.payment_method = "Holding";
-        },
-        saveData() {
-            this.ApplicantData.reference_id = channel == 'nairafy' ? this.nairafyReference : this.paystackReference;
-            this.loading = true
-            this.ApplicantData.post('/api/scheduler')
-            .then((response) => {
-                this.serverTxnId = response.data.appointment.id;
-            })
-            .catch(err => {
-                this.$toast.fire({ icon: 'error', title: 'Could not save appointment' })
-                return Promise.reject(err)
-            })
-            .finally(() => { this.loading = false })
-        },
-        searchSchedule(){
-            if (this.ApplicantData.service_id == ""){
-                alert("Please select the service type");
-                this.ApplicantData.date = "";
-                return;
-            }
-            else if (this.isWeekend(this.ApplicantData.date)){
-                alert("Weekend not available for selection");
-                this.ApplicantData.date = "";
-                return;
-            }
-            axios.get('/api/schedules?service_id='+this.ApplicantData.service_id+'&date='+this.ApplicantData.date)
-            .then(response =>{
-                if (response.data.schedules.length == 0){
-                    this.$swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'There is no space for this date!',
-                        footer: 'Please choose a later date!'
-                    });
-                }
-                this.schedules = response.data.schedules;
+            finally {
                 this.loading = false;
-            })
-            .catch(()=>{
-                this.loading = false;
-                this.$toast.fire({ icon: 'error', title: 'Schedules not loaded successfully',})
+            }
+        },
+        async handleCreateThenPay() {
+        try {
+            if (this.isButtonDisabled) return;
+            this.loading = true;
+            const response = await this.ApplicantData.post('/api/scheduler');
+            this.serverTxnId = response.data.appointment.id;
+            this.$refs.paystackRef.payWithPaystack();
+        } 
+        catch (error) {
+            this.$swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: error.response?.data?.message || 'Please try again later!'
             });
-        },
-        updateAmount(){
-            var dob = new Date(this.ApplicantData.dob);
-            var month_diff = Date.now() - dob.getTime();  
-            var age_dt = new Date(month_diff);   
-            var year = age_dt.getUTCFullYear();  
-            var age = Math.abs(year - 1970);  
-            
-            if (age >= 11){this.ApplicantData.amount = 100000;}
-            else {this.ApplicantData.amount = 50000;}
-        },
-        updateProfilePic(e){
-            let file = e.target.files[0];
-            let reader = new FileReader();
-            if (file['size'] < 2000000){
-                reader.onloadend = (e) => {
-                    this.ApplicantData.image = reader.result
-                }
-                reader.readAsDataURL(file)
-            }
-            else{
-                this.$swal.fire({type: 'error', title: 'File is too large'})
-            }
-        },
-        viewTerms(){
-            $('#termsModal').modal('show');
+        } 
+        finally {
+            this.loading = false;
         }
+        },
+        async handlePaystackCancel() {
+            if (this.serverTxnId) {
+                await axios.delete(`/api/scheduler/${this.serverTxnId}`);
+            }
+        },
+        async handlePaymentSuccess(ref, gateway = 'paystack') {
+            try {
+                const payload = {
+                    payment_method: gateway,
+                    payment_reference: ref.reference,
+                    payment_transaction: ref.transaction,
+                };
+                await axios.put(`/api/scheduler/${this.serverTxnId}`, payload);
+                this.$swal.fire({
+                    icon: 'success',
+                    title: 'Payment successful!',
+                    showConfirmButton: false,
+                    timer: 2000,
+                });
+            } 
+            catch (error) {
+                this.$swal.fire({
+                    icon: 'error',
+                    title: 'Payment update failed',
+                    text: 'Please contact support with your reference number.',
+                });
+            }
+        },
     },
-}
+};
 </script>

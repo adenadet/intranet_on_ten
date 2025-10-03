@@ -35,7 +35,7 @@
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="text-white" aria-hidden="true">&times;</span></button>
                         </div>
                         <div class="modal-body">
-                            <EServiceFormPatient :editMode.sync="editMode" :applicant.sync="applicant" @refreshPatient="refreshAppointments"/> 
+                            <EServiceFormPatient :editMode.sync="editMode" :applicant.sync="applicant" @refreshPayment="refreshAppointments"/> 
                         </div>
                     </div>
                 </div>
@@ -139,7 +139,7 @@ export default {
             user: {},
         }
     },
-    emits:['refreshAppointment'],
+    emits:['refreshAppointmentPage'],
     mounted() {},
     methods: {
         addApplicant(){
@@ -182,9 +182,10 @@ export default {
             });
         },
         closeModals(){
+            $('#applicantModal').modal('hide');
             $('#appointmentModal').modal('hide');
             $('#patientModal').modal('hide');
-            $('#applicantModal').modal('hide');
+            $('#paymentModal').modal('hide');
             $('#receiptModal').modal('hide');
         },
         getInitials(page = 1) {

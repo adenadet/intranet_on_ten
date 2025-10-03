@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Webhook\PaystackController;
 
 Route::namespace('App\Http\Controllers\Api\Auth')->name('api.auth.')->group(base_path('routes/api/auth.php'));
 Route::namespace('App\Http\Controllers\Api\Chats')->middleware('auth:api')->name('api.chats.')->group(base_path('routes/api/chats.php'));
@@ -34,3 +35,6 @@ Route::apiResources([
     'policies'      => 'App\Http\Controllers\Api\PolicyController',
     'scheduler'     => 'App\Http\Controllers\Api\EMR\RegistrationController',
 ]);
+
+Route::post('/paystack/webhook', [PaystackController::class, 'handle'])
+     ->name('paystack.webhook');

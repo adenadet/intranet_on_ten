@@ -32,19 +32,28 @@
                 <div class="card-header bg-navy">
                     <h3 class="card-title">All Requests</h3>
                     <div class="card-tools">
-                        <div class="input-group input-group-sm" style="width: 350px;">
-                            <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-
+                        <div class="input-group" style="width: 450px;">
+                            <input type="text" name="table_search" class="form-control float-right" placeholder="Search" v-model="query">
                             <div class="input-group-append">
-                                <button type="submit" class="btn btn-sm btn-default"><i class="fas fa-search"></i></button>
-                                <button type="button" class="btn btn-sm btn-primary" @click="addLeaveRequest"><i class="fas fa-plus"></i></button>
+                                <button type="submit" class="btn btn-sm btn-default" @click="getAllInitials()"><i class="fas fa-search"></i></button>
+                                <select class="form-control ml-1" @change="getAllInitials()" v-model="type">
+                                    <option value="all">All</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="cancelled">Cancelled</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="ongoing">Ongoing</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="rejected">Rejected</option>
+                                    <option value="unapproved">Unapproved</option>
+                                </select>
+                                <button type="button" class="btn btn-sm btn-primary ml-1" @click="addLeaveRequest"><i class="fas fa-plus"></i></button>
                                 <button type="button" class="btn btn-sm btn-info" @click="uploadLeaveRequest"><i class="fas fa-upload"></i></button>
                             </div>
                         </div>
                     </div>
                 </div>        
                 <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-                <HrmsDetailLeaveRequestList source="admin" :requests.sync="requests" />
+                <HrmsDetailLeaveRequestList source="admin" :requests.sync="requests.data" />
                 <div class="card-footer">
                     <pagination v-model="current_page" @paginate="getAllInitials" :per-page="requests.per_page != null ? requests.per_page : 52" :records="requests.total != null ? requests.total : 550" ></pagination>
                 </div>
@@ -61,8 +70,10 @@ export default {
             editMode: false,
             leave_request: {},
             loading: false,
+            query: '',
             request: {},
             requests: {},
+            type: 'all',
         }
     },
     mounted() {
@@ -80,7 +91,7 @@ export default {
         },
         getAllInitials(page=1){
             this.loading = true;
-            axios.get('/api/hrms/leaves?type=all&page='+page)
+            axios.get('/api/hrms/leaves?query='+this.query+'&type='+this.type+'&page='+page)
             .then(response => {
                 this.refreshRequests(response);
                 this.loading = false;

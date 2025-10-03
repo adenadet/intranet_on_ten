@@ -5,7 +5,7 @@
                 <EServiceFormSearch search_type="front_admin" @searchedAppointments="refreshAppointments" />
                 <div class="card overlay-wrapper">
                     <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-                    <EServiceDetailAppointmentList source="front_office" :appointments.sync="appointments" @refreshAppointments="getAllInitials(current_page)" />
+                    <EServiceDetailAppointmentList source="front_office" :appointments.sync="appointments" @refreshAppointmentPage="getAllInitials(current_page)" />
                     <div class="card-footer">
                         <pagination v-model="current_page" @paginate="getAllInitials" :per-page="appointments.per_page != null ? appointments.per_page : 52" :records="appointments.total != null ? appointments.total : 550" ></pagination>
                     </div>
@@ -32,7 +32,7 @@ export default {
     methods: {
         getAllInitials(page=1){
             this.loading = true;
-            axios.get('/api/emr/appointments?page='+page)
+            axios.get('/api/emr/appointments?type=office&page='+page)
             .then(response=>{
                 this.appointments = response.data.appointments;   
                 this.loading = false;
