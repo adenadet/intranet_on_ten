@@ -75,7 +75,6 @@
                 <li class="nav-item">
                     <a href="/users" class="nav-link"><i class="nav-icon fas fa-users"></i><p>Users</p></a>
                 </li>
-                
                 @endif
                 <li class="nav-item">
                     <a href="/chats" class="nav-link"><i class="nav-icon fas fa-comments"></i><p>Chats </p></a>

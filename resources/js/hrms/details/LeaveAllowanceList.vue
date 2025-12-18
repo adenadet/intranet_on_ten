@@ -35,7 +35,7 @@
             <tr v-for="(allowance, index) in allowances">
                 <td>{{ addOne(index) }}</td>
                 <td>{{ allowance.employee != null ? FullName(allowance.employee.user) : 'Wondering' }}</td>
-                <td>{{ allowance.leave_request != null ? FullName(allowance.leave_request) : 'N/A' }}</td>
+                <td>{{ allowance.leave_type != null ? allowance.leave_type.name : 'N/A' }}</td>
                 <td>{{ allowance.status }}</td>
                 <td>{{ currency(allowance.amount) }}</td>
                 <td>

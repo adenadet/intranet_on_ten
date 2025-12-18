@@ -1,5 +1,27 @@
 import {createRouter, createWebHistory} from 'vue-router';
 
+import CPDashboard          from '../consultant_practices/Dashboard.vue';
+import CPPatient            from '../consultant_practices/Patient.vue';
+import CPPatients           from '../consultant_practices/Patients.vue';
+import CPSession            from '../consultant_practices/Session.vue';
+import CPSessions           from '../consultant_practices/Sessions.vue';
+
+    import CPDetailAccountList              from '../consultant_practices/details/AccountList.vue';
+    import CPDetailConsultant               from '../consultant_practices/details/Consultant.vue';
+    import CPDetailConsultantList           from '../consultant_practices/details/ConsultantList.vue';
+    import CPDetailPatientList              from '../consultant_practices/details/PatientList.vue';
+    import CPDetailPayment                  from '../consultant_practices/details/Payment.vue';
+    import CPDetailPaymentConfirmation      from '../consultant_practices/details/PaymentConfirmation.vue';
+    import CPDetailPaymentList              from '../consultant_practices/details/PaymentList.vue';
+    import CPDetailPricelistList            from '../consultant_practices/details/PricelistList.vue';
+    import CPDetailSession                  from '../consultant_practices/details/Session.vue';
+    import CPDetailSessionList              from '../consultant_practices/details/SessionList.vue';
+
+    import CPFormConsultant                 from '../consultant_practices/forms/Consultant.vue';
+    import CPFormPayment                    from '../consultant_practices/forms/Payment.vue';
+    import CPFormPaymentConfirmation        from '../consultant_practices/forms/PaymentConfirmation.vue';
+    import CPFormSession                    from '../consultant_practices/forms/Session.vue';
+    
 import DashboardMain        from '../dashboard/Main.vue';
 
 import EServiceAdminDashboard               from '../eservices/admin/Dashboard.vue';
@@ -186,6 +208,13 @@ import component from 'vue3-paystack';
 
 const routes = [
     {path: '/',                                             component: DashboardMain},
+
+    {path: '/consultant_practices/front_office',                    component: CPDashboard},
+    {path: '/consultant_practices/front_office/patients',           component: CPPatients},
+    {path: '/consultant_practices/front_office/patients/:id',       component: CPPatient},
+    {path: '/consultant_practices/front_office/sessions',           component: CPSessions},
+    {path: '/consultant_practices/front_office/sessions/:id',       component: CPSession},
+
     {path: '/contacts',                                     component: UserContacts},
     {path: '/contacts/:id',                                 component: HrmsEmployeeContact},
     {path: '/dashboard',                                    component: DashboardMain},
@@ -289,6 +318,28 @@ const router = createRouter({
 
 export function registerGlobalComponents(app) {
     app.component('DashboardMain',           DashboardMain);
+
+    app.component('CPDashboard',                     CPDashboard);
+    app.component('CPPatient',                       CPPatient);
+    app.component('CPPatients',                      CPPatients);
+    app.component('CPSession',                       CPSession);
+    app.component('CPSessions',                      CPSessions);
+
+        app.component('CPDetailAccountList',                  CPDetailAccountList);
+        app.component('CPDetailConsultant',                   CPDetailConsultant);
+        app.component('CPDetailConsultantList',               CPDetailConsultantList);
+        app.component('CPDetailPatientList',                  CPDetailPatientList);
+        app.component('CPDetailPayment',                      CPDetailPayment);
+        app.component('CPDetailPaymentConfirmation',          CPDetailPaymentConfirmation);
+        app.component('CPDetailPaymentList',                  CPDetailPaymentList);
+        app.component('CPDetailPricelistList',                CPDetailPricelistList);
+        app.component('CPDetailSession',                      CPDetailSession);
+        app.component('CPDetailSessionList',                  CPDetailSessionList); 
+        
+        app.component('CPFormConsultant',                     CPFormConsultant);
+        app.component('CPFormPayment',                        CPFormPayment);
+        app.component('CPFormPaymentConfirmation',            CPFormPaymentConfirmation);
+        app.component('CPFormSession',                        CPFormSession);
 
     app.component('EServiceCertificate',             EServiceCertificate);
     app.component('EServiceCertificateBioData',      EServiceCertificateBioData);

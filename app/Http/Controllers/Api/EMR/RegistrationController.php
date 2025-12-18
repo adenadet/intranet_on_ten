@@ -2,31 +2,69 @@
 namespace App\Http\Controllers\Api\EMR;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-use App\Models\EMR\Appointment;
-use App\Models\EMR\Cancellation;
-use App\Models\EMR\Patient;
-use App\Models\EMR\RadFinding;
-use App\Models\EMR\Schedule;
-use App\Models\EMR\Service;
-use App\Models\Area;
-use App\Models\State;
-use App\Models\Country;
-use App\Models\User;
-use App\Models\EMR\Payment;
-
+use App\Http\Traits\EService\AppointmentTrait;
 use App\Mail\RegistrationMail as RegMail;
 use App\Mail\RescheduleMail as ResMail;
+use App\Models\EMR\Appointment;
+use App\Models\EMR\Schedule;
+use App\Models\EMR\Service;
+use App\Models\Country;
+use App\Models\EMR\Payment;
+use App\Models\Hrms\PublicHoliday;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class RegistrationController extends Controller
 {
+    use AppointmentTrait;
     public function index()
     {
+        // inputs          // service id to search for
+        $daysToSearch = 30;                           // how many days ahead to search
+        $public_holidays = PublicHoliday::where('date', '>=', date('Y-m-d'))->where('date', '<=', date('Y-m-d', strtotime('+'.$daysToSearch.' days')))->pluck('date')->toArray();                          // array of ‘YYYY-MM-DD’ strings
+
+        // build public holidays clause only if array not empty
+        if (!empty($public_holidays)) {
+            $phPlaceholders = implode(',', array_fill(0, count($public_holidays), '?'));
+            $phClause = "AND d.date NOT IN ($phPlaceholders)";
+            // binding order: serviceId (for s), serviceId (for a), daysToSearch, then public holidays...
+            $bindings = array_merge([1, 1, $daysToSearch], $public_holidays);
+        } else {
+            $phClause = ""; 
+            $bindings = [1, 1, $daysToSearch];
+        }
+
+        $sql = " SELECT d.date, s.schedule
+        FROM ( SELECT DATE_ADD(CURDATE(), INTERVAL (u.n + t.n*10) DAY) AS date, (u.n + t.n*10) AS offset
+        FROM ( SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4  UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) u
+        CROSS JOIN (SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t
+        ) d
+        JOIN emr_service_schedules s
+        ON s.service_id = ?
+        LEFT JOIN emr_appointments a
+        ON a.service_id = ?
+        AND a.date = d.date
+        AND a.schedule = s.schedule
+        AND a.deleted_at IS NULL
+        AND a.status != 'cancelled'   -- treat cancelled appointments as not blocking
+        WHERE d.offset BETWEEN 1 AND ?
+        AND DAYOFWEEK(d.date) NOT IN (1,7)   -- exclude Sundays(1) and Saturdays(7)
+        {$phClause}
+        AND a.id IS NULL                      -- only slots without an active appointment
+        ORDER BY d.date ASC, s.schedule ASC
+        LIMIT 5
+        ";
+
+        $uk_tb_slots = DB::select($sql, $bindings);
+
+        //return response()->json($slot);
+
+
         return response()->json([
-            'nations' => Country::orderBy('name', 'ASC')->get(),   
-            'services'      => Service::orderBy('name', 'ASC')->get(),   
+            'nations'  => Country::orderBy('name', 'ASC')->get(),   
+            'services' => Service::orderBy('name', 'ASC')->get(),
+            'uk_tb_slots' => $uk_tb_slots,
         ]);
     }
 
@@ -41,36 +79,7 @@ class RegistrationController extends Controller
             'schedule' => 'sometimes',
         ]);
 
-        $patient = Patient::create([
-            'last_name'     => $request->input('last_name'),
-            'first_name'    => $request->input('first_name'),
-            'middle_name'   => $request->input('middle_name'),
-            'dob' => $request->input('dob'),
-            'sex' => $request->input('sex'),
-            'image' => NULL,
-            'passport_page' => NULL,
-            'lmp' => $request->input('lmp'),
-            'email' => $request->input('email'),
-            'phone' => $request->input('phone'),
-            'alt_phone' => $request->input('alt_phone'),
-            'nigerian_address' => $request->input('nigerian_address'),
-            'uk_address' => $request->input('uk_address'),
-            'accompanying_kids' => $request->input('accompanying_kids'),
-            'nationality_id' => $request->input('nationality_id'),
-            'passport_no' => $request->input('passport_no'),
-            'visa_type' => $request->input('visa_type'),
-            'created_by' => 0,
-        ]);
-
-        $appointment = Appointment::create([
-            'patient_id' => $patient->id,
-            'service_id' => $request->input('service_id'),
-            'date'       => $request->input('date'),
-            'amount'     => $request->input('amount') ?? 0,
-            'schedule'   => $request->input('schedule'),
-            'status'     => 0,
-            'created_by' => 0,
-        ]);
+        $appointment = $this->appointment_create($request);
 
         return response()->json([
             'appointment' => $appointment
@@ -98,6 +107,7 @@ class RegistrationController extends Controller
             'details' => $request->input('payment_transaction').' | '.$request->input('payment_reference'),    
         ]);
 
+        $appointment->status = 1;
         $appointment->transaction_id = "SNH-".$appointment->id."-".$payment->id."-".$appointment->patient_id;
         $appointment->save();
 
@@ -155,7 +165,7 @@ class RegistrationController extends Controller
         	$schedules = [];
         }
         else if (($date = $_GET['date']) && ($service_id = $_GET['service_id'])){
-            $taken = Appointment::select('schedule')->where([['date', '=', $date]])->get();
+            $taken = Appointment::select('schedule')->where([['date', '=', $date], ['status', '>', '1']])->get();
             $schedules = Schedule::select('schedule')->where('service_id', '=', $service_id)->whereNotIn('schedule', $taken)->get();
             }
         else{

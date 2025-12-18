@@ -12,6 +12,10 @@ use App\Models\State;
 use App\Models\Country;
 use App\Models\EMR\Consultation;
 use App\Models\User;
+use Carbon\Carbon;
+use DateTime;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 trait AppointmentTrait{
@@ -118,6 +122,87 @@ trait AppointmentTrait{
         return $query;
         
     }
+
+    public function appointment_create($data){
+        DB::beginTransaction();
+
+        try{
+            if (empty($data['patient_id'])){
+                $patient = Patient::firstOrCreate([
+                    'last_name'     => $data['last_name'],
+                    'first_name'    => $data['first_name'],
+                    'passport_no'   => $data['passport_no'] 
+                ], 
+                [
+                    'middle_name'   => $data['middle_name'],
+                    'dob' => $data['dob'],
+                    'sex' => $data['sex'],
+                    'image' => NULL,
+                    'passport_page' => NULL,
+                    'lmp' => $data['lmp'],
+                    'email' => $data['email'],
+                    'phone' => $data['phone'],
+                    'alt_phone' => $data['alt_phone'],
+                    'nigerian_address' => $data['nigerian_address'],
+                    'uk_address' => $data['uk_address'],
+                    'accompanying_kids' => $data['accompanying_kids'],
+                    'nationality_id' => $data['nationality_id'],
+                    'passport_no' => $data['passport_no'],
+                    'visa_type' => $data['visa_type'],
+                    'created_by' => 0,
+                ]);
+            }
+            else{
+                $patient = Patient::find($data['patient_id']);
+            }
+
+            //Determine the Amount based on the Age of the patient
+            $birthdate = new DateTime($patient->dob);
+            $today = new DateTime(); 
+            $interval = $today->diff($birthdate);
+            $age_in_years = $interval->y;
+
+            $available_appointment = Appointment::where('patient_id', '=', $patient->id)
+            ->whereBetween('created_at', [
+                Carbon::now()->subDays(7)->startOfDay(),
+                Carbon::now()->endOfDay()
+            ])
+            ->whereDate('date', '>', date('Y-m-d'))
+            ->get();
+
+            if ($available_appointment->count() > 0){
+                $appointment = Appointment::find($available_appointment[0]->id);
+
+                $appointment->patient_id = $patient->id;
+                $appointment->service_id = $data['service_id'];
+                $appointment->date       = $data['date'];
+                $appointment->amount     = $age_in_years < 11 ? 50000 : 100000;
+                $appointment->schedule   = $data['schedule'];
+
+                $appointment->save();
+            }
+            else{
+                $appointment = Appointment::create([
+                    'patient_id' => $patient->id,
+                    'service_id' => $data['service_id'],
+                    'date'       => $data['date'],
+                    'amount'     => $age_in_years < 11 ? 50000 : 100000,
+                    'schedule'   => $data['schedule'],
+                    'status'     => 0,
+                    'created_by' => auth('api')->id() ?? Auth::id() ?? 0,
+                ]);
+            }
+
+            DB::commit();
+            return $appointment;
+
+        }
+        catch(Exception $e){
+            DB::rollback();
+            return $e->getMessage();
+        }    
+    }
+
     public function appointment_get_all($type, $page, $paginated, $sort_order){
         switch ($type){
             case 'admin':

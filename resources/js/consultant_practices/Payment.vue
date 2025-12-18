@@ -1,0 +1,10 @@
+<template>
+<section>
+    <div class="col-md-5">
+
+    </div>
+    <div class="col-md-7">
+        
+    </div>
+</section>
+</template>

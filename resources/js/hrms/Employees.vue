@@ -120,6 +120,12 @@ export default {
             .then((response ) => {this.refreshPage(response);})
             .catch(()=>{});
         },
+        uploadEmployees(){
+            this.loading = true;
+            this.editMode = false;
+            $('#uploadModal').modal('show');
+            this.loading = false;
+        },
     },
     mounted(){ 
         this.getAllInitials();

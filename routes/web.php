@@ -23,6 +23,7 @@ Route::get('/clear-cache', function() {
 
 Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['auth','role:Staff'],], function () {    
     Route::get('/',                 'ModulesController@dashboard')->name('home');
+    Route::get('/consultant_practices',         'ModulesController@consultant_practices')->name('consultant_practices');
     Route::get('/contacts',         'ModulesController@contacts')->name('contacts');
     Route::get('/home',             'ModulesController@dashboard')->name('dashboard');
     Route::get('/dashboard',        'ModulesController@dashboard')->name('dashboard');
@@ -45,6 +46,7 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['auth','ro
     
     //Auto Redirect
     Route::get('/chats/{any}',              'ModulesController@chats')->where('any', '.*');
+    Route::get('/consultant_practices/{any}',           'ModulesController@consultant_practices')->where('any', '.*');
     Route::get('/contacts/{any}',           'ModulesController@contacts')->where('any', '.*');
     Route::get('/departments/{any}',        'ModulesController@departments')->where('any', '.*');
     Route::get('/hrms/{any}',               'ModulesController@hrms')->where('any', '.*');

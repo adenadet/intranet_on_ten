@@ -41,6 +41,26 @@
                     </div>
                 </div>
             </div>
+            <div class="row" v-if="ApplicantData.service_id == 1">
+                <div class="col-md-12 table-responsive p-o">
+                    <table class="table table-striped table-hover">
+                        <thead class="bg-dark">
+                            <tr><th colspan="3">Next Available Slots</th></tr>
+                            <tr><th>#</th><th>Date</th><th>Schedule</th></tr>
+                        </thead>
+                        <tbody v-if="uk_tb_slots.length != 0">
+                            <tr v-for="(schedule, index) in uk_tb_slots">
+                                <td>{{ addOne(index) }}</td>
+                                <td>{{ schedule.date }}</td>
+                                <td>{{ schedule.schedule }}</td>
+                            </tr>
+                        </tbody>
+                        <tbody v-else>
+                            <tr><td colspan="5">No Schedule available for selected date</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-sm-4">
                     <div class="form-group">
@@ -208,6 +228,7 @@ export default {
             today: '',
             tomorrow: '',
             PUBLIC_KEY: "pk_live_9e3c92567f7ad310ae7c28e248b8edb67ca2661a",
+            PUBLIC_TEST: "pk_test_a598743a2527b186e293b76fb39bcfa6834eb153",
             loading: false,
             nairafyReference: this.genRef('nairafy'),
             nations: [],
@@ -216,6 +237,7 @@ export default {
             serverTxnId: null,
             services: [], 
             terms: false,
+            uk_tb_slots: [],
             vendor_id: "47c3ac1b-361c-488e-b8bb-0c56da0411df", 
         }
     },
@@ -360,6 +382,7 @@ export default {
         refreshScheduler(response){
             this.services = response.data.services;
             this.nations = response.data.nations;
+            this.uk_tb_slots = response.data.uk_tb_slots;
         },
         processAppointment(channel, response){
             this.ApplicantData.payment_method = channel;

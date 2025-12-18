@@ -16,6 +16,14 @@ class ModulesController extends Controller
         return view('chats')->with($params);
     }
 
+    public function consultant_practices(){
+        $params = [
+            'page' => 'consultant_practices',
+            'page_title' => 'Consultant Practices',
+        ];
+        return view('app')->with($params);
+    }
+
     public function contacts()
     {
         $params = [

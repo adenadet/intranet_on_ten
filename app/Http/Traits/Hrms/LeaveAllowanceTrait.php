@@ -7,7 +7,7 @@ use App\Http\Traits\General\FileManagerTrait;
 
 use App\Models\Hrms\Employee;
 use App\Models\Hrms\LeaveAllowance;
-
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -54,20 +54,38 @@ trait LeaveAllowanceTrait{
     }
 
     public function hrms_leave_allowance_get_all($type, $specific, $detailed, $paginated, $page){
+        $query = LeaveAllowance::query();
         switch ($type){
             case 'all':
-                $query = LeaveAllowance::all();
+                $query = $query->withTrashed();
             break;
             case 'mine':
                 $employee = Employee::where('user_id', '=', (Auth::id() ?? auth('api')->id()))->first();
-                $query = LeaveAllowance::where('employee_id', '=', $employee->id);
+                $query = $query->where('employee_id', '=', $employee->id);
             break;
-            case 'status':
+            /*case 'status':
                 $query = LeaveAllowance::where('status', '=', $specific);
-            break; 
+            break;*/ 
         }
 
-        $query = $detailed ? $query->with(['employee.user']) : $query;
+        if (is_array($specific)){
+            if (!empty($specific['query'])){
+                $search = $specific['query'];
+
+                $users = User::where('first_name', 'LIKE', "%$search%")
+                    ->orWhere('middle_name', 'LIKE', "%$search%")
+                    ->orWhere('last_name', 'LIKE', "%$search%")
+                    ->orWhere('email', 'LIKE', "%$search%")
+                    ->pluck('id');
+                
+                $employees = Employee::whereIn('user_id', $users)->orWhere('username', 'LIKE', "%$search%")->orderBy('username', 'ASC')->pluck('id');
+
+                $query = $query->whereIn('employee_id', $employees);
+            }
+        }
+
+        $query = $detailed ? $query->with(['employee.user', 'employee_leave.leave_type']) : $query;
+        $query = $query->latest();
         $query = $paginated ? $query->paginate(50) : $query->get(); 
 
         return $query;
