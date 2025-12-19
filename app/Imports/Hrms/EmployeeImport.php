@@ -16,7 +16,21 @@ class EmployeeImport implements ToModel, WithHeadingRow
     {
         $number = Employee::max('employee_id');
         $number++;
+        $unique = !empty($row['unique_id']) ? str_replace('SNH-', '', $row['unique_id']) : $number;
 
+        $line_manager = $supervisor = null;
+        if(!empty($row['supervisor_snh_id'])){
+            $sup_employee = Employee::where('username', '=', $row['supervisor_snh_id'])->first();
+            if($sup_employee){
+                $supervisor = $sup_employee->employee_id;
+            }
+        }
+        if(!empty($row['line_manager_snh_id'])){
+            $lm_employee = Employee::where('username', '=', $row['line_manager_snh_id'])->first();
+            if($lm_employee){
+                $line_manager = $lm_employee->employee_id;
+            }
+        } 
         $user = User::create([
             'email' => $row['email'] ?? null,
             'first_name' => $row['first_name'],
@@ -36,19 +50,19 @@ class EmployeeImport implements ToModel, WithHeadingRow
             'image' => 'default.png',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
-            'unique_id' => $row['unique_id'] ?? 'SNH-'.$number,
+            'unique_id' => $row['unique_id'] ?? 'SNH-'.$unique,
             'password' => bcrypt('asdfasdf'),
         ]);
 
         $employee = Employee::create([
             'user_id' => $user->id,
-            'employee_id' => $number,
+            'employee_id' => $unique,
             'office_shift_id' => NULL,
-            'reports_to' => $row['reports_to'] ?? null,
-            'supervisor_id' => $row['supervisor_id'] ?? null,
-            'username' => $user->unique_id ?? 'SNH-'.$number,
+            'reports_to' => $line_manager ?? null,
+            'supervisor_id' => $supervisor ?? null,
+            'username' => $user->unique_id ?? 'SNH-'.$unique,
             'email' => $row['email'] ?? null,
-            'department_id' => $row['department_id'],
+            'department_id' => $row['department_id'] ?? null,
             'sub_department_id' => NULL,
             'designation_id' => $row['designation_id'] ?? null,
             'date_of_joining' => $row['date_of_joining'] ?? date('Y-m-d'),

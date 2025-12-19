@@ -1,9 +1,8 @@
 <template>
-    <section class="col-md-12">
-        <div class="card card-primary">
-            <div class="card-header"><h3 class="card-title">Employee Upload</h3></div>
-            <form role="form" @submit.prevent="uploadEmployees">
-                <div class="card-body">
+    <section class="overlay-wrapper p-0">
+        <form role="form" @submit.prevent="uploadEmployees">
+            <div class="row">
+                <div class="col-md-12">
                     <div class="form-group">
                         <label>Type</label>
                         <select type="email" class="form-control" name="upload_type" id="upload_type">
@@ -12,16 +11,24 @@
                             <option value="excel">Excel</option>
                         </select>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
                     <div class="form-group">
                         <label>File</label>
                         <input type="file" class="form-control" name="upload_file" id="upload_file" @change="uploadFile">
                     </div>
                 </div>
-                <div class="card-footer">
+            </div>
+            <div class="row">
+                <div class="col-md-12">
                     <button type="submit" class="btn btn-primary">Submit</button>
+
+                    <router-link to=""></router-link>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </section>
 </template>
 <script>
@@ -59,7 +66,6 @@ export default {
             if (file['size'] < 2000000){
                 reader.onloadend = (e) => {
                     this.employeeData.file = reader.result;
-                    //console.log(reader.result);
                     }
                 reader.readAsDataURL(file)
             }

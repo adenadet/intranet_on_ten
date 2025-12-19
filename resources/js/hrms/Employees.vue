@@ -1,5 +1,18 @@
 <template>
 <section class="contain-fluid">
+    <div class="modal fade" id="employeeFormModal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-navy">
+                    <h4 class="modal-title">Create Employee Details</h4>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <HrmsFormEmployee :editMode.sync="editMode" :employee.sync="employee" @refreshPage="getAllInitials"/>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="uploadModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -8,7 +21,7 @@
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-white">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <HrmsFormEmployeeImport :editMode.sync="editMode" @refreshPage="refreshPage"/>
+                    <HrmsFormEmployeeImport :editMode.sync="editMode" @refreshPage="getAllInitials"/>
                 </div>
             </div>
         </div>
@@ -23,7 +36,7 @@
                             <input type="text" name="table_search" class="form-control float-right" placeholder="Search" v-model="query">
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-primary mr-1" @click="searchEmployee"><i class="fas fa-search"></i></button>
-                                <select class="form-control" v-model="source" @change="getAllInitials(1)">
+                                <select class="form-control" v-model="source" @change="getAllInitials">
                                     <option value="0">Inactive</option>
                                     <option value="1">Active</option>
                                     <option value="2">Resigned</option>
@@ -39,7 +52,7 @@
                     </div>
                 </div>
                 <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-                <HrmsDetailEmployeeList :employees.sync="employees.data" :source="source" @refreshPage="getAllInitials(current_page)"/>
+                <HrmsDetailEmployeeList :employees.sync="employees.data" :source="source" @refreshPage="getAllInitials()"/>
                 <div class="card-footer bg-navy">
                     <div class="col-12">
                         <pagination v-model="current_page" @paginate="getAllInitials" :per-page="employees.per_page != null ? employees.per_page : 52" :records="employees.total != null ? employees.total : 550" ></pagination>
@@ -68,7 +81,7 @@ export default {
         addEmployee(){
             this.editMode = false;
             this.employee = {};
-            $('#employeeModal').modal('show');
+            $('#employeeFormModal').modal('show');
         },
         closeModals(){
             $('#employeeModal').modal('hide'); 
@@ -100,10 +113,11 @@ export default {
                 }
             });  
         },
-        getAllInitials(page=1){
+        getAllInitials(){
             this.loading = true
-            axios.get('/api/hrms/employees?page='+page+'&source='+this.source).then(response =>{
+            axios.get('/api/hrms/employees?page='+this.current_page+'&source='+this.source).then(response =>{
                 this.refreshPage(response);
+                this.closeModals();
                 this.loading = false;
             })
             .catch(()=>{

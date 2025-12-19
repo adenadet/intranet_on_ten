@@ -267,7 +267,7 @@ export default {
             .then(response =>{
                 this.$emit('refreshPage', response);
                 this.loading = false;
-                this.$swal.fire({icon: 'success', title: 'The Leave Request has been created', showConfirmButton: false, timer: 1500});
+                this.$swal.fire({icon: 'success', title: 'The Employee has been created', showConfirmButton: false, timer: 1500});
             })
             .catch(()=>{
                 this.loading = false;

@@ -143,7 +143,7 @@ class EmployeeController extends Controller
 
     public function initials()
     {
-        $employees = Employee::pluck('id');
+        $employees = Employee::pluck('user_id');
         return response()->json([
             'areas' => Area::select('id', 'name')->orderBy('name', 'ASC')->get(),
             'departments'   => Department::select('id', 'name')->orderBy('name', 'ASC')->get(),

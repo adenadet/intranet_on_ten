@@ -176,6 +176,7 @@ export default {
             this.loading= true;
             axios.get('/api/consultant_practices/sessions/initials')
             .then(response =>{
+                this.consultants = response.data.consultants;
                 this.specialties = response.data.specialties;
                 this.services = response.data.services;
                 this.patients = response.data.patients;
