@@ -6,7 +6,7 @@
                     <div class="form-group">
                         <label>Type</label>
                         <select type="email" class="form-control" name="upload_type" id="upload_type">
-                            <option value="">--Select Uplad Type</option>
+                            <option value="">--Select Upload Type</option>
                             <option value="csv">CSV</option>
                             <option value="excel">Excel</option>
                         </select>
@@ -24,8 +24,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <button type="submit" class="btn btn-primary">Submit</button>
-
-                    <router-link to=""></router-link>
+                    <a href="/samples/hrms/sample_upload_employees.xlsx"  class="btn btn-success float-right" target="_blank" download><i class="fa fa-download mr-1"></i>Download Sample Excel</a>
                 </div>
             </div>
         </form>

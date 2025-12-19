@@ -322,19 +322,22 @@ trait LeaveTrait{
             break;
         }
         
-        /*if(!is_null($specific) && !empty($specific)){
-            $users = User::where(function($question) use ($specific){
-                $question->where('first_name', 'LIKE', "%$specific%")
-                ->orWhere('middle_name', 'LIKE', "%$specific%")
-                ->orWhere('last_name', 'LIKE', "%$specific%")
-                ->orWhere('email', 'LIKE', "%$specific%");
-                })
-            ->pluck('id');
+        if(is_array($specific)){
+            if(!empty($specific['query'])){
+                $question = $specific['query'];
 
-            $employees = Employee::whereIn('user_id', $users)->pluck('id');
+                $users = User::orderBy('first_name', 'ASC')->where(function($quest) use ($question){
+                    $quest->where('first_name', 'LIKE', "%$question%")
+                    ->orWhere('middle_name', 'LIKE', "%$question%")
+                    ->orWhere('last_name', 'LIKE', "%$question%")
+                    ->orWhere('email', 'LIKE', "%$question%");
+                })->pluck('id');
 
-            $query->whereIn('employee_id', $employees);
-        }*/
+                $employees = Employee::whereIn('user_id', $users)->pluck('id');
+
+                $query = $query->whereIn('employee_id', $employees);
+            }
+        }
         
         $quest = $detailed ? $query->with(['employee.user', 'leave_type', 'approver']) : $query;
         $query->latest();

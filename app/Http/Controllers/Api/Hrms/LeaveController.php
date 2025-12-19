@@ -41,7 +41,7 @@ class LeaveController extends Controller
     public function index()
     {
         return response()->json([
-            'requests' => $this->hrms_leave_request_get_all($_GET['type'], $_GET['query'] ?? null, true, true, $_GET['page']),    
+            'requests' => $this->hrms_leave_request_get_all($_GET['type'], $_GET ?? null, true, true, $_GET['page']),    
         ]);
     }
 
