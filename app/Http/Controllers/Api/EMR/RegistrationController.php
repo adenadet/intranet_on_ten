@@ -103,7 +103,7 @@ class RegistrationController extends Controller
             'appointment_id' => $appointment->id,
             'amount' => $appointment->amount, 
             'employee_id' => 0,
-            'channel' => $request->input('payment_channel') ?? "Nairafy", 
+            'channel' => $request->input('payment_channel') ?? "Paystack", 
             'details' => $request->input('payment_transaction').' | '.$request->input('payment_reference'),    
         ]);
 

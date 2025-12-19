@@ -335,7 +335,9 @@ export default {
         async handlePaystackSuccess(ps) {
             try {
                 await axios.put(`/api/scheduler/${this.serverTxnId}`, {
-                    payment_gateway : 'paystack',
+                    payment_reference : ps.reference,
+                    payment_transaction: response.transaction,
+                    payment_method : 'Paystack',
                     reference       : ps.reference,
                     status          : ps.status,
                     raw_response    : ps,          // optionally persist full payload
@@ -391,14 +393,13 @@ export default {
                 this.ApplicantData.payment_reference = response.transaction.payment ? response.transaction.payment.description : '';    
             }
             else{
-                this.ApplicantData.payment_reference= response.reference;
+                this.ApplicantData.payment_reference = response.reference;
                 this.ApplicantData.payment_transaction = response.transaction;
             }
             this.createApplicant();
         },
         processErrorAppointment(channel, response){
             if (response.message != "Approved"){
-                alert("Payment was unsuccessful");
                 this.ApplicantData.payment_method = "Paystack";
                 this.ApplicantData.payment_reference= response.reference;
                 this.ApplicantData.payment_transaction = response.transaction;
@@ -413,7 +414,7 @@ export default {
             this.ApplicantData.payment_method = "Holding";
         },
         saveData() {
-            this.ApplicantData.reference_id = channel == 'nairafy' ? this.nairafyReference : this.paystackReference;
+            this.ApplicantData.reference_id = (channel == 'nairafy') ? this.nairafyReference : this.paystackReference;
             this.loading = true
             this.ApplicantData.post('/api/scheduler')
             .then((response) => {
