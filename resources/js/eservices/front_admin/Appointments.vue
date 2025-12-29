@@ -1,7 +1,7 @@
 <template>
     <section class="container-fluid overlay-wrapper">
         <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-        <EServiceFormSearch search_type="front_admin" @searchedAppointments="refreshAppointments"/>
+            <EServiceFormSearch search_type="front_admin" @searchedAppointments="refreshAppointments"/>
         <div class="card">
             <EServiceDetailAppointmentList source="front_admin" :appointments.sync="appointments" @refreshAppointmentPage="getAllInitials(current_page)" />
             <div class="card-footer">

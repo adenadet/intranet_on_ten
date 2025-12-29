@@ -503,30 +503,22 @@ trait LeaveTrait{
             $leave_type = LeaveType::create([
                 'name' => $request->input('name'),
                 'no_of_days' => $request->input('no_of_days'),
+                'leave_category' => $request->input('leave_category') ?? 'Calendar',
                 'status' => 1,
                 'start_date' => $request->input('start_date') ?? date('Y-m-d'),
                 'end_date' => $request->input('end_date'),
                 'created_by' => auth('api')->id(),
                 'updated_by' => auth('api')->id(),
             ]);
-            if ($leave_type){$this->log_user_activity('leave_type_create', $leave_type->id, true); $complete = true;}
-            else{
-                $this->log_user_activity('leave_type_create', null, false);
-                $complete = false;
-            }
-        }
-        catch(Exception $e){
-            $this->log_user_activity('leave_type_create', null, false);
-            $complete = false;
-        }
-        if ($complete){
+            $this->log_user_activity('leave_type_create', $leave_type->id, true); 
             DB::commit();
             return $leave_type;
         }
-        else{
+        catch(Exception $e){
             DB::rollBack();
-        }   
-
+            $this->log_user_activity('leave_type_create', null, false);
+            return $e->getMessage();
+        }
     }
 
     public function hrms_leave_type_get_all($types, $specific, $detailed, $paginated, $page = 1){
@@ -563,11 +555,12 @@ trait LeaveTrait{
         DB::beginTransaction();
         try{
             $leave_type = LeaveType::where('id', '=', $id)->first();
-            $leave_type->name = $request->input('name');
-            $leave_type->no_of_days = $request->input('no_of_days');
-            $leave_type->status = $request->input('status');
-            $leave_type->start_date = $request->input('start_date') ?? date('Y-m-d');
-            $leave_type->end_date = $request->input('end_date');
+            $leave_type->name = $request->input('name') ?? $leave_type->name;
+            $leave_type->no_of_days = $request->input('no_of_days') ?? $leave_type->no_of_days;
+            $leave_type->leave_category = $request->input('leave_category') ?? $leave_type->leave_category;
+            $leave_type->status = $request->input('status') ?? $leave_type->status;
+            $leave_type->start_date = $request->input('start_date') ?? $leave_type->start_date;
+            $leave_type->end_date = $request->input('end_date') ?? $leave_type->end_date;
             $leave_type->updated_by = auth('api')->id();
             
             $leave_type->save();

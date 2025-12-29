@@ -10,7 +10,7 @@
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-white">&times;</span></button>
                         </div>
                         <div class="modal-body p-0">
-                            <HrmsFormLeaveType :editMode="editMode" :leave_type="leave_type"/>
+                            <HrmsFormLeaveType :editMode="editMode" :leave_type="leave_type" @refreshPage="getAllInitials"/>
                         </div>
                     </div>
                 </div>
@@ -48,7 +48,7 @@
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                                         <router-link :to="'/hrms/admin/leaves/types/'+leave_type.id" class="dropdown-item btn btn-block btn-sm"><i class="fa fa-eye mr-1 text-primary"></i> View Leave Type</router-link>
-                                        <button class="dropdown-item btn btn-block btn-sm" @click="updateLeaveType(leave_type)"><i class="fa fa-edit mr-1 text-warning"></i> Update Leave Type</button>
+                                        <button class="dropdown-item btn btn-block btn-sm" @click="editLeaveType(leave_type)"><i class="fa fa-edit mr-1 text-warning"></i> Update Leave Type</button>
                                     </div>
                                 </td>
                             </tr>
@@ -87,11 +87,11 @@ export default {
             //Fire.$emit('leaveTypeDataFill', {});
             $('#leaveTypeModal').modal('show');
         },
+        assignLeaveType(){},
         closeModals(){
             $('#assignLeaveTypeModal').modal('hide');
             $('#leaveTypeModal').modal('hide');
         },
-        assignLeaveType(){},
         deleteLeaveType(id){
             this.$swal.fire({
                 title: 'Are you sure?',

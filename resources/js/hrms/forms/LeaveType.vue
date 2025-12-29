@@ -27,16 +27,16 @@
                         <input class="form-control" type="number" name="no_of_days" id="no_of_days" v-model="leaveTypeData.no_of_days" />
                     </div>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                     <div class="form-group">
                         <label>Start Date</label>
                         <input class="form-control" type="date" name="start_date" id="start_date" v-model="leaveTypeData.start_date" />
                     </div>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                     <div class="form-group">
                         <label>End Date</label>
-                        <input class="form-control" type="date" name="end_date" id="end_date" v-model="leaveTypeData.start_date" />
+                        <input class="form-control" type="date" name="end_date" id="end_date" v-model="leaveTypeData.end_date" />
                     </div>
                 </div>
                 <div class="col-sm-4">
@@ -49,7 +49,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <!--div class="col-sm-4">
                     <div class="form-group">
                         <label>Recurring</label>
                         <select class="form-control" name="recurring" id="recurring" v-model="leaveTypeData.recurring">
@@ -64,9 +64,9 @@
                         <label>Recur Date</label>
                         <input class="form-control" type="text" name="date" id="date" v-model="leaveTypeData.date" />
                     </div>
-                </div>
+                </div-->
             </div>
-            <button @click.prevent="editMode ? updateBioData() : createBioData()" type="submit" name="submit" class="submit btn btn-primary">Submit</button>
+            <button @click.prevent="editMode ? updateLeaveType() : createLeaveType()" type="submit" name="submit" class="submit btn btn-primary">Submit</button>
         </form>
     </div> 
 </section>
@@ -108,8 +108,41 @@ export default {
     emits:['refreshPage'],
     mounted() {},
     methods: {
-        createLeaveType(){},
-        updateLeaveType(){},
+        createLeaveType(){
+            this.loading = true;
+            this.leaveTypeData.post('/api/hrms/leave_types')
+            .then(() =>{
+                this.loading = false;
+                this.$emit('refreshPage');
+                this.$swal.fire({icon: 'success', title: 'The Leave Type has been created', showConfirmButton: false, timer: 1500});
+            })
+            .catch(()=>{
+                this.$swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!',
+                    footer: 'Please try again later!'
+                });
+                this.loading = false;
+            });
+        },
+        updateLeaveType(){
+            this.loading = true;
+            this.leaveTypeData.put('/api/hrms/leave_types/'+this.leave_type.id)
+            .then(() =>{
+                this.$emit('refreshPage');
+                this.$swal.fire({icon: 'success', title: 'The Leave Type has been updated', showConfirmButton: false, timer: 1500});
+            })
+            .catch(()=>{
+                this.$swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!',
+                    footer: 'Please try again later!'
+                });
+            });
+            this.loading = false;    
+        },
         deleteAppointment(id){
             Swal.fire({
                 title: 'Are you sure?',

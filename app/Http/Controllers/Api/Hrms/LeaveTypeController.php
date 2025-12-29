@@ -58,10 +58,10 @@ class LeaveTypeController extends Controller
             'end_date' => 'sometimes|date|nullable',
         ]);
 
+        $leave_type = $this->hrms_leave_types_create_type($request);
         return response()->json([
-            'leave_type' => $this->hrms_leave_types_create_type($request),
-            'leave_types' => $this->hrms_leave_type_get_all_types('all', true, true),    
-        ]);
+            'leave_type' => $leave_type,  
+        ], is_string($leave_type) ? 500 : 201);
     }
 
     public function update(Request $request, $id)
@@ -74,10 +74,10 @@ class LeaveTypeController extends Controller
             'end_date' => 'sometimes|date|nullable',
         ]);
 
+        $leave_type = $this->hrms_leave_types_update_type($request, $id);
         return response()->json([
-            'leave_type'=> $this->hrms_leave_types_update_type($request, $id),
-            'leave_types' => $this->hrms_leave_type_get_all_types('all', true, true),    
-        ]);
+            'leave_type'=> $leave_type,   
+        ], is_string($leave_type) ? 500 : 200);
     }
 
     public function destroy($id)

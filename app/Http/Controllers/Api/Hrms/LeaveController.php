@@ -65,17 +65,19 @@ class LeaveController extends Controller
             'employee_id' => 'sometimes|numeric',
         ]);
 
+        $leave_request = $this->hrms_leave_request_create_leave($request);
         return response()->json([
-            'leave_request' => $this->hrms_leave_request_create_leave($request),
-        ]);
+            'leave_request' => $leave_request,
+        ], is_string($leave_request) ? 500 : 201);
 
     }
 
     public function show($id)
     {
+        $leave_request = $this->hrms_leave_request_show_leave($id, $_GET['type']);
         return response()->json([
-            'leave_request' => $this->hrms_leave_request_show_leave($id, $_GET['type']),
-        ]);
+            'leave_request' => $leave_request,
+        ], is_string($leave_request) ? 404 : 200);
     }
 
     public function update(Request $request, $id)
@@ -89,9 +91,10 @@ class LeaveController extends Controller
             'is_half' => 'required|boolean',
         ]);
 
+        $leave_request = $this->hrms_leave_request_show_leave($id, 'my_leaves');
+
         return response()->json([
             'leave_request'     => $this->hrms_leave_request_update_leave($request, $id),
-            'leave_requests'    => $this->hrms_leave_request_get_all('my_leaves', null, true, true, $_GET['page'] ?? 1),    
-        ]);
+        ], is_string($leave_request) ? 500 : 200);
     }
 }
