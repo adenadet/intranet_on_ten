@@ -30,5 +30,6 @@ Route::group(['prefix'=>'hrms'], function () {
         '/leaves'               => 'LeaveController',
         '/leave_allowances'     => 'LeaveAllowanceController',
         '/leave_types'          => 'LeaveTypeController',
+        '/public_holidays'      => 'PublicHolidayController',
     ]);
 });

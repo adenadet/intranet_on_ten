@@ -66,10 +66,10 @@ trait EmployeeTrait{
         $query = Employee::query();
         switch($type){
             case 'active':
-                $query = $query->whereIn('user_id', $users)->where('employment_status', '=', 1)->has('user')->orderBy('username', 'ASC');
+                $query = $query->whereIn('user_id', $users)->where('employment_status', '=', 1)->orderBy('username', 'ASC');
             break;
             case 'all':
-                $query = $query->whereIn('user_id', $users)->orderBy('username', 'ASC');
+                $query = $query->whereIn('user_id', $users);
             break;
             case 'my_employee':
             break;
@@ -83,14 +83,38 @@ trait EmployeeTrait{
             break;
         }
 
-        $query = $query->orderBy('username', 'ASC');
-
+        if (is_array($specific)){
+            if(!empty($specific['department_id'])){
+                $query = $query->where('department_id', '=', $specific['department_id']);
+            }
+            if(!empty($specific['designation_id'])){
+                $query = $query->where('designation_id', '=', $specific['designation_id']);
+            }
+            if(!empty($specific['query'])){
+                $search = $specific['query'];
+                $users = User::where('first_name', 'LIKE', "%$search%")
+                    ->orWhere('middle_name', 'LIKE', "%$search%")
+                    ->orWhere('last_name', 'LIKE', "%$search%")
+                    ->orWhere('email', 'LIKE', "%$search%")
+                    ->pluck('id');
+                
+                $query = Employee::whereIn('user_id', $users)->orWhere('username', 'LIKE', "%$search%")->orderBy('username', 'ASC');
+            }
+            if(!empty($specific['status']) && $specific['status'] != 'all'){
+                //echo $specific['status'];
+                $query = $query->where('employment_status', '=', $specific['status']);
+            }
+        }
+        
+        /*
         if ($specific == 'leave'){
             $query = $query->select('id', 'user_id', 'supervisor_id', 'reports_to', 'department_id', 'username')->with(['leave_types.leave_type', 'department', 'user.department']);
         }
         else{
-            $query = $detailed ? $query->with(['leave_types.leave_type', 'department', 'designation', 'supervisor.user', 'line_manager.user', 'user.area', 'user.branch', 'user.department', 'user.roles', 'user.state']) : $query->select('id', 'employee_id', 'user_id')->with('user');
-        }
+        }*/
+    
+        $query = $detailed ? $query->has('user')->with(['leave_types.leave_type', 'department', 'designation', 'supervisor.user', 'line_manager.user', 'user.area', 'user.branch', 'user.department', 'user.roles', 'user.state']) : $query->select('id', 'employee_id', 'user_id')->has('user')->with('user');
+        $query = $query->orderBy('username', 'ASC');
         $query = $paginated ? $query->paginate(52) : $query->get();
         
         return $query;

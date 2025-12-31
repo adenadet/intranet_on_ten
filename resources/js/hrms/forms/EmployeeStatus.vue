@@ -18,7 +18,7 @@
                     <label>Employment Status</label>
                     <select class="form-control" v-model="employeeData.employment_status">
                         <option value="">--Select Employment Status--</option>
-                        <option value="0">Inactive</option>
+                        <option value="100">Inactive</option>
                         <option value="1">Active</option>
                         <option value="2">Resigned</option>
                         <option value="3">Terminated</option>

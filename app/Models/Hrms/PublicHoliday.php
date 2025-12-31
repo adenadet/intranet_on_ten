@@ -2,14 +2,15 @@
 
 namespace App\Models\Hrms;
 
+use App\Models\Structure;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PublicHoliday extends Model
+class PublicHoliday extends Structure
 {
     protected $primaryKey = 'id';
     protected $table = 'hrms_public_holidays';
-    protected $fillable = array('date', 'created_by', 'updated_by', 'deleted_by', 'created_at', 'updated_at', 'deleted_at');
+    protected $fillable = array('date', 'status', 'created_by', 'updated_by', 'deleted_by', 'created_at', 'updated_at', 'deleted_at');
 
     public function creator(){
         return $this->belongsTo('App\Models\User', 'created_by', 'id');

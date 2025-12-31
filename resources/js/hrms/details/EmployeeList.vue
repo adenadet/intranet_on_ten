@@ -52,7 +52,7 @@
                     <th>Line Manager</th>
                     <th>Status</th>
                     <th>Date</th>
-                    <th></th>
+                    <th><button type="button" class="btn btn-primary ml-1" @click="addEmployee"><i class="fa fa-user-plus"></i></button></th>
                 </tr>
             </thead>
             <tbody>
@@ -63,7 +63,7 @@
                     <td>{{ employee.designation != null ? employee.designation.name : "No Designation" }}</td>
                     <td>{{ employee.supervisor != null ? FullName(employee.supervisor.user) : 'No Supervisor Assigned Yet' }}</td>
                     <td>{{ employee.line_manager != null ? FullName(employee.line_manager.user) : 'No Supervisor Assigned Yet'  }}</td>
-                    <td>{{ employee.employment_status != null ? (employee.employment_status == 0 ? 'Inactive' : (employee.employment_status == 1 ? 'Active' : (employee.employment_status == 2 ? 'Resigned' : (employee.employment_status == 3 ? 'Terminated' : (employee.employment_status == 4 ? 'Deceased' : (employee.employment_status == 5 ? 'Retired' : 'Undefined')))))): 'Undefined'}}</td>
+                    <td>{{ employee.employment_status != null ? (employee.employment_status == 100 ? 'Inactive' : (employee.employment_status == 1 ? 'Active' : (employee.employment_status == 2 ? 'Resigned' : (employee.employment_status == 3 ? 'Terminated' : (employee.employment_status == 4 ? 'Deceased' : (employee.employment_status == 5 ? 'Retired' : 'Undefined')))))): 'Undefined'}}</td>
                     <td>{{ ExcelDate(employee.date_of_joining) }} {{(employee.date_of_leaving != null && employee.date_of_joining != '') ? ' - '+ExcelDate(employee.date_of_leaving) : ' Till Now'  }}</td>
                     <td><button class="nav-link btn btn-tool" data-toggle="dropdown" type="button"><i class="fa fa-ellipsis-v text-dark"></i></button>
                         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
@@ -100,10 +100,10 @@ export default {
     },
     emits: ['refreshPage'],
     methods:{
-        addUser(){
+        addEmployee(){
             this.editMode = false;
-            this.user = {};
-            $('#userModal').modal('show');
+            this.employee = {};
+            $('#employeeFormModal').modal('show');
         },
         assignLeaveType(employee){
             //this.editMode = false;

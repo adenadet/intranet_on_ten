@@ -30,7 +30,7 @@ class EmployeeLeaveTypeController extends Controller
 
     public function initials(){
         return response()->json([
-            'leave_types' => $this->hrms_leave_type_get_all('active', null, false, false, null),
+            'leave_types' => $this->hrms_leave_type_get_all('allocate', null, false, false, null),
         ]);
     }
 

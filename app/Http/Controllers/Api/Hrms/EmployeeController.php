@@ -125,18 +125,14 @@ class EmployeeController extends Controller
         $areas = Area::select('id', 'name')->where('state_id', 25)->orderBy('name', 'ASC')->get();
         $branches = Branch::select('id', 'name')->orderBy('name', 'ASC')->get();
         $departments = Department::select('id', 'name')->orderBy('name', 'ASC')->get();
-        $employees = $_GET['source'] == 'all' ? $this->hrms_employee_get_all('all', null, true, true, $_GET['page'] ?? 1) : $this->hrms_employee_get_by_status($_GET['source'], true, true, $_GET['page'] ?? 1);
+        $employees = $this->hrms_employee_get_all($_GET['status'] ?? 'active', $_GET, true, true, $_GET['page'] ?? 1);
         $nok = NextOfKin::where('user_id', auth('api')->id())->get();
         $states = State::orderBy('name', 'ASC')->get();
         
         return response()->json([
-            'areas' => $areas,
-            'branches' => $branches,
             'departments' => $departments,
             'employees' => $employees,
             //'old_employees' => $this->user_staffs_get_all('all', null, true, true, $_GET['page'] ?? 1),
-            'nok' => $nok,
-            'states' => $states,       
             'users' => $this->user_get_all(),
         ]);
     }

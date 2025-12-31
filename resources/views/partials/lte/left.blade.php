@@ -41,7 +41,8 @@
                         <li class="nav-item"><a href="/hrms/admin/designations" class="nav-link"><i class="fa fa-user-tag nav-icon"></i><p>Designations</p></a></li>
                         <li class="nav-item"><a href="/hrms/admin/employees" class="nav-link"><i class="fa fa-users nav-icon"></i><p>Employees</p></a></li>
                         <li class="nav-item"><a href="/hrms/admin/leaves/types" class="nav-link"><i class="fa fa-copy nav-icon"></i><p>Leave Types</p></a></li>
-                        <li class="nav-item"><a href="/hrms/admin/leaves/requests" class="nav-link"><i class="fa fa-file nav-icon"></i><p>All Requests</p></a></li>
+                        <li class="nav-item"><a href="/hrms/admin/leaves/requests" class="nav-link"><i class="fa fa-file nav-icon"></i><p>Leave Requests</p></a></li>
+                        <li class="nav-item"><a href="/hrms/admin/public_holidays" class="nav-link"><i class="fa fa-calendar-day nav-icon"></i><p>Public Holidays</p></a></li>
                         <li class="nav-item"><a href="/hrms/admin/leaves_allowances" class="nav-link"><i class="fa fa-money-check nav-icon"></i><p>Leave Allowances</p></a></li>
                     </ul>
                 </li>

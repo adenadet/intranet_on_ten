@@ -109,6 +109,7 @@ import HrmsLeaveRequestsTeam            from '../hrms/leaves/RequestsTeam.vue';
 import HrmsLeaveType                    from '../hrms/leaves/Type.vue';
 import HrmsLeaveTypes                   from '../hrms/leaves/Types.vue';
 import HrmsLeaveUserLeaveTypes          from '../hrms/leaves/UserLeaveTypes.vue';
+import HrmsPublicHolidays               from '../hrms/PublicHolidays.vue';
 
     import HrmsDetailAssignedEmployeeLeaveType  from '../hrms/details/AssignedEmployeeLeaveType.vue';
     import HrmsDetailDesignation                from '../hrms/details/Designation.vue';
@@ -132,6 +133,7 @@ import HrmsLeaveUserLeaveTypes          from '../hrms/leaves/UserLeaveTypes.vue'
     import HrmsFormLeaveRequest                 from '../hrms/forms/LeaveRequest.vue';
     import HrmsFormLeaveRequestConfirm          from '../hrms/forms/LeaveRequestConfirm.vue';
     import HrmsFormLeaveType                    from '../hrms/forms/LeaveType.vue';
+    import HrmsFormPublicHoliday                from '../hrms/forms/PublicHoliday.vue';
 
 import NoticeAdmin                  from '../notices/Admin.vue';
 import NoticeAll                    from '../notices/All.vue';
@@ -269,6 +271,7 @@ const routes = [
     {path: '/hrms/admin/leaves/types',                      component: HrmsLeaveTypes},
     {path: '/hrms/admin/leaves/types/:id',                  component: HrmsLeaveType},
     {path: '/hrms/admin/leaves_allowances',                 component: HrmsLeaveAllowances},
+    {path: '/hrms/admin/public_holidays',                   component: HrmsPublicHolidays},
 
     {path: '/hrms/leaves/allowances',                       component: HrmsLeaveAllowanceMine},
     {path: '/hrms/leaves/all_requests',                     component: HrmsLeaveRequestsAdmin},
@@ -418,6 +421,7 @@ export function registerGlobalComponents(app) {
     app.component('HrmsLeaveType',              HrmsLeaveType);
     app.component('HrmsLeaveTypes',             HrmsLeaveTypes);
     app.component('HrmsLeaveUserLeaveTypes',    HrmsLeaveUserLeaveTypes);
+    app.component('HrmsPublicHolidays',         HrmsPublicHolidays);
     
         app.component('HrmsDetailAssignedEmployeeLeaveType', HrmsDetailAssignedEmployeeLeaveType);
         app.component('HrmsDetailDesignation',              HrmsDetailDesignation);
@@ -441,6 +445,7 @@ export function registerGlobalComponents(app) {
         app.component('HrmsFormLeaveRequestConfirm',        HrmsFormLeaveRequestConfirm);
         app.component('HrmsFormLeaveRequestImport',         HrmsFormLeaveRequestImport);
         app.component('HrmsFormLeaveType',                  HrmsFormLeaveType);
+        app.component('HrmsFormPublicHoliday',              HrmsFormPublicHoliday);
 
     app.component('NoticeAll',          NoticeAll);
     app.component('NoticeAdmin',        NoticeAdmin);

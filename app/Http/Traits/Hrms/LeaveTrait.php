@@ -302,8 +302,8 @@ trait LeaveTrait{
                 $employee = Employee::where('user_id', '=', auth('api')->id())->first();
                 $team_members = Employee::where('reports_to', '=', $employee->employee_id)->orWhere('supervisor_id', '=', $employee->employee_id)->pluck('id');
                 $query = $query->whereIn('employee_id', $team_members);
-                if ($specific != 'all'){$query = $query->where('status', '=', $specific);}
-                $query = $query->orderBy('status', 'ASC');
+                //if ($specific != 'all'){$query = $query->where('status', '=', $specific);}
+                //$query = $query->orderBy('status', 'ASC');
                 break;
             case 'ongoing':
                 $query = $query->whereDate('from_date', '>=', date('Y-m-d'))
@@ -322,7 +322,7 @@ trait LeaveTrait{
             break;
         }
         
-        if(is_array($specific)){
+        /*if(is_array($specific)){
             if(!empty($specific['query'])){
                 $question = $specific['query'];
 
@@ -337,10 +337,11 @@ trait LeaveTrait{
 
                 $query = $query->whereIn('employee_id', $employees);
             }
-        }
+        }*/
         
         $quest = $detailed ? $query->with(['employee.user', 'leave_type', 'approver']) : $query;
-        $query->latest();
+        //$query->latest();
+        $query = $query->orderBy('status', 'ASC');
         $leaves = $paginated ? $quest->latest()->paginate(50) : $quest->latest()->get();
             
         return $leaves;

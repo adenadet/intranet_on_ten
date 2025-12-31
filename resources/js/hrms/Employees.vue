@@ -1,18 +1,5 @@
 <template>
 <section class="contain-fluid">
-    <div class="modal fade" id="employeeFormModal">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header bg-navy">
-                    <h4 class="modal-title">Create Employee Details</h4>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                </div>
-                <div class="modal-body">
-                    <HrmsFormEmployee :editMode.sync="editMode" :employee.sync="employee" @refreshPage="getAllInitials"/>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="modal fade" id="uploadModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -30,14 +17,14 @@
         <div class="col-12">
             <div class="card overlay-wrapper p-0">
                 <div class="card-header bg-navy">
-                    <h3 class="card-title">{{source == 0 ? 'Inactive' : (source == 1 ? 'Active' : (source == 2 ? 'Resigned' : (source == 3 ? 'Terminated' : (source == 4 ? 'Deceased' : (source == 5 ? 'Retired' : 'All')))))}} Employees</h3>
+                    <h3 class="card-title">Employees</h3>
                     <div class="card-tools">
-                        <div class="input-group input-group" style="width: 400px;">
+                        <div class="input-group input-group" style="width: 550px;">
                             <input type="text" name="table_search" class="form-control float-right" placeholder="Search" v-model="query">
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-primary mr-1" @click="searchEmployee"><i class="fas fa-search"></i></button>
-                                <select class="form-control" v-model="source" @change="getAllInitials">
-                                    <option value="0">Inactive</option>
+                                <button type="button" class="btn btn-primary mr-1" @click="getAllInitials"><i class="fas fa-search"></i></button>
+                                <select class="form-control mr-1" v-model="source" @change="getAllInitials">
+                                    <option value="100">Inactive</option>
                                     <option value="1">Active</option>
                                     <option value="2">Resigned</option>
                                     <option value="3">Terminated</option>
@@ -45,8 +32,38 @@
                                     <option value="5">Retired</option>
                                     <option value="all">All</option>
                                 </select>
-                                <button type="button" class="btn btn-primary ml-1" @click="addEmployee"><i class="fa fa-user-plus"></i></button>
-                                <button type="button" class="btn btn-success ml-1" @click="uploadEmployees"><i class="fa fa-upload"></i></button>
+                                <select class="form-control mr-1" v-model="department_id" @change="getAllInitials">
+                                    <option value="">--Select Department--</option>
+                                    <option v-for="d in departments" :key="d.id" :value="d.id">{{ d.name }}</option>
+                                </select>
+                                <button type="button" class="btn btn-primary ml-1" @click="uploadEmployees"><i class="fa fa-upload"></i></button>
+                                <!--ul class="navbar-nav ml-auto">
+                                    <li class="nav-item dropdown">
+                                        <a class="btn btn-success ml-1" data-toggle="dropdown" href="#"><i class="fa fa-filter"></i></a>
+                                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right p-3">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label>Department</label>
+                                                        <select class="form-control" v-model="department">
+                                                            <option>All Departments</option>
+                                                            <option v-for="d in departments" :key="d.id" :value="d.id">{{ d.name }}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label>Designation</label>
+                                                        <select class="form-control" v-model="department">
+                                                            <option>All Departments</option>
+                                                            <option v-for="d in departments" :key="d.id" :value="d.id">{{ d.name }}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul-->
                             </div>
                         </div>    
                     </div>
@@ -68,6 +85,8 @@ export default {
     data(){
         return {
             current_page: 1,
+            department_id: '',
+            departments: [],
             editMode: false,
             employee:{},
             employees: {},
@@ -78,11 +97,6 @@ export default {
         }
     },
     methods:{
-        addEmployee(){
-            this.editMode = false;
-            this.employee = {};
-            $('#employeeFormModal').modal('show');
-        },
         closeModals(){
             $('#employeeModal').modal('hide'); 
             $('#roleModal').modal('hide');
@@ -115,7 +129,7 @@ export default {
         },
         getAllInitials(){
             this.loading = true
-            axios.get('/api/hrms/employees?page='+this.current_page+'&source='+this.source).then(response =>{
+            axios.get('/api/hrms/employees?department_id='+this.department_id+'&page='+this.current_page+'&status='+this.source).then(response =>{
                 this.refreshPage(response);
                 this.closeModals();
                 this.loading = false;
@@ -126,6 +140,7 @@ export default {
             });
         },
         refreshPage(response){
+            this.departments = response.data.departments;
             this.employees = response.data.employees;
             this.closeModals();
         },
