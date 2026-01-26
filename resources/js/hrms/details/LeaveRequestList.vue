@@ -51,6 +51,7 @@
                     <th></th>
                     <th>Staff</th>
                     <th>Leave Type</th>
+                    <th>No of Days</th>
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Requested On</th>
@@ -66,6 +67,7 @@
                     <td>{{addOne(index)}}</td>
                     <td>{{request.employee != null ? FullName(request.employee.user) : 'Deactivated Staff'}}</td>
                     <td>{{request.leave_type_id != null && request.leave_type != null ? request.leave_type.name : ''}}</td>
+                    <td>{{ request.leave_days }}</td>
                     <td>{{ExcelDate(request.from_date) }}</td>
                     <td>{{ExcelDate(request.to_date) }}</td>
                     <td>{{ExcelDate(request.updated_at) }}</td>

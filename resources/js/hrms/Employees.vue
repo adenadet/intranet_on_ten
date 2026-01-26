@@ -129,7 +129,7 @@ export default {
         },
         getAllInitials(){
             this.loading = true
-            axios.get('/api/hrms/employees?department_id='+this.department_id+'&page='+this.current_page+'&status='+this.source).then(response =>{
+            axios.get('/api/hrms/employees?department_id='+this.department_id+'&page='+this.current_page+'&query='+this.query+'&status='+this.source).then(response =>{
                 this.refreshPage(response);
                 this.closeModals();
                 this.loading = false;

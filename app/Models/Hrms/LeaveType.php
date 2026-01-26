@@ -3,8 +3,10 @@
 namespace App\Models\Hrms;
 
 use App\Models\Structure;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class LeaveType extends Structure
 {

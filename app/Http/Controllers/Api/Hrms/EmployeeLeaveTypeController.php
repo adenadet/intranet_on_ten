@@ -36,11 +36,10 @@ class EmployeeLeaveTypeController extends Controller
 
     public function store(Request $request)
     {
-        //Add the checks here
-        //Add to DB
+        $employee_leave_types = $this->hrms_leave_employee_assign_leave_types($request->input('employee_id'), $request->input('leave_types'));
         return response()->json([
-            'employee_leave_type'   => $this->employee_leave_type_create($request),
-        ]);
+            'employee_leave_type'   => $employee_leave_types,
+        ], is_string($employee_leave_types) ? 500 : 201);
     }
 
     public function show(string $id)

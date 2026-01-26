@@ -8,6 +8,7 @@ use App\Http\Traits\Hrms\LeaveTrait;
 use App\Mail\Leave\ConfirmMail;
 use App\Mail\Leave\RejectMail;
 use App\Mail\Leave\SupervisorConfirmMail;
+use App\Models\Department;
 use App\Models\Hrms\Employee;
 use App\Models\Hrms\EmployeeLeaveType;
 use App\Models\Hrms\LeaveRequest;
@@ -41,6 +42,7 @@ class LeaveController extends Controller
     public function index()
     {
         return response()->json([
+            'departments' => Department::select('id', 'name')->orderBy('name', 'ASC')->get(),
             'requests' => $this->hrms_leave_request_get_all($_GET['type'], $_GET ?? null, true, true, $_GET['page']),    
         ]);
     }

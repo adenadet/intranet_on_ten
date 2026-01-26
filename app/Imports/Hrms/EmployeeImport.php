@@ -60,7 +60,7 @@ class EmployeeImport implements ToModel, WithHeadingRow
             'office_shift_id' => NULL,
             'reports_to' => $line_manager ?? null,
             'supervisor_id' => $supervisor ?? null,
-            'username' => $user->unique_id ?? 'SNH-'.$unique,
+            'username' => $user->unique_id,
             'email' => $row['email'] ?? null,
             'department_id' => $row['department_id'] ?? null,
             'sub_department_id' => NULL,

@@ -79,17 +79,16 @@
                             <tbody>
                                 <tr v-for="appointment in appointments">
                                     <td>{{ appointment.patient.passport_no }}</td>
-                                    <td>{{ appointment.date | dateDay}}</td>
-                                    <td>{{ appointment.date | dateMonth}}</td>
-                                    <td>{{ appointment.date | dateYear}}</td>
+                                    <td>{{ dateDay(appointment.date)}}</td>
+                                    <td>{{ dateMonth(appointment.date) }}</td>
+                                    <td>{{ dateYear(appointment.date)}}</td>
                                     <td>{{ appointment.report != null ? 'Done' : 'Not Done' }}</td>
                                     <td>{{ appointment.report != null ? appointment.report.summary : 'N/A' }}</td>
-                                    <td>{{ 
-                                    appointment.consultation.decision == 6 ? 'CXR Done' : (
-                                    appointment.consultation.decision == 8 ? 'Child < 11 years old' : 
-                                    (appointment.consultation.decision == 10 && appointment.consultation.women_pregnant == 1 ? 'Pregnant, CXR Deferred: Sputum Smear or Culture Not Done' : 
-                                    (appointment.consultation.decision == 7 && appointment.consultation.women_pregnant == 1 ? 'Pregnant, CXR Declined: Sputum Smear or Culture Done' : 
-                                    (appointment.consultation.decision == 10 && appointment.consultation.women_pregnant == 0 ? 'Applicant Deferred: Sputum Smear or Culture Not Done' : (appointment.consultation.decision == 7 && appointment.consultation.women_pregnant == 0 ? 'Applicant Declined: Sputum Smear or Culture Done' : '')))))}}</td>
+                                    <td>{{ appointment.consultation != null &&  appointment.consultation.decision == 6 ? 'CXR Done' : (
+                                    appointment.consultation != null &&  appointment.consultation.decision == 8 ? 'Child < 11 years old' : 
+                                    (appointment.consultation != null &&  appointment.consultation.decision == 10 && appointment.consultation.women_pregnant == 1 ? 'Pregnant, CXR Deferred: Sputum Smear or Culture Not Done' : 
+                                    (appointment.consultation != null &&  appointment.consultation.decision == 7 && appointment.consultation.women_pregnant == 1 ? 'Pregnant, CXR Declined: Sputum Smear or Culture Done' : 
+                                    (appointment.consultation != null &&  appointment.consultation.decision == 10 && appointment.consultation.women_pregnant == 0 ? 'Applicant Deferred: Sputum Smear or Culture Not Done' : (appointment.consultation != null &&  appointment.consultation.decision == 7 && appointment.consultation.women_pregnant == 0 ? 'Applicant Declined: Sputum Smear or Culture Done' : '')))))}}</td>
                                     <td>N/A</td>
                                     <td>N/A</td>
                                     <td>N/A</td>
@@ -107,23 +106,22 @@
                                     <td>{{ appointment.consultation != null && (appointment.consultation.sym_cough == 1 ||appointment.consultation.sym_fever == 1 || appointment.consultation.sym_haemoptysis == 1 || appointment.consultation.sym_night_sweats == 1 || appointment.consultation.sym_weight_loss == 1) ? 'Yes' : 'No' }}</td>
                                     <td>{{ appointment.consultation != null && (appointment.consultation.all_household_tb == 1 || appointment.consultation.all_recent_contact == 1) ? 'Yes' : 'No' }}</td>
                                     <td>{{ (appointment.report != null && appointment.report.summmary == 'suggestive') || (appointment.laboratory != null && appointment.laboratory.summmary == 'abnormal') ? 'Yes' : 'No' }}</td>
-                                    <td>{{ 
-                                    appointment.consultation != null && (appointment.consultation.sym_cough == 1 ||appointment.consultation.sym_fever == 1 || appointment.consultation.sym_haemoptysis == 1 || appointment.consultation.sym_night_sweats == 1 || appointment.consultation.sym_weight_loss == 1 ||appointment.consultation.all_household_tb == 1 || appointment.consultation.all_recent_contact == 1) ? 'History/Examination' : 
+                                    <td>{{ appointment.consultation != null && (appointment.consultation.sym_cough == 1 ||appointment.consultation.sym_fever == 1 || appointment.consultation.sym_haemoptysis == 1 || appointment.consultation.sym_night_sweats == 1 || appointment.consultation.sym_weight_loss == 1 ||appointment.consultation.all_household_tb == 1 || appointment.consultation.all_recent_contact == 1) ? 'History/Examination' : 
                                     (appointment.report != null && appointment.report.summmary == 'suggestive' ? 'CXR' : (appointment.laboratory != null && appointment.laboratory.summmary == 'abnormal' ? 'Sputum' : 'N/A'))}}</td>
-                                    <td>{{ appointment.consultation.decision == 6 && appointment.report != null && appointment.report.summary != 'suggestive' ? 'No' : (appointment.consultation.decision == 8 ? 'No' : (appointment.consultation.decision == 7 && appointment.laboratory == null ? 'Pending' :(appointment.consultation.decision == 7 && appointment.laboratory != null && appointment.laboratory.summary == 'normal' ? 'No' : 'Yes')))  }}</td>
+                                    <td>{{ appointment.consultation != null && (appointment.consultation.decision == 6 && appointment.report != null && appointment.report.summary != 'suggestive') ? 'No' : (appointment.consultation.decision == 8 ? 'No' : (appointment.consultation.decision == 7 && appointment.laboratory == null ? 'Pending' :(appointment.consultation.decision == 7 && appointment.laboratory != null && appointment.laboratory.summary == 'normal' ? 'No' : 'Yes')))  }}</td>
                                     <td>Unknown</td>
                                     <td>{{ 
                                     appointment.status == 10 ? 'N/A' : 
-                                    (appointment.consultation.women_pregnant == 1 && appointment.status != 10 ? 'Pregnancy-related' : 
-                                    (appointment.consultation.decision == 7 ? 'Pending Sputum Culture' : 
+                                    (appointment.consultation != null && appointment.consultation.women_pregnant == 1 && appointment.status != 10 ? 'Pregnancy-related' : 
+                                    (appointment.consultation != null && appointment.consultation.decision == 7 ? 'Pending Sputum Culture' : 
                                     (appointment.report != null && appointment.report.summary == 'suggestive' ? 'Pending Sputum Culture' : 'Unknown'
                                     ))) }}
                                     </td>
                                     <td>{{ appointment.unique_id }}</td>
                                     <td>{{ appointment.status == 10 ? 'Issued' : 'Not Issued' }}</td>
-                                    <td>{{ appointment.issue_at | dateDay }}</td>
-                                    <td>{{ appointment.issue_at | dateMonth }}</td>
-                                    <td>{{ appointment.issue_at | dateYear }}</td>
+                                    <td>{{ dateDay(appointment.issue_at) }}</td>
+                                    <td>{{ dateMonth(appointment.issue_at) }}</td>
+                                    <td>{{ dateYear(appointment.issue_at) }}</td>
                                     <td>Nigeria</td>
                                     <td>St. Nicholas Hospital</td>
                                     <td><ul v-if="appointment.report != null"><li v-for="finding in appointment.report.findings" :key="finding.id">{{ finding.code}} - {{ finding.name }}</li></ul></td>

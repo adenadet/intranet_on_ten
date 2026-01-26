@@ -344,7 +344,7 @@ export default {
                 });
 
                 this.ApplicantData.reset();
-                this.$swal.fire({icon: 'success', title: 'The Profile details has been created', showConfirmButton: false, timer: 1500});
+                this.$swal.fire({icon: 'success', title: 'The Appointment details has been created', showConfirmButton: false, timer: 1500});
             } 
             catch (err) {
                 // If this fails you may want to flag the appointment for review

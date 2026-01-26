@@ -44,30 +44,46 @@ trait LeaveTrait{
         DB::beginTransaction();
 
         try{
-            foreach($leave_types as $leave_type){
-                $employee_leave_type = EmployeeLeaveType::create([
-                    'employee_id' => $employee_id,
-                    'leave_type_id' => $leave_type,
-                    'days_used' => 0,
-                    'pending_days' => 0,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
+            $current_leave_types = $this->hrms_leave_type_get_all('active', null, false, false, null);
 
-                $this->log_user_activity('leave_request_confirm', $leave_types, false);
+            // Extract IDs only
+            $current_leave_type_ids = collect($current_leave_types)->pluck('id')->toArray();
+
+            $clear = EmployeeLeaveType::where('employee_id', $employee_id)->whereIn('leave_type_id', $current_leave_type_ids)->whereNotIn('leave_type_id', $leave_types)->delete();
+            
+            foreach($leave_types as $leave_type){
+                $employee_leave_type = EmployeeLeaveType::where('employee_id', '=', $employee_id)->where('leave_type_id', '=', $leave_type)->withTrashed()->first();
+                
+                if ($employee_leave_type){
+                    $employee_leave_type->deleted_at = null;
+                    $employee_leave_type->save();
+                }
+                else{
+                    $leaveType = LeaveType::find($leave_type);
+                    EmployeeLeaveType::create([
+                        'employee_id' => $employee_id,
+                        'leave_type_id' => $leave_type,
+                        'balance' => $leaveType->no_of_days,
+                        'days_used' => 0,
+                        'pending_days' => 0,
+                        'created_by' => auth('api')->id() ?? Auth::id(),
+                        'updated_by' => auth('api')->id() ?? Auth::id(),
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+                }
+                //$this->log_user_activity('leave_request_confirm', $leave_types, false);
             }
+
+            $employee_leave_types = EmployeeLeaveType::where('employee_id', '=', $employee_id)->whereIn('leave_type_id', $current_leave_type_ids)->get();
+            DB::commit();
+            return $employee_leave_types;
         } 
         catch(Exception $e){
-            $this->log_user_activity('leave_request_confirm', $leave_types, false);
-            $complete = false;
-        }
-        if ($complete){
-            DB::commit();
-            $employee_leave_types = $this->hrms_leave_types_get_my_current_leave_types($employee_id, true, true);
-            return $employee_leave_types;
-        }
-        else{
             DB::rollBack();
+            return $e->getMessage();
+            //$this->log_user_activity('leave_request_confirm', $leave_types, false);
+            
         } 
     }
 
@@ -302,8 +318,6 @@ trait LeaveTrait{
                 $employee = Employee::where('user_id', '=', auth('api')->id())->first();
                 $team_members = Employee::where('reports_to', '=', $employee->employee_id)->orWhere('supervisor_id', '=', $employee->employee_id)->pluck('id');
                 $query = $query->whereIn('employee_id', $team_members);
-                //if ($specific != 'all'){$query = $query->where('status', '=', $specific);}
-                //$query = $query->orderBy('status', 'ASC');
                 break;
             case 'ongoing':
                 $query = $query->whereDate('from_date', '>=', date('Y-m-d'))
@@ -322,7 +336,7 @@ trait LeaveTrait{
             break;
         }
         
-        /*if(is_array($specific)){
+        if(is_array($specific)){
             if(!empty($specific['query'])){
                 $question = $specific['query'];
 
@@ -337,7 +351,12 @@ trait LeaveTrait{
 
                 $query = $query->whereIn('employee_id', $employees);
             }
-        }*/
+
+            if(!empty($specific['department_id'])){
+                $employees = Employee::where('department_id', '=', $specific['department_id'])->pluck('id');
+                $query = $query->whereIn('employee_id', $employees);
+            }
+        }
         
         $quest = $detailed ? $query->with(['employee.user', 'leave_type', 'approver']) : $query;
         //$query->latest();

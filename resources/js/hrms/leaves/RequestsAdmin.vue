@@ -32,7 +32,7 @@
                 <div class="card-header bg-navy">
                     <h3 class="card-title">All Requests</h3>
                     <div class="card-tools">
-                        <div class="input-group" style="width: 450px;">
+                        <div class="input-group" style="width: 550px;">
                             <input type="text" name="table_search" class="form-control float-right" placeholder="Search" v-model="query">
                             <div class="input-group-append">
                                 <button type="submit" class="btn btn-sm btn-default" @click="getAllInitials()"><i class="fas fa-search"></i></button>
@@ -45,6 +45,10 @@
                                     <option value="pending">Pending</option>
                                     <option value="rejected">Rejected</option>
                                     <option value="unapproved">Unapproved</option>
+                                </select>
+                                <select class="form-control ml-1" v-model="department_id" @change="getAllInitials">
+                                    <option value="">--Select Department--</option>
+                                    <option v-for="d in departments" :key="d.id" :value="d.id">{{ d.name }}</option>
                                 </select>
                                 <button type="button" class="btn btn-sm btn-primary ml-1" @click="addLeaveRequest"><i class="fas fa-plus"></i></button>
                                 <button type="button" class="btn btn-sm btn-info" @click="uploadLeaveRequest"><i class="fas fa-upload"></i></button>
@@ -67,6 +71,8 @@ export default {
     data() {
         return {
             current_page: 1,
+            departments: [],
+            department_id: '',
             editMode: false,
             leave_request: {},
             loading: false,
@@ -91,7 +97,7 @@ export default {
         },
         getAllInitials(page=1){
             this.loading = true;
-            axios.get('/api/hrms/leaves?query='+this.query+'&type='+this.type+'&page='+page)
+            axios.get('/api/hrms/leaves?department_id='+this.department_id+'&query='+this.query+'&type='+this.type+'&page='+page)
             .then(response => {
                 this.refreshRequests(response);
                 this.loading = false;
@@ -105,6 +111,7 @@ export default {
             });
         },
         refreshRequests(response) {
+            this.departments = response.data.departments;
             this.requests = response.data.requests;
         },
         uploadLeaveRequest(){

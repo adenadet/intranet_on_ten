@@ -7,15 +7,16 @@
                 <div class="card-header bg-navy">
                     <h3 class="card-title">My Team Leave Requests</h3>
                     <div class="card-tools">
-                        <div class="input-group input-group-sm" style="width: 150px;">
-                            <select name="table_search" class="form-control float-right" @change="getAllInitials(1)" v-model="list_type">
-                                <option value="all">All</option>
-                                <option value="0">Unapproved</option>
-                                <option value="1">Approved</option>
-                                <option value="3">Ongoing</option>
-                                <option value="2">Completed</option>
-                            </select>
+                        <div class="input-group input-group-sm" style="width: 350px;">
+                            <input type="text" class="form-control" v-model="query" />
                             <div class="input-group-append">
+                                <select name="table_search" class="form-control float-right" @change="getAllInitials" v-model="list_type">
+                                    <option value="all">All</option>
+                                    <option value="0">Unapproved</option>
+                                    <option value="1">Approved</option>
+                                    <option value="3">Ongoing</option>
+                                    <option value="2">Completed</option>
+                                </select>
                                 <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
                             </div>
                         </div>
@@ -37,6 +38,7 @@ export default {
             current_page: 1,
             editMode: true,
             loading: false,
+            query: '',
             request: {},
             requests: {},
             list_type: 'all',
@@ -48,7 +50,7 @@ export default {
     methods: {
         getAllInitials(page=1){
             this.loading = true;
-            axios.get('/api/hrms/leaves?type=team&page='+page+'&query='+this.list_type)
+            axios.get('/api/hrms/leaves?type=team&page='+page+'&list_type='+this.list_type+'&query='+this.query)
             .then(response => {
                 this.requests = response.data.requests;
                 this.loading = false;

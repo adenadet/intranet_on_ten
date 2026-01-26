@@ -38,7 +38,7 @@ class DashboardController extends Controller
             'new_staffs'    => User::where('user_type', '!=', 'Applicant')->orderBy('created_at', 'DESC')->limit(8)->get(),
             'tickets'       => Ticket::where('agent_id', '=', auth('api')->id())->orWhere('category_id', '=', auth('api')->user()->department_id)->with(['creator', 'category', 'status', 'priority'])->latest()->paginate(5),
             'staff_months'  => Winner::where('month_id', '=', $staff_month)->with('user.department')->with('branch')->get(),
-            'notices'       => Notice::orderBy('created_at', 'DESC')->paginate(3),
+            'notices'       => Notice::where('start_date', '<=', date('Y-m-d'))->where('end_date','=', date('Y-m-d'))->orderBy('created_at', 'DESC')->paginate(3),
         ]);
     }
 

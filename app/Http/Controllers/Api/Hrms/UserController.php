@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Area;
 use App\Models\Branch;
+use App\Models\Hrms\Employee;
 use App\Models\NextOfKin;
 use App\Models\State;
 use App\Models\User;
@@ -98,7 +99,7 @@ class UserController extends Controller
     public function profile()
     {
         $branches = Branch::all();
-        $user = Staff::where('user_id', auth('api')->id())->with('area')->with('state')->with('branch')->first();
+        $user = Employee::where('user_id', auth('api')->id())->with('area')->with('state')->with('branch')->first();
         $nok = NextOfKin::where('user_id', auth('api')->id())->get();
         $states = State::orderBy('name', 'ASC')->get();
         $areas = Area::where('state_id', 25)->orderBy('name', 'ASC')->get();
