@@ -100,6 +100,7 @@ export default {
         closeModals(){
             $('#employeeModal').modal('hide'); 
             $('#roleModal').modal('hide');
+            $('#uploadModal').modal('hide');
         },
         deleteUser(id){
             this.$swal.fire({
@@ -112,17 +113,18 @@ export default {
                 confirmButtonText: 'Yes, delete it!'
             })
             .then((result) => {
-                //Send Delete request
                 if(result.value){
                     this.loading = true;
                     this.form.delete('/api/ums/staffs/'+id)
                     .then(response=>{
                         this.$swal.fire('Deleted!', response.data.message, 'success');
                         this.refreshPage(response);
-                        this.loading = false;   
                     })
                     .catch(()=>{
                         this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
+                    })
+                    .finally(()=>{
+                        this.loading = false;   
                     });
                 }
             });  

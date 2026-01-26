@@ -12,9 +12,8 @@
     </div>
     <div class="card-header bg-navy">Schedule An Appointment</div>
     <div class="card-body overlay-wrapper">
-        <!--form class="" method="POST"-->
-            <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-            <alert-error :form="ApplicantData"></alert-error> 
+        <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
+        <alert-error :form="ApplicantData"></alert-error> 
             <div class="row">
                 <div class="col-md-4 col-sm-12">
                     <div class="form-group">
@@ -169,8 +168,7 @@
             :onSuccess="response => processAppointment('nairafy', response)" 
             :onFail="nairafyErrorAppointment" /-->          
             <button class="btn btn-primary ml-3" :disabled="isButtonDisabled" @click="handleCreateThenPay">PAY NGN {{ ApplicantData.amount }} with Paystack</button>
-            <paystack ref="paystackRef" buttonClass="d-none" :publicKey="PUBLIC_KEY" :email="ApplicantData.email" :amount="ApplicantData.amount * 100" :reference="paystackReference" :onSuccess="handlePaystackSuccess" :onCancel="handlePaystackCancel"/>
-                <!--/form-->
+            <paystack ref="paystackRef" buttonClass="d-none" :publicKey="PUBLIC_TEST" :email="ApplicantData.email" :amount="ApplicantData.amount * 100" :reference="paystackReference" :onSuccess="handlePaystackSuccess" :onCancel="handlePaystackCancel"/>
     </div>
     <div class="card-footer">
         Kindly note the terms 
@@ -334,20 +332,29 @@ export default {
         },
         async handlePaystackSuccess(ps) {
             try {
+                this.loading = true;
                 await axios.put(`/api/scheduler/${this.serverTxnId}`, {
                     payment_reference : ps.reference,
-                    payment_transaction: response.transaction,
+                    payment_transaction: ps.transaction || ps.reference,
                     payment_method : 'Paystack',
                     reference       : ps.reference,
                     status          : ps.status,
                     raw_response    : ps,          // optionally persist full payload
+                })
+                .then(()=>{
+                    this.$swal.fire({icon: 'success', title: 'The Appointment details has been created', showConfirmButton: false, timer: 1500});
+                })
+                .catch(()=>{
+                    this.$swal.fire({icon: 'error', title: 'Something went wrong, check if you got a payment receipt in your email', showConfirmButton: false, timer: 1500});
+                })
+                .finally(()=>{
+                    this.ApplicantData.reset();
+                    this.loading = false;
                 });
-
-                this.ApplicantData.reset();
-                this.$swal.fire({icon: 'success', title: 'The Appointment details has been created', showConfirmButton: false, timer: 1500});
             } 
             catch (err) {
-                // If this fails you may want to flag the appointment for review
+                this.$swal.fire({icon: 'error', title: 'Something went wrong, check if you got a payment receipt in your email', showConfirmButton: false, timer: 1500});
+                this.loading = false;
             }
         },
         isWeekend(date){

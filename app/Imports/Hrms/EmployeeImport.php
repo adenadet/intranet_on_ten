@@ -56,7 +56,7 @@ class EmployeeImport implements ToModel, WithHeadingRow
 
         $employee = Employee::create([
             'user_id' => $user->id,
-            'employee_id' => $unique,
+            'employee_id' => $number,
             'office_shift_id' => NULL,
             'reports_to' => $line_manager ?? null,
             'supervisor_id' => $supervisor ?? null,
