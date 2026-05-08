@@ -12,14 +12,14 @@
                     <div class="row invoice-info">
                         <div class="col-sm-7 invoice-col">
                             <address>
-                                REF: <u><b>{{ appointment.patient | fullName }}</b></u><br>
+                                REF: <u><b>{{ FullName(appointment.patient)}}</b></u><br>
                                 SNH No: <u><b>{{ appointment.unique_id }}</b></u><br>
-                                Date of Birth: <u><b>{{ appointment.patient.dob | excelDate }}</b></u><br>
+                                Date of Birth: <u><b>{{ excelDate(appointment.patient.dob)  }}</b></u><br>
                             </address>
                         </div>
                         <div class="col-sm-5 invoice-col">
                             <address>
-                                Date:  <u><b>{{ referral.updated_at | excelDate }}</b></u><br>
+                                Date:  <u><b>{{ ExcelDate(referral.updated_at)  }}</b></u><br>
                             </address>
                         </div>
                     </div>
@@ -31,8 +31,8 @@
                                 <strong>Yours Sincerely,<br />
                                 For: St. Nicholas Hospital, </strong><br />
 
-                                <img :src="referral.created_by == 56 ? './img/consents/rusman.png' : (referral.created_by == 57 ? './img/consents/rabudah.png' :(referral.created_by == 55 ? './img/consents/bsalami.png' :(referral.created_by == 331 ? './img/consents/mnwachukwu.png' :'./img/consents/bsalami.png')))" class="img-fluid text-fluid" />
-                                <strong>Dr. {{referral.creator | fullName}}</strong>
+                                <img :src="referral.created_by == 56 ? './img/consents/rusman.png' : (referral.created_by == 57 ? './img/consents/rabudah.png' :(referral.created_by == 55 ? './img/consents/bsalami.png' :(referral.created_by == 331 ? './img/consents/mnwachukwu.png' :'./img/consents/bsalami.png')))" class="img-fluid text-fluid" style="height: 150px !important;"/>
+                                <strong>Dr. {{FullName(referral.creator) }}</strong>
                             </div>
                         </div>
                     </div>

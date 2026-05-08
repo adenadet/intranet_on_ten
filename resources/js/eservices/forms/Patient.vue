@@ -101,13 +101,22 @@
         <div class="col-md-6 col-sm-12">
             <div class="form-group">
                 <label>Address in Nigeria*</label>
-                <QuillEditor content-type="html" theme="snow" class="form-control" id="nigerian_address" name="nigerian_address" v-model:content="ApplicantData.nigerian_address" :class="{'is-invalid' : ApplicantData.errors.has('nigerian_address') }">{{ApplicantData.nigerian_address}}</QuillEditor>
+                <!--QuillEditor content-type="html" theme="snow" class="form-control" id="nigerian_address" name="nigerian_address" v-model:content="ApplicantData.nigerian_address" :class="{'is-invalid' : ApplicantData.errors.has('nigerian_address') }">{{ApplicantData.nigerian_address}}</QuillEditor -->
+                <input type="text" v-model="ApplicantData.nigerian_address_street" class="form-control" id="nigerian_address_street" name="nigerian_address_street" placeholder="Street Address e.g. 2, Olabode Street"/>
+                <input type="text" v-model="ApplicantData.nigerian_address_street2" class="form-control" id="nigerian_address_street2" name="nigerian_address_street2" placeholder="Street Address e.g. off Station Road"/>
+                <input type="text" v-model="ApplicantData.nigerian_address_city" class="form-control" id="nigerian_address_city" name="nigerian_address_city" placeholder="Town or City e.g. Ondo,"/>
+                <input type="text" v-model="ApplicantData.nigerian_address_country" class="form-control" id="nigerian_address_country" name="nigerian_address_country" placeholder="Country e.g. Nigeria"/>
             </div>
         </div>
         <div class="col-md-6 col-sm-12">
             <div class="form-group">
                 <label>Address in the UK*</label>
-                <QuillEditor theme="snow" class="form-control" rows="5" id="uk_address" name="uk_address" placeholder="Enter Address *" required v-model:content="ApplicantData.uk_address" content-type="html" :class="{'is-invalid' : ApplicantData.errors.has('uk_address') }"></QuillEditor>
+                <!--QuillEditor theme="snow" class="form-control" rows="5" id="uk_address" name="uk_address" placeholder="Enter Address *" required v-model:content="ApplicantData.uk_address" content-type="html" :class="{'is-invalid' : ApplicantData.errors.has('uk_address') }"></QuillEditor-->
+                <input type="text" v-model="ApplicantData.uk_address_street" class="form-control" id="uk_address_street" name="uk_address_street" placeholder="Street Address e.g. University of Birmingham"/>
+                <input type="text" v-model="ApplicantData.uk_address_street2" class="form-control" id="uk_address_street2" name="uk_address_street2" placeholder="Street Address e.g. Edgbaston"/>
+                <input type="text" v-model="ApplicantData.uk_address_city" class="form-control" id="uk_address_city" name="uk_address_city" placeholder="Town or City e.g. Birmingham"/>
+                <input type="text" v-model="ApplicantData.uk_address_postcode" class="form-control" id="uk_address_postcode" name="uk_address_postcode" placeholder="Postcode e.g. B15 2TT"/>
+            
             </div>
         </div>
     </div>
@@ -132,8 +141,16 @@ export default {
                 email:'',
                 id:'', 
                 image:'', 
-                nigerian_address:'', 
+                nigerian_address:'',
+                nigerian_address_street:'',
+                nigerian_address_street2:'',
+                nigerian_address_city:'',
+                nigerian_address_country:'', 
                 uk_address:'',
+                uk_address_street:'',
+                uk_address_street2:'',
+                uk_address_city:'',
+                uk_address_postcode:'',
                 accompanying_kids: 0,
                 visa_type: '',
                 passport_no: '',

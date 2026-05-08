@@ -57,33 +57,30 @@
                     <ul class="nav nav-treeview">
                         @if(Auth::user()->hasRole('Consultant Practice FO') || Auth::user()->hasRole('Super Admin'))
                         <li class="nav-item">
-                            <a href="/consultant_practices/front_office" class="nav-link">
-                            <i class="fas fa-laptop-medical nav-icon"></i>
-                            <p>Front Office</p>
+                            <a href="/consultant_practices/front" class="nav-link">
+                            <i class="fas fa-laptop-medical nav-icon"></i><p>Front Office</p>
+                            </a>
+                        </li>
+                        @endif
+                        @if(Auth::user()->hasRole('Consultant Practice Med') || Auth::user()->hasRole('Super Admin'))
+                        <li class="nav-item">
+                            <a href="/consultant_practices/medical" class="nav-link">
+                            <i class="fas fa-user-md nav-icon"></i><p>Medical Officer</p>
                             </a>
                         </li>
                         @endif
                         @if(Auth::user()->hasRole('Consultant Practice Fin') || Auth::user()->hasRole('Super Admin'))
                         <li class="nav-item">
-                            <a href="/consultant_practices/doctor" class="nav-link">
-                            <i class="fas fa-user-circle nav-icon"></i>
-                            <p>Finance Officer</p>
+                            <a href="/consultant_practices/finance" class="nav-link">
+                            <i class="fas fa-user-circle nav-icon"></i><p>Finance Officer</p>
                             </a>
                         </li>
                         @endif
                         @if(Auth::user()->hasRole('Consultant Practice Admin') || Auth::user()->hasRole('Super Admin'))
                         <li class="nav-item">
-                            <a href="/consultant_practices/administrator" class="nav-link">
+                            <a href="/consultant_practices/admin" class="nav-link">
                             <i class="fa fa-user-cog nav-icon"></i>
                             <p>Administrator</p>
-                            </a>
-                        </li>
-                        @endif
-                        @if(Auth::user()->hasRole('Consultant Practice Front Admin') || Auth::user()->hasRole('Super Admin'))
-                        <li class="nav-item">
-                            <a href="/consultant_practices/front_admin" class="nav-link">
-                            <i class="fa fa-user-cog nav-icon"></i>
-                            <p>Front Administrator</p>
                             </a>
                         </li>
                         @endif

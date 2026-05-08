@@ -70,7 +70,7 @@
                     <td>{{ request.leave_days }}</td>
                     <td>{{ExcelDate(request.from_date) }}</td>
                     <td>{{ExcelDate(request.to_date) }}</td>
-                    <td>{{ExcelDate(request.updated_at) }}</td>
+                    <td>{{ExcelDate(request.created_at) }}</td>
                     <td>{{request.status == 0 ? 'Unapproved' : 
                             (request.status == 2 ? 'Completed' :
                             (request.status == 1 ? (

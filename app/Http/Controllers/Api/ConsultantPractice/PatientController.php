@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Api\ConsultantPractice;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ConsultantPractice\ConsultantPracticeTrait;
 use App\Models\ConsultantPractice\Patient;
+use App\Services\ConsultantPractice\PatientManagerService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PatientController extends Controller
 {
+    use ConsultantPracticeTrait;
     public function destroy(string $id)
     {
         //
@@ -34,7 +37,7 @@ class PatientController extends Controller
     public function show(string $id)
     {
         try{
-            $query = Patient::where('id', '=', $id)->where('unique_id', '=', $id)->firstOrFail();
+            $query = Patient::where('id', '=', $id)->orWhere('unique_id', '=', $id)->firstOrFail();
         }
         catch(Exception $e){
             $query = $e->getMessage();
@@ -52,16 +55,12 @@ class PatientController extends Controller
             'unique_id' => 'required',
         ]);
 
-        $query = Patient::create([
-            'name' => $request->name,
-            'unique_id' => $request->unique_id,
-            'created_by' => Auth::id() ?? auth('api')->id(),
-            'updated_by' => Auth::id() ?? auth('api')->id(),
-        ]);
+        $patient_manager = new PatientManagerService();
+        $patient = $patient_manager->create($request);
 
         return response()->json([
-            'patient' => $query,
-        ], is_string($query) ? 500 : 201);
+            'patient' => $patient,
+        ]);
     }
 
     public function update(Request $request, string $id)
@@ -71,21 +70,12 @@ class PatientController extends Controller
             'unique_id' => 'required',
         ]);
 
-        try{
-            $query = Patient::where('id', '=', $id)->where('unique_id', '=', $id)->firstOrFail();
-            $query->update([
-                'name' => $request->name,
-                'unique_id' => $request->unique_id,
-                'updated_by' => Auth::id() ?? auth('api')->id(),
-            ]);
-        }
-        catch(Exception $e){
-            $query = $e->getMessage();
-        }
+        $patient_manager = new PatientManagerService();
+        $patient = $patient_manager->update($request, $id);
         
         return response()->json([
-            'patient' => $query,
-        ], is_string($query) ? 500 : 201);
+            'patient' => $patient,
+        ], is_string($patient) ? 500 : 201);
     }
 
 }

@@ -145,13 +145,19 @@
                 <div class="col-md-12 col-sm-12">
                     <div class="form-group">
                         <label>Address in Nigeria*</label>
-                        <QuillEditor contentType="html" rows="5" id="nigerian_address" name="nigerian_address" placeholder="Enter Address *" required v-model:content="ApplicantData.nigerian_address" :class="{'is-invalid' : ApplicantData.errors.has('nigerian_address') }"></QuillEditor>
+                        <input type="text" v-model="ApplicantData.nigerian_address_street" class="form-control" id="nigerian_address_street" name="nigerian_address_street" placeholder="Street Address e.g. 2, Olabode Street"/>
+                        <input type="text" v-model="ApplicantData.nigerian_address_street2" class="form-control" id="nigerian_address_street2" name="nigerian_address_street2" placeholder="Street Address e.g. off Station Road"/>
+                        <input type="text" v-model="ApplicantData.nigerian_address_city" class="form-control" id="nigerian_address_city" name="nigerian_address_city" placeholder="Town or City e.g. Ondo,"/>
+                        <input type="text" v-model="ApplicantData.nigerian_address_country" class="form-control" id="nigerian_address_country" name="nigerian_address_country" placeholder="Country e.g. Nigeria"/>
                     </div>
                 </div>
                 <div class="col-md-12 col-sm-12">
                     <div class="form-group">
                         <label>Address in the UK*</label>
-                        <QuillEditor contentType="html" rows="5" id="uk_address" name="uk_address" placeholder="Enter Address *" required v-model:content="ApplicantData.uk_address" :class="{'is-invalid' : ApplicantData.errors.has('uk_address') }"></QuillEditor>
+                        <input type="text" v-model="ApplicantData.uk_address_street" class="form-control" id="uk_address_street" name="uk_address_street" placeholder="Street Address e.g. University of Birmingham"/>
+                        <input type="text" v-model="ApplicantData.uk_address_street2" class="form-control" id="uk_address_street2" name="uk_address_street2" placeholder="Street Address e.g. Edgbaston"/>
+                        <input type="text" v-model="ApplicantData.uk_address_city" class="form-control" id="uk_address_city" name="uk_address_city" placeholder="Town or City e.g. Birmingham"/>
+                        <input type="text" v-model="ApplicantData.uk_address_postcode" class="form-control" id="uk_address_postcode" name="uk_address_postcode" placeholder="Postcode e.g. B15 2TT"/>
                     </div>
                 </div>
             </div>
@@ -168,7 +174,7 @@
             :onSuccess="response => processAppointment('nairafy', response)" 
             :onFail="nairafyErrorAppointment" /-->          
             <button class="btn btn-primary ml-3" :disabled="isButtonDisabled" @click="handleCreateThenPay">PAY NGN {{ ApplicantData.amount }} with Paystack</button>
-            <paystack ref="paystackRef" buttonClass="d-none" :publicKey="PUBLIC_TEST" :email="ApplicantData.email" :amount="ApplicantData.amount * 100" :reference="paystackReference" :onSuccess="handlePaystackSuccess" :onCancel="handlePaystackCancel"/>
+            <paystack ref="paystackRef" buttonClass="d-none" :publicKey="PUBLIC_KEY" :email="ApplicantData.email" :amount="ApplicantData.amount * 100" :reference="paystackReference" :onSuccess="handlePaystackSuccess" :onCancel="handlePaystackCancel"/>
     </div>
     <div class="card-footer">
         Kindly note the terms 
@@ -212,7 +218,15 @@ export default {
                 id:'', 
                 image:'', 
                 nigerian_address:'', 
+                nigerian_address_street:'',
+                nigerian_address_street2:'', 
+                nigerian_address_city:'',
+                nigerian_address_country:'',   
                 uk_address:'',
+                uk_address_street:'',
+                uk_address_street2:'',
+                uk_address_city:'',
+                uk_address_postcode:'',
                 accompanying_kids: 0,
                 visa_type: '',
                 passport_number: '',
@@ -298,7 +312,7 @@ export default {
             })
             .catch(() => {
                 this.loading = false;
-                toast.fire({icon: 'error', title: 'Your appointments did not loaded successfully',})
+                this.$toast.fire({icon: 'error', title: 'Your appointments did not loaded successfully',})
             });
         },
         async handlePaystackCancel() {
@@ -469,8 +483,8 @@ export default {
             var year = age_dt.getUTCFullYear();  
             var age = Math.abs(year - 1970);  
             
-            if (age >= 11){this.ApplicantData.amount = 100000;}
-            else {this.ApplicantData.amount = 50000;}
+            if (age >= 11){this.ApplicantData.amount = 120000;}
+            else {this.ApplicantData.amount = 60000;}
         },
         updateProfilePic(e){
             let file = e.target.files[0];

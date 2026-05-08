@@ -1,0 +1,121 @@
+<template>
+<section class="overlay-wrapper p-0">
+    <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
+    <div class="modal fade" id="companyFormModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-navy">
+                    <h4 class="modal-title">{{ editMode ? 'Edit' : 'New'}} Company</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="text-white" aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <CPFormCompany :editMode="editMode" :company.sync="company" @refreshCompanyForm="refreshPage"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <table class="table table-head-fixed table-striped text-nowrap">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Consultants</th>
+                <th>Status</th>
+                <th><button class="btn btn-xs btn-primary float-right" @click="addCompany()"><i class="fa fa-plus"></i></button></th>
+            </tr>
+        </thead>
+        <tbody v-if="companies.length > 0">
+            <tr v-for="(company, index) in companies" :key="company.id">
+                <td>{{ addOne(index) }}</td>
+                <td>{{ company.name }}</td>
+                <td>{{ company.consultants.length }}</td>
+                <td>
+                    <span v-if="company.status == 1" class="badge badge-primary">Active</span>
+                    <span v-else class="badge badge-danger">Inactive</span>
+                </td>
+                <td>
+                    <span class="nav-link float-right" data-toggle="dropdown" href="#">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </span>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <router-link class="btn btn-block dropdown-item" :to="'/consultant_practices/'+source+'/companies/' + company.id"><i class="fas fa-eye mr-2 text-success"></i> View Company</router-link>
+                        <button class="btn btn-block dropdown-item" @click="updateCompany(company)"><i class="fas fa-edit mr-2 text-primary"></i> Update Company</button>
+                        <button class="btn btn-block dropdown-item" @click="deactivateCompany(company.id)"><i class="fas fa-power-off mr-2 text-danger"></i> {{ company.status == 1 ? 'Deactivate' : 'Reactivate' }} Company</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tbody v-else>
+            <tr><td colspan="6">No Company meets your requirements</td></tr>
+        </tbody>
+    </table>
+</section>
+</template>
+<script>
+export default {
+    data(){
+        return {
+            company: {},
+            editMode: false,
+            form: new Form({}),
+            loading: false,
+        }
+    },
+    emits:['refreshCompanyList'],
+    methods:{
+        addCompany(){
+            this.loading = true;
+            this.editMode = false;
+            this.company = {};
+            $('#companyFormModal').modal('show');
+            this.loading = false; 
+        },
+        closeModals(){
+            $('#companyFormModal').modal('hide');
+        },
+        deactivateCompany(id){
+            this.$swal.fire({
+                title: 'Are you sure?',
+                text: "This Company and its Consultants will no longer be available",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, deactivate it!'
+            })
+            .then((result) => {
+                //Send Delete request
+                if(result.value){
+                    this.loading = true;
+                    this.form.delete('/api/consultant_practices/companies/'+id)
+                    .then(response=>{
+                        this.$swal.fire('Deactivated!', response.data.message, 'success');
+                        this.refreshPage(response);
+                        this.loading = false;   
+                    })
+                    .catch(()=>{
+                        this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
+                    });
+                }
+            });  
+        },
+        refreshPage(){
+            this.closeModals();
+            this.$emit('refreshCompanyList');
+        },
+        updateCompany(company){
+            this.loading = true;
+            this.editMode = true;
+            this.company = company;
+            $('#companyFormModal').modal('show');
+            this.loading = false;
+        }
+    },
+    mounted() {},
+    props:{
+        companies: Array,
+        source: String,
+    },
+    watch:{}
+}
+</script>

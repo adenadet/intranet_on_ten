@@ -10,14 +10,15 @@ class Payment extends Structure
 {
     use HasFactory;
     
-    public const StatusActive = 1;
-    public const StatusDeleted = 0;
+    public const StatusPending = 1;
     public const StatusConfirmed = 10;
-
+    public const StatusCancelled = 100;
+    public const StatusReversed = 200;
+    
     protected $primaryKey = 'id';
     protected $table = 'consultant_practice_payments';
 
-    protected $fillable = array('unique_id', 'consultant_id', 'account_id', 'amount', 'balance', 'confirmed_by', 'confirmed_at', 'status', 'description', 'created_by', 'updated_by', 'deleted_by', 'created_at', 'updated_at', 'deleted_at');
+    protected $fillable = array('company_id', 'account_id', 'reference', 'amount', 'notes', 'confirmed_by', 'confirmed_at','reversed_by', 'reversed_at', 'status', 'created_by', 'updated_by', 'deleted_by', 'created_at', 'updated_at', 'deleted_at');
 
     public function account(){
         return $this->belongsTo('App\Models\ConsultantPractice\Account', 'account_id', 'id');
@@ -27,8 +28,8 @@ class Payment extends Structure
         return $this->belongsTo('App\Models\User', 'confirmed_by', 'id');
     }
 
-    public function consultants(){
-        return $this->hasMany('App\Models\ConsultantPractice\Consultant', 'specialty_id', 'id');
+    public function company(){
+        return $this->belongsTo('App\Models\ConsultantPractice\Company', 'company_id', 'id');
     }
 
     public function creator(){
@@ -39,8 +40,8 @@ class Payment extends Structure
         return $this->belongsTo('App\Models\User', 'deleted_by', 'id');
     }
 
-    public function session_payments(){
-        return $this->hasMany('App\Models\ConsultantPractice\Sessionpayment', 'payment_id', 'id');
+    public function reverser(){
+        return $this->belongsTo('App\Models\User', 'reversed_by', 'id');
     }
 
     public function updater(){

@@ -3,23 +3,42 @@
 namespace App\Http\Controllers\Api\ConsultantPractice;
 
 use App\Http\Controllers\Controller;
-use App\Http\Traits\ConsultantPractice\ConsultantTrait;
+use App\Http\Traits\ConsultantPractice\ConsultantPracticeTrait;
 use Illuminate\Http\Request;
-use App\Http\Traits\ConsultantPractice\SessionTrait;
 use App\Models\ConsultantPractice\Patient;
+use App\Models\ConsultantPractice\Session;
+use App\Models\ConsultantPractice\SessionConfirmation;
+use App\Models\ConsultantPractice\SessionPayment;
 use App\Models\ConsultantPractice\Specialty;
+use App\Services\ConsultantPractice\SessionManagerService;
 
 class SessionController extends Controller
 {
-    use ConsultantTrait, SessionTrait;
+    use ConsultantPracticeTrait;
     
-    public function confirm(Request $request, string $id)
+    public function confirm_payment(Request $request)
     {
-        $session = $this->consultant_practice_session_confirm($_GET['type'], $request, $id);
-
+        $session = Session::find($request->input('session_id'));
+        $session_manager = new SessionManagerService();
+        
+        $session = $request->input('decision') === 'reject' ? $session_manager->reject($session, $request->all()) : $session_manager->payment_confirm($session, $request->all());
+    
         return response()->json([
             'sessions' => $session
         ], is_string($session) ? 500 : 200);
+        
+    }
+
+    public function confirm_service(Request $request)
+    {
+        $session = Session::find($request->input('session_id'));
+        $session_manager = new SessionManagerService();
+        
+        $session = $request->input('decision') === 'reject' ? $session_manager->reject($session, $request->all()) : $session_manager->service_confirm($session, $request->all());
+        return response()->json([
+            'sessions' => $session
+        ], is_string($session) ? 500 : 200);
+        
     }
 
     public function destroy(string $id)
@@ -51,7 +70,20 @@ class SessionController extends Controller
 
     public function store(Request $request)
     {
-        $session = $this->consultant_practice_session_create($request);
+        $this->validate($request, [
+            'amount' => 'required|numeric',
+            'consultant_id' => 'required|exists:consultant_practice_consultants,id',
+            'date' => 'required|date',
+            'patient_id' => 'required|exists:consultant_practice_patients,id',
+            'specialty_id' => 'nullable|exists:consultant_practice_specialties,id',
+            'services' => 'required|array|min:1',
+            'services.*.service_id' => 'required|exists:consultant_practice_services,id',
+            'services.*.price' => 'required|numeric',
+            'services.*.adjusted_price' => 'required|numeric',
+        ]);
+
+        $session_manager = new SessionManagerService();
+        $session = $session_manager->create($request);
 
         return response()->json([
             'sessions' => $session
@@ -63,7 +95,9 @@ class SessionController extends Controller
         $session = $this->consultant_practice_session_get_by($id, true);
 
         return response()->json([
-            'sessions' => $session
+            'session' => $session,
+            'confirmation' => SessionConfirmation::where('session_id', $id)->with('creator')->first() ?? null,
+            'payment' => SessionPayment::where('session_id', $id)->with('creator')->first() ?? null,
         ], is_string($session) ? 404 : 200);
     }
 

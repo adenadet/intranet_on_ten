@@ -47,9 +47,9 @@
                         <table class="table table-striped text-nowrap" v-if="reportData.report_type == 'all'">
                             <thead>
                                 <tr>
-                                    <th>Reference ID <br />of Applicant <br />(Passport number)</th>
+                                    <th>Reference ID <br />of Applicant</th>
                                     <th colspan="3">Examination Date</th>
-                                    <th>Chest X-ray</th>
+                                    <th>Chest X-ray (CXR) done?</th>
                                     <th>CXR Result</th>
                                     <th>Reason why CXR <br /> was not done?</th>
                                     <th>Sputum Smear <br />Result (1)</th>
@@ -83,56 +83,107 @@
                                     <td>{{ dateMonth(appointment.date) }}</td>
                                     <td>{{ dateYear(appointment.date)}}</td>
                                     <td>{{ appointment.report != null ? 'Done' : 'Not Done' }}</td>
-                                    <td>{{ appointment.report != null ? appointment.report.summary : 'N/A' }}</td>
-                                    <td>{{ appointment.consultation != null &&  appointment.consultation.decision == 6 ? 'CXR Done' : (
-                                    appointment.consultation != null &&  appointment.consultation.decision == 8 ? 'Child < 11 years old' : 
-                                    (appointment.consultation != null &&  appointment.consultation.decision == 10 && appointment.consultation.women_pregnant == 1 ? 'Pregnant, CXR Deferred: Sputum Smear or Culture Not Done' : 
-                                    (appointment.consultation != null &&  appointment.consultation.decision == 7 && appointment.consultation.women_pregnant == 1 ? 'Pregnant, CXR Declined: Sputum Smear or Culture Done' : 
-                                    (appointment.consultation != null &&  appointment.consultation.decision == 10 && appointment.consultation.women_pregnant == 0 ? 'Applicant Deferred: Sputum Smear or Culture Not Done' : (appointment.consultation != null &&  appointment.consultation.decision == 7 && appointment.consultation.women_pregnant == 0 ? 'Applicant Declined: Sputum Smear or Culture Done' : '')))))}}</td>
+                                    <td v-if="appointment.report == null">N/A</td>
+                                    <td v-else-if="appointment.report != null && appointment.report.summary == 'normal'">Normal</td>
+                                    <td v-else-if="appointment.report != null && appointment.report.summary == 'abnormal'">Abnormal without TB</td>
+                                    <td v-else-if="appointment.report != null && appointment.report.summary == 'suggestive'">Abnormal with TB</td>
+                                    <td>
+                                        <span v-if="appointment.consultation != null &&  appointment.consultation.decision == 6">CXR was done</span>
+                                        <span v-else-if="appointment.consultation != null &&  appointment.consultation.decision == 8">Child < 11 years old</span>
+                                        <span v-else-if="appointment.consultation != null &&  appointment.consultation.decision == 10 && appointment.consultation.women_pregnant == 1">Pregnant, CXR Deferred: Sputum Smear/Culture Not Done</span>
+                                        <span v-else-if="appointment.consultation != null &&  appointment.consultation.decision == 7 && appointment.consultation.women_pregnant == 1">Pregnant, CXR Declined: Sputum Smear/Culture Done</span>
+                                        <span v-else-if="appointment.consultation != null &&  appointment.consultation.decision == 10 && appointment.consultation.women_pregnant == 0">Applicant Deferred: Sputum Smear/Culture Not Done</span>
+                                        <span v-else-if="appointment.consultation != null &&  appointment.consultation.decision == 7 && appointment.consultation.women_pregnant == 0">Applicant Declined: Sputum Smear/Culture Done</span>
+                                        <span v-else>No Show</span>
+                                    </td>
                                     <td>N/A</td>
                                     <td>N/A</td>
                                     <td>N/A</td>
                                     <td>
-                                        {{ appointment.laboratory != null ? appointment.laboratory.summary : (appointment.consultation.decision == 7 && appointment.laboratory == null ? 'Pending': (appointment.consultation.decision == 7 || appointment.laboratory != null ? 'Sputum Done' : 'Not Done')) }}
+                                        <span v-if="appointment.laboratory != null">{{ appointment.laboratory.summary }}</span>
+                                        <span v-else-if="appointment.consultation.decision == 7 && appointment.laboratory == null">Pending</span>
+                                        <span v-else-if="appointment.consultation.decision == 7 || appointment.laboratory != null">Sputum Done</span>
+                                        <span v-else>Not Done</span>
                                     </td>
                                     <td>
-                                        {{ appointment.laboratory != null ? appointment.laboratory.summary : (appointment.consultation.decision == 7 && appointment.laboratory == null ? 'Pending': (appointment.consultation.decision == 7 || appointment.laboratory != null ? 'Sputum Done' : 'Not Done')) }}
+                                        <span v-if="appointment.laboratory != null">{{ appointment.laboratory.summary }}</span>
+                                        <span v-else-if="appointment.consultation.decision == 7 && appointment.laboratory == null">Pending</span>
+                                        <span v-else-if="appointment.consultation.decision == 7 || appointment.laboratory != null">Sputum Done</span>
+                                        <span v-else>Not Done</span>
                                     </td>
                                     <td>
-                                        {{ appointment.laboratory != null ? appointment.laboratory.summary : (appointment.consultation.decision == 7 && appointment.laboratory == null ? 'Pending': (appointment.consultation.decision == 7 || appointment.laboratory != null ? 'Sputum Done' : 'Not Done')) }}
+                                        <span v-if="appointment.laboratory != null">{{ appointment.laboratory.summary }}</span>
+                                        <span v-else-if="appointment.consultation.decision == 7 && appointment.laboratory == null">Pending</span>
+                                        <span v-else-if="appointment.consultation.decision == 7 || appointment.laboratory != null">Sputum Done</span>
+                                        <span v-else>Not Done</span>
                                     </td>
+                                    <td>Drug Sensitivty Testing Not Done</td>
                                     <td>N/A</td>
-                                    <td>N/A</td>
-                                    <td>{{ appointment.consultation != null && (appointment.consultation.sym_cough == 1 ||appointment.consultation.sym_fever == 1 || appointment.consultation.sym_haemoptysis == 1 || appointment.consultation.sym_night_sweats == 1 || appointment.consultation.sym_weight_loss == 1) ? 'Yes' : 'No' }}</td>
-                                    <td>{{ appointment.consultation != null && (appointment.consultation.all_household_tb == 1 || appointment.consultation.all_recent_contact == 1) ? 'Yes' : 'No' }}</td>
-                                    <td>{{ (appointment.report != null && appointment.report.summmary == 'suggestive') || (appointment.laboratory != null && appointment.laboratory.summmary == 'abnormal') ? 'Yes' : 'No' }}</td>
-                                    <td>{{ appointment.consultation != null && (appointment.consultation.sym_cough == 1 ||appointment.consultation.sym_fever == 1 || appointment.consultation.sym_haemoptysis == 1 || appointment.consultation.sym_night_sweats == 1 || appointment.consultation.sym_weight_loss == 1 ||appointment.consultation.all_household_tb == 1 || appointment.consultation.all_recent_contact == 1) ? 'History/Examination' : 
-                                    (appointment.report != null && appointment.report.summmary == 'suggestive' ? 'CXR' : (appointment.laboratory != null && appointment.laboratory.summmary == 'abnormal' ? 'Sputum' : 'N/A'))}}</td>
-                                    <td>{{ appointment.consultation != null && (appointment.consultation.decision == 6 && appointment.report != null && appointment.report.summary != 'suggestive') ? 'No' : (appointment.consultation.decision == 8 ? 'No' : (appointment.consultation.decision == 7 && appointment.laboratory == null ? 'Pending' :(appointment.consultation.decision == 7 && appointment.laboratory != null && appointment.laboratory.summary == 'normal' ? 'No' : 'Yes')))  }}</td>
-                                    <td>Unknown</td>
-                                    <td>{{ 
-                                    appointment.status == 10 ? 'N/A' : 
-                                    (appointment.consultation != null && appointment.consultation.women_pregnant == 1 && appointment.status != 10 ? 'Pregnancy-related' : 
-                                    (appointment.consultation != null && appointment.consultation.decision == 7 ? 'Pending Sputum Culture' : 
-                                    (appointment.report != null && appointment.report.summary == 'suggestive' ? 'Pending Sputum Culture' : 'Unknown'
-                                    ))) }}
+                                    <td>
+                                        <span v-if="appointment.consultation != null && (appointment.consultation.sym_cough == 1 ||appointment.consultation.sym_fever == 1 || appointment.consultation.sym_haemoptysis == 1 || appointment.consultation.sym_night_sweats == 1 || appointment.consultation.sym_weight_loss == 1)">Yes</span>
+                                        <span v-else>No</span>
+                                    </td>
+                                    <td>
+                                        <span v-if="appointment.consultation != null && (appointment.consultation.all_household_tb == 1 || appointment.consultation.all_recent_contact == 1)">Yes</span>
+                                        <span v-else>No</span>
+                                    </td>
+                                    <td>
+                                        <span v-if="(appointment.report != null && appointment.report.summmary == 'suggestive') || (appointment.laboratory != null && appointment.laboratory.summmary == 'abnormal')">Yes</span>
+                                        <span v-else>No</span>
+                                    </td>
+                                    <td>
+                                        <span v-if="appointment.consultation != null && (appointment.consultation.sym_cough == 1 ||appointment.consultation.sym_fever == 1 || appointment.consultation.sym_haemoptysis == 1 || appointment.consultation.sym_night_sweats == 1 || appointment.consultation.sym_weight_loss == 1 ||appointment.consultation.all_household_tb == 1 || appointment.consultation.all_recent_contact == 1)">History/Examination</span>
+                                        <span v-else-if="appointment.report != null && appointment.report.summmary == 'suggestive'">CXR</span>
+                                        <span v-else-if="appointment.laboratory != null && appointment.laboratory.summmary == 'abnormal'">Sputum Smear</span>
+                                        <span v-else>N/A</span>
+                                    </td>
+                                    <td>
+                                        <span v-if="appointment.consultation != null && (appointment.consultation.decision == 6 && appointment.report != null && appointment.report.summary != 'suggestive')">No</span>
+                                        <span v-else-if="appointment.consultation.decision == 8">No</span>
+                                        <span v-else-if="appointment.consultation.decision == 7 && appointment.laboratory == null">Pending</span>
+                                        <span v-else-if="appointment.consultation.decision == 7 && appointment.laboratory != null && appointment.laboratory.summary == 'normal'">No</span>
+                                        <span v-else>Yes</span>
+                                    </td>
+                                    <td>
+                                        <span v-if="appointment.consultation != null && (appointment.consultation.decision == 6 && appointment.report != null && appointment.report.summary != 'suggestive')">No</span>
+                                        <span v-else-if="appointment.consultation.decision == 8">No</span>
+                                        <span v-else-if="appointment.consultation.decision == 7 && appointment.laboratory == null">Pending</span>
+                                        <span v-else-if="appointment.consultation.decision == 7 && appointment.laboratory != null && appointment.laboratory.summary == 'normal'">No</span>
+                                        <span v-else>Pending</span>
+                                    </td>
+                                    <td>
+                                        <span v-if="appointment.status == 10 && 
+                                        (appointment.laboratory?.summary == 'normal' || appointment.report?.summary == 'normal' || appointment.report?.summary == 'abnormal')">N/A</span>
+                                        <span v-else-if="appointment.status == 10 && 
+                                        (appointment.laboratory?.summary != 'normal')">Referred for treatment</span>
+                                        <span v-else-if="appointment.status == 10 && appointment.consultation?.status == 10">Declined to participate in screening</span>
+                                        <span v-else-if="appointment.consultation != null && appointment.consultation.women_pregnant == 1 && appointment.status != 10">Pregnancy-related</span>
+                                        <span v-else-if="appointment.consultation != null && appointment.consultation.decision == 7">Pending Sputum Smear or Sputum Culture result</span>
+                                        <span v-else-if="appointment.report != null && appointment.report.summary == 'suggestive'">Pending Sputum Smear or Sputum Culture result</span>
+                                        <span v-else>Other Reason</span>
                                     </td>
                                     <td>{{ appointment.unique_id }}</td>
-                                    <td>{{ appointment.status == 10 ? 'Issued' : 'Not Issued' }}</td>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <span v-if="appointment.status == 10 && 
+                                        (appointment.laboratory?.summary == 'normal' || appointment.report?.summary == 'normal' || appointment.report?.summary == 'abnormal')">Issued</span>
+                                        <span v-else>Not Issued</span>
+                                        {{ appointment.status == 10 ? 'Issued' : 'Not Issued' }}
+                                    </td>
                                     <td>{{ dateDay(appointment.issue_at) }}</td>
                                     <td>{{ dateMonth(appointment.issue_at) }}</td>
                                     <td>{{ dateYear(appointment.issue_at) }}</td>
                                     <td>Nigeria</td>
                                     <td>St. Nicholas Hospital</td>
                                     <td><ul v-if="appointment.report != null"><li v-for="finding in appointment.report.findings" :key="finding.id">{{ finding.code}} - {{ finding.name }}</li></ul></td>
-                                    <td v-html="(appointment.report != null ? appointment.report.details : 'N/A')"></td>
+                                    <td v-html="appointment.report?.details || 'N/A'"></td>
                                 </tr>
                             </tbody>
                         </table>
-                        <table class="table table-striped text-nowrap" v-else-if="reportData.report_type == 'sputum'">
+                        <!--table class="table table-striped text-nowrap" v-else-if="reportData.report_type == 'sputum'">
                             <thead>
                                 <tr v-for="appointment in appointments">
-                                    <th>Reference ID of Applicant (Passport number)</th>
+                                    <th>Reference ID of Applicant</th>
                                     <th colspan="3">Examination Date</th>
                                     <th colspan="3">Date of Birth</th>
                                     <th>Sputum Smear Result (1)</th>
@@ -146,6 +197,7 @@
                                     <th>TB Confirmed</th>
                                     <th>Reason for certificate not issued</th>
                                     <th>Certificate Number</th>
+                                    <th>Clinic Reference Number</th>
                                     <th>Medical Certificate Issued</th>
                                     <th colspan="3">Issue Date of Medical Certificate</th>
                                     <th>FCO region of screening</th>
@@ -155,7 +207,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Reference ID of Applicant (Passport number)</td>
+                                    <td>&nbsp;</td>
                                     <td>Examination Day</td>
                                     <td>Examination Month</td>
                                     <td>Examination Year</td>
@@ -180,7 +232,7 @@
                                     <td>Comments from Screening Physician</td>
                                 </tr>
                             </tbody>
-                        </table>
+                        </table-->
                         <table class="" v-else>
                             <tr>
                                 <tbody><td colspan="10">Enter Report Parameters</td></tbody>

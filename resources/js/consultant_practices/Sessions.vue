@@ -22,7 +22,7 @@
                 </div>
             </div>
             <div class="card-body table-responsive p-0" style="height: 500px;">
-                <CPDetailSessionList :sessions="sessions.data" source="front_office" @refreshSessionList="refreshPage"/>
+                <CPDetailSessionList :sessions="sessions.data" :source="type" @refreshSessionList="refreshPage"/>
             </div>
             <div class="card-footer">
                 <pagination v-model="current_page" @paginate="getAllInitials" :per-page="sessions.per_page != null ? sessions.per_page : 52" :records="sessions.total != null ? sessions.total : 550" ></pagination>
@@ -35,11 +35,13 @@
 export default {
     data(){
         return  {
+            current_page: 1,
             end_date: '',
             query: '',
             sessions:   {data: [], total: 0,},
             start_date: '',
-            type: '',
+            status: '',
+            type: 'front',
         }
     },
     mounted() {
@@ -47,23 +49,21 @@ export default {
     },
     methods:{
         closeModal(){
-            $('#termsModal').modal('hide');
+            $('#Modal').modal('hide');
         },
         getAllInitials(){
             this.loading = true;
-            axios.get('/api/consultant_practices/sessions?end_date='+this.end_date+'query='+this.query+'&start_date='+this.start_date+'&type='+this.type)
-            .then(response => {;
-                this.consultants = response.data.consultants;
-                this.patients = response.data.patients;
-                this.payments = response.data.payments;
-                this.consultants = response.data.consultants;
+            axios.get('/api/consultant_practices/sessions?type='+this.type+'&status='+this.status+'&start_date='+this.start_date+'&end_date='+this.end_date+'&query='+this.query)
+            .then(response => {
+                this.sessions = response.data.sessions ?? {data: [], total: 0,};
             })
             .catch(() => {
+                this.$toast.fire({icon: 'error', title: 'Sessions did not loaded successfully',})
+            })
+            .finally(()=>{
                 this.loading = false;
-                this.$toast.fire({icon: 'error', title: 'Your appointments did not loaded successfully',})
             });
         },
-        
     },
 }
 </script>

@@ -58,11 +58,11 @@
                         <i class="fas fa-calendar-check mr-1"></i>Sessions
                     </h3>
                     <div class="card-tools">
-                        <router-link to="/consultant_practices/front_office/sessions"><button type="button" class="btn btn-xs btn-dark float-right"><i class="fas fa-eye"></i> See All</button></router-link>
+                        <router-link to="/consultant_practices/front/sessions"><button type="button" class="btn btn-xs btn-dark float-right"><i class="fas fa-eye"></i> See All</button></router-link>
                     </div>
                 </div>
                 <div class="card-body table-responsive p-0" style="height: 500px;">
-                    <CPDetailSessionList :sessions="sessions.data" source="front_office"/>
+                    <CPDetailSessionList :sessions="sessions.data" source="front"/>
                 </div>
             </div>
         </section>
@@ -71,11 +71,11 @@
                 <div class="card-header bg-dark">
                     <h3 class="card-title"><i class="fa fa-user-injured mr-1"></i>Patients</h3>
                     <div class="card-tools">
-                        <router-link to="/consultant_practices/front_office/patients"><button type="button" class="btn btn-xs btn-info float-right"><i class="fas fa-eye"></i> See All</button></router-link>
+                        <router-link to="/consultant_practices/front/patients"><button type="button" class="btn btn-xs btn-info float-right"><i class="fas fa-eye"></i> See All</button></router-link>
                     </div>
                 </div>
                 <div class="card-body table-responsive p-0" style="height: 500px;">
-                    <CPDetailPatientList :patients="patients.data" source="front_office" />
+                    <CPDetailPatientList :patients="patients.data" source="front" />
                 </div>
             </div>
         </section>
@@ -107,10 +107,13 @@ export default {
                 this.patients = response.data.patients;
                 this.payments = response.data.payments;
                 this.consultants = response.data.consultants;
+                this.sessions = response.data.sessions;
             })
             .catch(() => {
-                this.loading = false;
                 this.$toast.fire({icon: 'error', title: 'Your appointments did not loaded successfully',})
+            })
+            .finally(() => {
+                this.loading = false;
             });
         },
         

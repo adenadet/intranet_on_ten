@@ -16,11 +16,15 @@ class Consultant extends Structure
     protected $primaryKey = 'id';
     protected $table = 'consultant_practice_consultants';
 
-    protected $fillable = array('unique_id', 'first_name', 'last_name', 'title', 'company_name', 'specialty_id', 'status', 'created_by', 'updated_by', 'deleted_by', 'created_at', 'updated_at', 'deleted_at');
+    protected $fillable = array('unique_id', 'first_name', 'last_name', 'title', 'company_id', 'sex', 'specialty_id', 'status', 'created_by', 'updated_by', 'deleted_by', 'created_at', 'updated_at', 'deleted_at');
 
     public function accounts(){
     	return $this->hasMany('App\Models\ConsultantPractice\Account', 'consultant_id', 'id');
 	}
+
+    public function company(){
+    	return $this->belongsTo('App\Models\ConsultantPractice\Company', 'company_id', 'id');
+    }
 
     public function creator(){
     	return $this->belongsTo('App\Models\User', 'created_by', 'id');
@@ -34,8 +38,8 @@ class Consultant extends Structure
     	return $this->hasMany('App\Models\ConsultantPractice\Payment', 'consultant_id', 'id');
 	}
 
-    public function pricelists(){
-        return $this->hasMany('App\Models\ConsultantPractice\Pricelist', 'consultant_id', 'id');
+    public function services(){
+        return $this->hasMany('App\Models\ConsultantPractice\ConsultantService', 'consultant_id', 'id');
     }
 
     public function sessions(){

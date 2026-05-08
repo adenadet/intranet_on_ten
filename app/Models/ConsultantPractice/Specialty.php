@@ -21,4 +21,20 @@ class Specialty extends Structure
     public function consultants(){
         return $this->hasMany('App\Models\ConsultantPractice\Consultant', 'specialty_id', 'id');
     }
+
+    public function services(){
+        return $this->hasMany('App\Models\ConsultantPractice\Service', 'specialty_id', 'id');
+    }
+
+    public function creator(){
+    	return $this->belongsTo('App\Models\User', 'created_by', 'id');
+	}
+
+    public function deleter(){
+        return $this->belongsTo('App\Models\User', 'deleted_by', 'id');
+    }
+
+    public function updater(){
+        return $this->belongsTo('App\Models\User', 'updated_by', 'id');
+    }
 }

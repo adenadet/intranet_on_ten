@@ -3,10 +3,28 @@
 use Illuminate\Support\Facades\Route;
 Route::group(['prefix'=>'consultant_practices'], function () {
      
+    Route::get( '/accounts/initials', 'AccountController@initials')->name('accounts.initials'); 
+    Route::get( '/consultants/initials', 'ConsultantController@initials')->name('consultants.initials'); 
+    Route::get( '/consultant_services/consultant/{id}', 'ConsultantServiceController@consultant')->name('consultant_services.consultant'); 
+    Route::get( '/consultant_services/initials', 'ConsultantServiceController@initials')->name('consultant_services.initials'); 
+    Route::post('/consultant_services/multiple', 'ConsultantServiceController@multiple')->name('consultant_services.multiple'); 
+    Route::get( '/services/initials', 'ServiceController@initials')->name('services.initials'); 
+    Route::post('/sessions/confirm_payment', 'SessionController@confirm_payment')->name('sessions.confirm_payment'); 
+    Route::post('/sessions/confirm_service', 'SessionController@confirm_service')->name('sessions.confirm_service'); 
     Route::get( '/sessions/initials',    'SessionController@initials')->name('sessions.initials'); 
     
     Route::apiResources([
-        'dashboard'     => 'DashboardController',
-        'sessions'      => 'SessionController',
+        'accounts'              => 'AccountController',
+        'companies'             => 'CompanyController',
+        'consultants'           => 'ConsultantController',
+        'consultant_services'   => 'ConsultantServiceController',
+        'dashboard'             => 'DashboardController',
+        'patients'              => 'PatientController',
+        'payments'              => 'PaymentController',
+        'price_lists'           => 'PriceListController',
+        'price_list_items'      => 'PriceListItemController',
+        'services'              => 'ServiceController',
+        'sessions'              => 'SessionController',
+        'specialties'           => 'SpecialtyController',
     ]);
 });

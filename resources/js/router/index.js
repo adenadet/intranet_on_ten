@@ -1,26 +1,75 @@
 import {createRouter, createWebHistory} from 'vue-router';
 
+import CPAdminCompany       from '../consultant_practices/AdminCompany.vue';
+import CPAdminCompanies     from '../consultant_practices/AdminCompanies.vue';
+import CPAdminConsultant    from '../consultant_practices/AdminConsultant.vue';
+import CPAdminConsultants   from '../consultant_practices/AdminConsultants.vue';
+import CPAdminDashboard     from '../consultant_practices/AdminDashboard.vue';
+import CPAdminPatient       from '../consultant_practices/AdminPatient.vue';
+import CPAdminPatients      from '../consultant_practices/AdminPatients.vue';
+import CPAdminPayment       from '../consultant_practices/AdminPayment.vue';
+import CPAdminPayments      from '../consultant_practices/AdminPayments.vue';
+import CPAdminService       from '../consultant_practices/AdminService.vue';
+import CPAdminServices      from '../consultant_practices/AdminServices.vue';
+import CPAdminSession       from '../consultant_practices/AdminSession.vue';
+import CPAdminSessions      from '../consultant_practices/AdminSessions.vue';
+import CPAdminSpecialty     from '../consultant_practices/AdminSpecialty.vue';
+import CPAdminSpecialties   from '../consultant_practices/AdminSpecialties.vue';
+
+import CPFinanceCompanies   from '../consultant_practices/FinanceCompanies.vue';
+import CPFinanceCompany     from '../consultant_practices/FinanceCompany.vue';
+import CPFinanceConsultant  from '../consultant_practices/FinanceConsultant.vue';
+import CPFinanceConsultants from '../consultant_practices/FinanceConsultants.vue';
+import CPFinanceDashboard   from '../consultant_practices/FinanceDashboard.vue';
+import CPFinanceInvoice     from '../consultant_practices/FinanceInvoice.vue';
+import CPFinanceInvoices    from '../consultant_practices/FinanceInvoices.vue';
+import CPFinancePayment     from '../consultant_practices/FinancePayment.vue';
+import CPFinancePayments    from '../consultant_practices/FinancePayments.vue';
+
 import CPDashboard          from '../consultant_practices/Dashboard.vue';
 import CPPatient            from '../consultant_practices/Patient.vue';
 import CPPatients           from '../consultant_practices/Patients.vue';
 import CPSession            from '../consultant_practices/Session.vue';
 import CPSessions           from '../consultant_practices/Sessions.vue';
 
+import CPMedicalDashboard          from '../consultant_practices/MedicalDashboard.vue';
+import CPMedicalPatient            from '../consultant_practices/MedicalPatient.vue';
+import CPMedicalPatients           from '../consultant_practices/MedicalPatients.vue';
+import CPMedicalSession            from '../consultant_practices/MedicalSession.vue';
+import CPMedicalSessions           from '../consultant_practices/MedicalSessions.vue';
+
     import CPDetailAccountList              from '../consultant_practices/details/AccountList.vue';
+    import CPDetailCompany                  from '../consultant_practices/details/Company.vue';
+    import CPDetailCompanyList              from '../consultant_practices/details/CompanyList.vue';
     import CPDetailConsultant               from '../consultant_practices/details/Consultant.vue';
     import CPDetailConsultantList           from '../consultant_practices/details/ConsultantList.vue';
+    import CPDetailConsultantServiceList    from '../consultant_practices/details/ConsultantServiceList.vue';
+    import CPDetailLedgerList               from '../consultant_practices/details/LedgerList.vue';
     import CPDetailPatientList              from '../consultant_practices/details/PatientList.vue';
     import CPDetailPayment                  from '../consultant_practices/details/Payment.vue';
     import CPDetailPaymentConfirmation      from '../consultant_practices/details/PaymentConfirmation.vue';
     import CPDetailPaymentList              from '../consultant_practices/details/PaymentList.vue';
-    import CPDetailPricelistList            from '../consultant_practices/details/PricelistList.vue';
     import CPDetailSession                  from '../consultant_practices/details/Session.vue';
+    import CPDetailSessionConfirmation      from '../consultant_practices/details/SessionConfirmation.vue';
     import CPDetailSessionList              from '../consultant_practices/details/SessionList.vue';
+    import CPDetailSessionPaymentConfirmation      from '../consultant_practices/details/SessionPaymentConfirmation.vue';
+    import CPDetailServiceList              from '../consultant_practices/details/ServiceList.vue';
+    import CPDetailSpecialtyList            from '../consultant_practices/details/SpecialtyList.vue';
 
+    import CPFormAccount                    from '../consultant_practices/forms/Account.vue';
+    import CPFormCompany                    from '../consultant_practices/forms/Company.vue';
     import CPFormConsultant                 from '../consultant_practices/forms/Consultant.vue';
+    import CPFormConsultantService          from '../consultant_practices/forms/ConsultantService.vue';
+    import CPFormConsultantServiceMultiple  from '../consultant_practices/forms/ConsultantServiceMultiple.vue';
+    import CPFormPatient                    from '../consultant_practices/forms/Patient.vue';
     import CPFormPayment                    from '../consultant_practices/forms/Payment.vue';
     import CPFormPaymentConfirmation        from '../consultant_practices/forms/PaymentConfirmation.vue';
+    import CPFormService                    from '../consultant_practices/forms/Service.vue';
+    import CPFormServiceUpload              from '../consultant_practices/forms/ServiceUpload.vue';
     import CPFormSession                    from '../consultant_practices/forms/Session.vue';
+    import CPFormSessionConfirmation        from '../consultant_practices/forms/SessionConfirmation.vue';
+    import CPFormSessionPaymentConfirmation from '../consultant_practices/forms/SessionPaymentConfirmation.vue';
+    import CPFormSpecialty                  from '../consultant_practices/forms/Specialty.vue';
     
 import DashboardMain        from '../dashboard/Main.vue';
 
@@ -30,23 +79,23 @@ import EServiceAdminReportHomeOffice        from '../eservices/admin/HomeOffice.
 import EServiceAdminReportRadiologist       from '../eservices/admin/Radiologist.vue';
 import EServiceAdminReportSummary           from '../eservices/admin/Summary.vue';
 
-import EServiceCertificate           from '../eservices/certificates/Certificate.vue';
-import EServiceCertificateBioData    from '../eservices/certificates/BioData.vue';
-import EServiceCertificateFooter     from '../eservices/certificates/Footer.vue';
-import EServiceCertificateHeader     from '../eservices/certificates/Header.vue';
-import EServiceCertificateSummary    from '../eservices/certificates/Summary.vue';
-import EServiceCertificateSummaryKid from '../eservices/certificates/SummaryKid.vue';
-import EServiceCertificateSummaryLab from '../eservices/certificates/SummaryLab.vue';
+import EServiceCertificate              from '../eservices/certificates/Certificate.vue';
+import EServiceCertificateBioData       from '../eservices/certificates/BioData.vue';
+import EServiceCertificateFooter        from '../eservices/certificates/Footer.vue';
+import EServiceCertificateHeader        from '../eservices/certificates/Header.vue';
+import EServiceCertificateSummary       from '../eservices/certificates/Summary.vue';
+import EServiceCertificateSummaryKid    from '../eservices/certificates/SummaryKid.vue';
+import EServiceCertificateSummaryLab    from '../eservices/certificates/SummaryLab.vue';
 
-import EServiceFrontAppointment      from '../eservices/front/Appointment.vue';
-import EServiceFrontAppointments     from '../eservices/front/Appointments.vue';
-import EServiceFrontCertificates     from '../eservices/front/Certificates.vue';
-import EServiceFrontMissed           from '../eservices/front/Missed.vue';
-import EServiceFrontPatients         from '../eservices/front/Patients.vue';
-import EServicePayments              from '../eservices/front/Payments.vue';
-import EServicePayment               from '../eservices/front_admin/Payment.vue';
-import EServiceRadiographer          from '../eservices/front/Radiographer.vue';
-import EServiceFrontReferral         from '../eservices/front/Referral.vue';
+import EServiceFrontAppointment         from '../eservices/front/Appointment.vue';
+import EServiceFrontAppointments        from '../eservices/front/Appointments.vue';
+import EServiceFrontCertificates        from '../eservices/front/Certificates.vue';
+import EServiceFrontMissed              from '../eservices/front/Missed.vue';
+import EServiceFrontPatients            from '../eservices/front/Patients.vue';
+import EServicePayments                 from '../eservices/front/Payments.vue';
+import EServicePayment                  from '../eservices/front_admin/Payment.vue';
+import EServiceRadiographer             from '../eservices/front/Radiographer.vue';
+import EServiceFrontReferral            from '../eservices/front/Referral.vue';
 
 import EServiceFrontAdminPatients       from '../eservices/front_admin/Patients.vue';
 import EServiceFrontAdminAppointment    from '../eservices/front_admin/Appointment.vue';
@@ -209,13 +258,50 @@ import Error404 from '../general/errors/404.vue';
 import component from 'vue3-paystack';
 
 const routes = [
-    {path: '/',                                             component: DashboardMain},
+    {path: '/',                                                         component: DashboardMain},
 
-    {path: '/consultant_practices/front_office',                    component: CPDashboard},
-    {path: '/consultant_practices/front_office/patients',           component: CPPatients},
-    {path: '/consultant_practices/front_office/patients/:id',       component: CPPatient},
-    {path: '/consultant_practices/front_office/sessions',           component: CPSessions},
-    {path: '/consultant_practices/front_office/sessions/:id',       component: CPSession},
+    {path: '/consultant_practices/admin',                               component: CPAdminDashboard},
+    {path: '/consultant_practices/admin/companies',                     component: CPAdminCompanies},
+    {path: '/consultant_practices/admin/companies/:id',                 component: CPAdminCompany},
+    {path: '/consultant_practices/admin/consultants',                   component: CPAdminConsultants},
+    {path: '/consultant_practices/admin/consultants/:id',               component: CPAdminConsultant},
+    {path: '/consultant_practices/admin/dashboard',                     component: CPAdminDashboard},
+    {path: '/consultant_practices/admin/patients',                      component: CPAdminPatients},
+    {path: '/consultant_practices/admin/patients/:id',                  component: CPAdminPatient},
+    {path: '/consultant_practices/admin/payments',                      component: CPAdminPayments},
+    {path: '/consultant_practices/admin/payments/:id',                  component: CPAdminPayment},
+    {path: '/consultant_practices/admin/services',                      component: CPAdminServices},
+    {path: '/consultant_practices/admin/services/:id',                  component: CPAdminService},
+    {path: '/consultant_practices/admin/specialties',                   component: CPAdminSpecialties},
+    {path: '/consultant_practices/admin/specialties/:id',               component: CPAdminSpecialty},
+    {path: '/consultant_practices/admin/sessions',                      component: CPAdminSessions},
+    {path: '/consultant_practices/admin/sessions/:id',                  component: CPAdminSession},
+    
+
+    {path: '/consultant_practices/finance',                             component: CPFinanceDashboard},
+    {path: '/consultant_practices/finance/dashboard',                   component: CPFinanceDashboard},
+    {path: '/consultant_practices/finance/companies',                   component: CPFinanceCompanies},
+    {path: '/consultant_practices/finance/companies/:id',               component: CPFinanceCompany},
+    {path: '/consultant_practices/finance/consultants',                 component: CPFinanceConsultants},
+    {path: '/consultant_practices/finance/consultants/:id',             component: CPFinanceConsultant},
+    {path: '/consultant_practices/finance/invoices',                    component: CPFinanceInvoices},
+    {path: '/consultant_practices/finance/invoices/:id',                component: CPFinanceInvoice},
+    {path: '/consultant_practices/finance/payments',                    component: CPFinancePayments},
+    {path: '/consultant_practices/finance/payments/:id',                component: CPFinancePayment},
+
+    {path: '/consultant_practices/front',                               component: CPDashboard},
+    {path: '/consultant_practices/front/dashboard',                     component: CPDashboard},
+    {path: '/consultant_practices/front/patients',                      component: CPPatients},
+    {path: '/consultant_practices/front/patients/:id',                  component: CPPatient},
+    {path: '/consultant_practices/front/sessions',                      component: CPSessions},
+    {path: '/consultant_practices/front/sessions/:id',                  component: CPSession},
+
+    {path: '/consultant_practices/medical',                             component: CPMedicalDashboard},
+    {path: '/consultant_practices/medical/dashboard',                   component: CPMedicalDashboard},
+    {path: '/consultant_practices/medical/patients',                    component: CPMedicalPatients},
+    {path: '/consultant_practices/medical/patients/:id',                component: CPMedicalPatient},
+    {path: '/consultant_practices/medical/sessions',                    component: CPMedicalSessions},
+    {path: '/consultant_practices/medical/sessions/:id',                component: CPMedicalSession},
 
     {path: '/contacts',                                     component: UserContacts},
     {path: '/contacts/:id',                                 component: HrmsEmployeeContact},
@@ -253,7 +339,7 @@ const routes = [
     {path: '/eservices/front_office/appointment/:id',       component:EServiceFrontAppointment},
     {path: '/eservices/front_office/payments',              component:EServicePayments},
     {path: '/eservices/front_office/radiographer',          component:EServiceRadiographer},
-    {path: '/eservices/front_office/referral/:id',          component:EServiceFrontReferral}, 
+    //{path: '/eservices/front_office/referral/:id',          component:EServiceFrontReferral}, 
     {path: '/eservices/front_office/Certificates',          component:EServiceFrontCertificates},
 
     {path: '/eservices/radiologist',                        component:EServiceRadReports},
@@ -322,28 +408,67 @@ const router = createRouter({
 export function registerGlobalComponents(app) {
     app.component('DashboardMain',           DashboardMain);
 
+    app.component('CPAdminCompanies',                CPAdminCompanies);
+    app.component('CPAdminCompany',                  CPAdminCompany);
+    app.component('CPAdminDashboard',                CPAdminDashboard);
+    app.component('CPAdminService',                  CPAdminService);
+    app.component('CPAdminServices',                 CPAdminServices);
+
+    app.component('CPFinanceCompanies',              CPFinanceCompanies);
+    app.component('CPFinanceCompany',                CPFinanceCompany);
+    app.component('CPFinanceConsultant',             CPFinanceConsultant);
+    app.component('CPFinanceConsultants',            CPFinanceConsultants);
+    app.component('CPFinanceDashboard',              CPFinanceDashboard);
+    app.component('CPFinanceInvoice',                CPFinanceInvoice);
+    app.component('CPFinanceInvoices',               CPFinanceInvoices);
+    app.component('CPFinancePayment',                CPFinancePayment);
+    app.component('CPFinancePayments',               CPFinancePayments);
+    
     app.component('CPDashboard',                     CPDashboard);
     app.component('CPPatient',                       CPPatient);
     app.component('CPPatients',                      CPPatients);
     app.component('CPSession',                       CPSession);
     app.component('CPSessions',                      CPSessions);
 
+    app.component('CPMedicalDashboard',              CPMedicalDashboard);
+    app.component('CPMedicalPatient',                CPMedicalPatient);
+    app.component('CPMedicalPatients',               CPMedicalPatients);
+    app.component('CPMedicalSession',                CPMedicalSession);
+    app.component('CPMedicalSessions',               CPMedicalSessions);
+
         app.component('CPDetailAccountList',                  CPDetailAccountList);
+        app.component('CPDetailCompany',                      CPDetailCompany);
+        app.component('CPDetailCompanyList',                  CPDetailCompanyList);
         app.component('CPDetailConsultant',                   CPDetailConsultant);
         app.component('CPDetailConsultantList',               CPDetailConsultantList);
+        app.component('CPDetailConsultantServiceList',        CPDetailConsultantServiceList);
+        app.component('CPDetailLedgerList',                   CPDetailLedgerList);
         app.component('CPDetailPatientList',                  CPDetailPatientList);
         app.component('CPDetailPayment',                      CPDetailPayment);
         app.component('CPDetailPaymentConfirmation',          CPDetailPaymentConfirmation);
         app.component('CPDetailPaymentList',                  CPDetailPaymentList);
-        app.component('CPDetailPricelistList',                CPDetailPricelistList);
         app.component('CPDetailSession',                      CPDetailSession);
-        app.component('CPDetailSessionList',                  CPDetailSessionList); 
+        app.component('CPDetailSessionConfirmation',          CPDetailSessionConfirmation);
+        app.component('CPDetailSessionPaymentConfirmation',   CPDetailSessionPaymentConfirmation);
+        app.component('CPDetailSessionList',                  CPDetailSessionList);
+        app.component('CPDetailServiceList',                  CPDetailServiceList);
+        app.component('CPDetailSpecialtyList',                CPDetailSpecialtyList); 
         
+        app.component('CPFormAccount',                        CPFormAccount);
+        app.component('CPFormCompany',                        CPFormCompany);
         app.component('CPFormConsultant',                     CPFormConsultant);
+        app.component('CPFormConsultantService',              CPFormConsultantService);
+        app.component('CPFormConsultantServiceMultiple',      CPFormConsultantServiceMultiple);
+        app.component('CPFormPatient',                        CPFormPatient);
         app.component('CPFormPayment',                        CPFormPayment);
         app.component('CPFormPaymentConfirmation',            CPFormPaymentConfirmation);
+        app.component('CPFormService',                        CPFormService);
+        app.component('CPFormServiceUpload',                  CPFormServiceUpload);
         app.component('CPFormSession',                        CPFormSession);
-
+        app.component('CPFormSessionConfirmation',            CPFormSessionConfirmation);
+        app.component('CPFormSessionPaymentConfirmation',     CPFormSessionPaymentConfirmation);
+        app.component('CPFormSpecialty',                      CPFormSpecialty);
+       
     app.component('EServiceCertificate',             EServiceCertificate);
     app.component('EServiceCertificateBioData',      EServiceCertificateBioData);
     app.component('EServiceCertificateHeader',       EServiceCertificateHeader);

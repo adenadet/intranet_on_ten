@@ -25,7 +25,7 @@
                 <tbody v-if="tickets.data != null && tickets.data.length != 0 ">
                     <tr v-for="ticket in tickets.data" :key="ticket.id">
                         <td>{{ticket.subject}}</td>
-                        <td>{{ticket.user_id !== null ? ticket.creator.first_name+' '+ticket.creator.last_name : ''}}</td>
+                        <td>{{FullName(ticket.creator)}}</td>
                         <td>{{ticket.category.name}}</td>
                         <td :title="ticket.content">{{ readMore(ticket.content , 25, '...')}}</td>
                         <td>{{ticket.status.name}}</td>
@@ -41,7 +41,7 @@
                     <tr><td colspan=7>No Active Tickets</td></tr>
                 </tbody>
             </table>
-        </div>   
+        </div>
     </div>
     <div class="card-footer text-center"><a href="/ticketing">See More</a></div>
 </div>

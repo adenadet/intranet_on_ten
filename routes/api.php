@@ -28,14 +28,13 @@ Route::get('/schedulers/cancel', 'App\Http\Controllers\Api\EMR\RegistrationContr
 Route::post('/schedulers/cancelled', 'App\Http\Controllers\Api\EMR\RegistrationController@cancelled')->name('schedulers.cancelled');
 
 Route::apiResources([
-    'certificates'  => 'App\Http\Controllers\Api\EMR\CertificateController',
+    'certificates'      => 'App\Http\Controllers\Api\EMR\CertificateController',
     'emr/cancellations' => 'App\Http\Controllers\Api\EMR\CancellationController',
-    'dashboard'     => 'App\Http\Controllers\Api\DashboardController',
-    'member'        => 'App\Http\Controllers\Api\MemberController',
-    'notices'       => 'App\Http\Controllers\Api\NoticeController',
-    'policies'      => 'App\Http\Controllers\Api\PolicyController',
-    'scheduler'     => 'App\Http\Controllers\Api\EMR\RegistrationController',
+    'dashboard'         => 'App\Http\Controllers\Api\DashboardController',
+    'member'            => 'App\Http\Controllers\Api\MemberController',
+    'notices'           => 'App\Http\Controllers\Api\NoticeController',
+    'policies'          => 'App\Http\Controllers\Api\PolicyController',
+    'scheduler'         => 'App\Http\Controllers\Api\EMR\RegistrationController',
 ]);
 
-Route::post('/paystack/webhook', [PaystackController::class, 'handle'])
-     ->name('paystack.webhook');
+Route::post('/paystack/webhook', [PaystackController::class, 'handle'])->name('paystack.webhook');

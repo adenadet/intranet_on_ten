@@ -11,7 +11,7 @@
     </style>
 </head>
 <body>
-    @if($appointment->status == 10  && $appontment->issue_action == 'referral')
+    @if($appointment->status == 10  && $appointment->issue_action == 'referral')
     @else
     <div class="row m-0">
         <div class="col-2 p-3 pt-0">

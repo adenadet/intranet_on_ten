@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\Api\ConsultantPractice;
 
 use App\Http\Controllers\Controller;
-use App\Http\Traits\ConsultantPractice\ConsultantTrait;
-use App\Http\Traits\ConsultantPractice\SessionTrait;
-use App\Models\ConsultantPractice\Patient;
-use App\Models\ConsultantPractice\Payment;
+use App\Http\Traits\ConsultantPractice\ConsultantPracticeTrait;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    use ConsultantTrait, SessionTrait;
+    use ConsultantPracticeTrait;
     public function destroy(string $id)
     {
         //
@@ -20,10 +17,12 @@ class DashboardController extends Controller
     public function index()
     {
         return response()->json([
-            'consultants' => $this->consultant_practice_consultant_get_all('active', null, true, true),
-            'patients' => Patient::paginate(30),
-            'payments' => Payment::paginate(30),
-            'sessions' => $this->consultant_practice_session_get_all('active', null, true, true),
+            'companies' => $this->consultant_practice_company_get_all($_GET['type'] ?? 'front', $_GET, true, true),
+            'consultants' => $this->consultant_practice_consultant_get_all($_GET['type'] ?? 'front', $_GET, true, true),
+            'patients' => $this->consultant_practice_patient_get_all($_GET['type'] ?? 'front', $_GET, true, true),
+            'payments' => $this->consultant_practice_payment_get_all($_GET['type'] ?? 'front', $_GET, true, true),
+            'services' => $this->consultant_practice_service_get_all($_GET['type'] ?? 'front', $_GET, true, true),
+            'sessions' => $this->consultant_practice_session_get_all($_GET['type'] ?? 'front', $_GET, true, true),
         ]);
     }
 

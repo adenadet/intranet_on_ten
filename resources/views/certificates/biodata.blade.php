@@ -46,9 +46,27 @@
 </div>
 <div class="row">
     <label class="col-5" style="font-weight:normal !important; "><small>Full residential address:</small></label>
-    <div class="col-7"><div width="100%" min-height="200px" style="border: 1px solid #222; color: #222;" class="pl-2"><?php echo $appointment->patient->nigerian_address; ?></div></div>
+    <div class="col-7">
+        @if(!is_null($appointment->patient->nigerian_address))
+        <div width="100%" min-height="200px" style="border: 1px solid #222; color: #222;" class="pl-2">
+            <?php echo $appointment->patient->nigerian_address; ?>
+        </div>
+        @else
+        <div width="100%" min-height="200px" style="border: 1px solid #222; color: #222;" class="pl-2">
+            <?php echo $appointment->patient->nigerian_address_street; ?>, <?php echo $appointment->patient->nigerian_address_street2; ?>, <?php echo $appointment->patient->nigerian_address_city; ?>, <?php echo $appointment->patient->nigerian_address_country; ?> 
+        </div>
+        @endif
+    </div>
 </div>
 <div class="row">
     <label class="col-5" style="font-weight:normal !important; "><small>Address in the UK:</small></label>
-    <div class="col-7"><div width="100%" min-height="200px" style="border: 1px solid #222; color: #222;" class="pl-2"><?php echo $appointment->patient->uk_address; ?></div></div>
+    <div class="col-7">
+        @if(!is_null($appointment->patient->uk_address))
+        <div width="100%" min-height="200px" style="border: 1px solid #222; color: #222;" class="pl-2"><?php echo $appointment->patient->uk_address; ?></div>
+        @else
+        <div width="100%" min-height="200px" style="border: 1px solid #222; color: #222;" class="pl-2">
+            <?php echo $appointment->patient->uk_address_street; ?>, <?php echo $appointment->patient->uk_address_street2; ?>, <?php echo $appointment->patient->uk_address_city; ?>, <?php echo $appointment->patient->uk_address_postcode; ?> 
+        </div>
+        @endif
+    </div>
 </div>

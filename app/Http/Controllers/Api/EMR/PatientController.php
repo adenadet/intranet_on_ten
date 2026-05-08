@@ -14,6 +14,8 @@ use App\Models\Country;
 use App\Models\User;
 use Intervention\Image\Facades\Image;
 
+
+
 class PatientController extends Controller
 {
     public function index()
@@ -71,7 +73,16 @@ class PatientController extends Controller
             'phone' => $request->input('phone'),
             'alt_phone' => $request->input('alt_phone'),
             'nigerian_address' => $request->input('nigerian_address'),
+            'nigerian_address_street' =>  $request->input('nigerian_address_street'),
+            'nigerian_address_street2' => $request->input('nigerian_address_street2'),
+            'nigerian_address_city' => $request->input('nigerian_address_city'),
+            'nigerian_address_country' => $request->input('nigerian_address_country'), 
             'uk_address' => $request->input('uk_address'),
+            'uk_address_street' =>$request->input('uk_address_street'),
+            'uk_address_street2' => $request->input('uk_address_street2'),
+            'uk_address_city' =>$request->input('uk_address_city'),
+            'uk_address_postcode' => $request->input('uk_address_postcode'),
+                
             'accompanying_kids' => $request->input('accompanying_kids'),
             'nationality_id' => $request->input('nationality_id'),
             'passport_no' => $request->input('passport_no'),
@@ -84,11 +95,13 @@ class PatientController extends Controller
             'nations' => Country::orderBy('name', 'ASC')->get(), 
             'applicants' => Patient::orderBy('created_at', 'DESC')->with('nationality')->paginate(50),     
         ]);
-        }
+    }
 
     public function show($id)
     {
-        //
+        return response()->json([
+            //'patient' => $this->emr_     
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -118,8 +131,16 @@ class PatientController extends Controller
         $patient->email = $request->input('email');
         $patient->phone = $request->input('phone');
         $patient->alt_phone = $request->input('alt_phone');
-        $patient->nigerian_address = $request->input('nigerian_address');
-        $patient->uk_address = $request->input('uk_address');
+        $patient->nigerian_address = null;
+        $patient->nigerian_address_street = $request->input('nigerian_address_street');
+        $patient->nigerian_address_street2 = $request->input('nigerian_address_street2');
+        $patient->nigerian_address_city = $request->input('nigerian_address_city');
+        $patient->nigerian_address_country = $request->input('nigerian_address_country');
+        $patient->uk_address = null;
+        $patient->uk_address_street = $request->input('uk_address_street');
+        $patient->uk_address_street2 = $request->input('uk_address_street2');
+        $patient->uk_address_city = $request->input('uk_address_city');
+        $patient->uk_address_postcode = $request->input('uk_address_postcode');
         $patient->accompanying_kids = $request->input('accompanying_kids');
         $patient->nationality_id = $request->input('nationality_id');
         $patient->passport_no = $request->input('passport_no');
@@ -142,7 +163,7 @@ class PatientController extends Controller
 
     public function search()
     {
-        if ($search = \Request::get('q')){
+        if ($search = $_GET['q']){
             $applicants = Patient::orderBy('first_name', 'ASC')->where(function($query) use ($search){
                 $query->where('first_name', 'LIKE', "%$search%")
                 ->orWhere('middle_name', 'LIKE', "%$search%")

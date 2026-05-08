@@ -1,32 +1,61 @@
 <template>
-    <section class="overlay-wrapper p-0">
-        <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-        <table class="table table-head-fixed text-nowrap table-striped ">
-            <thead>
-                <tr>
-                    <th>Unique ID</th>
-                    <th>Patient</th>
-                    <th>Sex</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody v-if="patients.length > 0">
-                <tr v-for="patient in patients">
-                    <td>{{ patient.unique_id }}</td>
-                    <td>{{ patient.name }}</td>
-                    <td>{{ age(patient.dob)}}</td>
-                    <td>{{ patient.status }}</td>
-                    <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
-                </tr>
-            </tbody>
-            <tbody v-else>
-                <tr>
-                    <td colspan="5">No Patient meets your requirements</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
+<section class="overlay-wrapper p-0">
+    <div class="modal fade" id="patientFormModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title">Patient Details</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-white">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <CPFormPatient :editMode.sync="editMode" :patient.sync="patient" @refreshPatientForm="refreshPage" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
+    <table class="table table-head-fixed text-nowrap table-striped ">
+        <thead>
+            <tr>
+                <th>Unique ID</th>
+                <th>Patient</th>
+                <th>Type</th>
+                <th>Sex</th>
+                <th>Status</th>
+                <th><button class="btn btn-sm btn-primary float-right" @click="addPatient"><i class="fa fa-plus"></i></button></th>
+            </tr>
+        </thead>
+        <tbody v-if="patients.length > 0">
+            <tr v-for="patient in patients">
+                <td>{{ patient.unique_id }}</td>
+                <td>{{ patient.name }}</td>
+                <td>{{ patient.patient_type == 'hmo' ? "Insurance" : "Private" }}</td>
+                <td>{{ firstUp(patient.sex) }}</td>
+                <td><span :class="{'badge badge-success': patient.status == 1, 'badge badge-danger': patient.status == 0}">{{ patient.status == 1 ? 'Active' : 'Inactive' }}</span></td>
+                <td>
+                    <span class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </span>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" >
+                        <router-link v-if="source == 'admin'" class="btn btn-block dropdown-item" :to="'/consultant_practices/admin/patients/' + patient.id"><i class="fas fa-eye mr-2 text-success"></i> View Patient</router-link>
+                        <router-link v-else-if="source == 'finance'" class="btn btn-block dropdown-item" :to="'/consultant_practices/finance/patients/' + patient.id"><i class="fas fa-eye mr-2 text-success"></i> View Patient</router-link>
+                        <router-link v-else-if="source == 'front'" class="btn btn-block dropdown-item" :to="'/consultant_practices/front/patients/' + patient.id"><i class="fas fa-eye mr-2 text-success"></i> View Patient</router-link>
+                        <router-link v-else-if="source == 'medical'" class="btn btn-block dropdown-item" :to="'/consultant_practices/medical/patients/' + patient.id"><i class="fas fa-eye mr-2 text-success"></i> View Patient</router-link>
+                        <button class="btn btn-block dropdown-item" @click="updatePatient(patient)"><i class="fas fa-inbox mr-2 text-primary"></i> Update Patient</button>
+                        <button class="btn btn-block dropdown-item" @click="deactivatePatient(patient.id)"><i class="fas fa-times mr-2 text-danger"></i> {{patient.status == 1 ? 'Deactivate' : 'Reactivate'}} Patient</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tbody v-else>
+            <tr>
+                <td colspan="6">No Patient meets your requirements</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
 </template>
 <script>
 export default {
@@ -38,15 +67,16 @@ export default {
             patient: {},
         }
     },
+    emits:['refreshPatientList'],
     methods:{
         addPatient(){
             this.loading = true;
             this.editMode = false;
             this.patient = {};
-            $('#sessionFormModal').modal('show');
+            $('#patientFormModal').modal('show');
             this.loading = false; 
         },
-        deactivateSession(id){
+        deactivatePatient(id){
             this.$swal.fire({
                 title: 'Are you sure?',
                 text: "This Session will no longer be available to people who visit your page",
@@ -72,19 +102,22 @@ export default {
                 }
             });  
         },
-        startSession(dispute){
+        refreshPage(){
+            this.closeModals();
+            this.$emit('refreshPatientList');
+        },
+        startPatient(patient){
             this.loading = true;
             this.editMode = false;
             this.dispute = dispute;
             $('#transactionModal').modal('show');
             this.loading = false;
         },
-        updateSession(session){
-            alert(dispute.details);
+        updatePatient(patient){
             this.loading = true;
             this.editMode = true;
-            this.dispute = product;
-            $('#productModal').modal('show');
+            this.patient = patient;
+            $('#patientFormModal').modal('show');
             this.loading = false;
         }
     },

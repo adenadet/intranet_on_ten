@@ -16,10 +16,38 @@ class ModulesController extends Controller
         return view('chats')->with($params);
     }
 
-    public function consultant_practices(){
+    public function consultant_practices_admin(){
+        
         $params = [
             'page' => 'consultant_practices',
-            'page_title' => 'Consultant Practices',
+            'page_title' => 'Consultant Practice | Administrator',
+        ];
+        return view('app')->with($params);
+    }
+
+    public function consultant_practices_fo(){
+        
+        $params = [
+            'page' => 'consultant_practices',
+            'page_title' => 'Consultant Practice | Front Office',
+        ];
+        return view('app')->with($params);
+    }
+
+    public function consultant_practices_fin(){
+        
+        $params = [
+            'page' => 'consultant_practices',
+            'page_title' => 'Consultant Practice | Finance',
+        ];
+        return view('app')->with($params);
+    }
+
+    public function consultant_practices_med(){
+        
+        $params = [
+            'page' => 'consultant_practices',
+            'page_title' => 'Consultant Practice | Medical Officer',
         ];
         return view('app')->with($params);
     }

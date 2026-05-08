@@ -4,7 +4,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header bg-navy">
-                    <h4 class="modal-title">Update Employee Details</h4>
+                    <h4 class="modal-title"> Employee Details</h4>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">

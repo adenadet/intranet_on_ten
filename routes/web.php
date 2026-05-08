@@ -10,7 +10,9 @@ Route::get('/test/{id}', function () {return view('certificates.new2');});
 
 Route::resources([
     'certificates' => 'App\Http\Controllers\CertificateController',
-]); 
+]);
+
+Route::get('/eservices/front_office/referral/{id}', 'App\Http\Controllers\CertificateController@referral');
 
 Route::get('/clear-cache', function() {
     //$exitCode = Artisan::call('cache:clear');
@@ -23,7 +25,6 @@ Route::get('/clear-cache', function() {
 
 Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['auth','role:Staff'],], function () {    
     Route::get('/',                 'ModulesController@dashboard')->name('home');
-    Route::get('/consultant_practices',         'ModulesController@consultant_practices')->name('consultant_practices');
     Route::get('/contacts',         'ModulesController@contacts')->name('contacts');
     Route::get('/home',             'ModulesController@dashboard')->name('dashboard');
     Route::get('/dashboard',        'ModulesController@dashboard')->name('dashboard');
@@ -46,7 +47,7 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['auth','ro
     
     //Auto Redirect
     Route::get('/chats/{any}',              'ModulesController@chats')->where('any', '.*');
-    Route::get('/consultant_practices/{any}',           'ModulesController@consultant_practices')->where('any', '.*');
+    //Route::get('/consultant_practices/{any}','ModulesController@consultant_practices')->where('any', '.*');
     Route::get('/contacts/{any}',           'ModulesController@contacts')->where('any', '.*');
     Route::get('/departments/{any}',        'ModulesController@departments')->where('any', '.*');
     Route::get('/hrms/{any}',               'ModulesController@hrms')->where('any', '.*');
@@ -78,6 +79,20 @@ Route::group(['middleware' => ['auth', 'role:Staff', 'role:E-Services'],'namespa
     Route::get('/doctor/{any}',                             'ServiceController@medical')->where('any', '.*');
     Route::get('/radiologist/{any}',                        'ServiceController@radiologist')->where('any', '.*'); 
 });
+//Route::get('/consultant_practices','ModulesController@consultant_practices')->name('consultant_practices');
+   
+Route::group(['middleware' => ['auth'],'namespace' => 'App\Http\Controllers', 'name' => 'consultant_practices.', 'prefix' => '/consultant_practices'],function(){
+    Route::get('/admin',                                    'ModulesController@consultant_practices_admin');
+    Route::get('/finance',                                  'ModulesController@consultant_practices_fin');
+    Route::get('/front',                                    'ModulesController@consultant_practices_fo');
+    Route::get('/medical',                                  'ModulesController@consultant_practices_med');
+    
+    Route::get('/admin/{any}',                              'ModulesController@consultant_practices_admin')->where('any', '.*');
+    Route::get('/finance/{any}',                            'ModulesController@consultant_practices_fin')->where('any', '.*'); 
+    Route::get('/front/{any}',                              'ModulesController@consultant_practices_fo')->where('any', '.*');
+    Route::get('/medical/{any}',                    'ModulesController@consultant_practices_med')->where('any', '.*');
+});
+
 Auth::routes();
 Route::get('/{pathMatch}', function () {return view('app');})->where('pathMatch', '.*');
 
