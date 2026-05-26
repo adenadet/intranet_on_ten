@@ -42,7 +42,7 @@ class ServiceController extends Controller
 
     public function initials(){
         return response()->json([
-            'specialties' => $this->consultant_practice_specialty_get_all($_GET['type'] ?? 'front', null, false, false),
+            'specialties' => $this->consultant_practice_specialty_get_all($_GET['type'] ?? 'front', [], false, false),
         ]);
     }
 

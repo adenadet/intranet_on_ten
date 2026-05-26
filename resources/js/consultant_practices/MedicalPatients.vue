@@ -4,7 +4,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Price Lists</h3>
+                    <h3 class="card-title">Patients</h3>
                     <div class="card-tools">
                         <div class="input-group input-group-sm" style="width: 150px;">
                             <input type="text" name="table_search" v-model="query" class="form-control float-right" placeholder="Search">
@@ -32,7 +32,7 @@ export default {
             current_page: 1,
             end_date: '',
             query: '',
-            patients:   {data: [], total: 0,},
+            patients:{data: [], total: 0,},
             start_date: '',
             status: '',
             type: 'medical',

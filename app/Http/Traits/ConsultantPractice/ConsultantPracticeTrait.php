@@ -9,11 +9,7 @@ use App\Models\ConsultantPractice\Patient;
 use App\Models\ConsultantPractice\Payment;
 use App\Models\ConsultantPractice\Service;
 use App\Models\ConsultantPractice\Session;
-use App\Models\ConsultantPractice\SessionPayment;
 use App\Models\ConsultantPractice\Specialty;
-use App\Models\User;
-use Carbon\Carbon;
-use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 trait ConsultantPracticeTrait{
     use SettingsTrait;
 
-    public function consultant_practice_company_get_all($type, $specific, $detailed, $paginated){
+    public function consultant_practice_company_get_all(string $type, array $specific, bool $detailed, bool $paginated){
         $query = Company::query();
 
         switch($type){
@@ -54,26 +50,17 @@ trait ConsultantPracticeTrait{
 
     public function consultant_practice_company_get_by($id, $detailed){
         try{
-            $query = Company::where('id', '=', $id)->orWhere('unique_id', '=', $id);
-            $query = $detailed ? $query->with(['consultants.specialty', 'accounts.bank']) : $query->select('id', 'name',)->with(['accounts.bank']);
+            $query = Company::where('id', '=', $id);
+            $query = $detailed ? $query->with(['consultants.specialty', 'accounts.bank', 'ledgers.referenceable']) : $query->select('id', 'name',)->with(['accounts.bank']);
             $query = $query->firstOrFail();
             return $query;
         }
         catch(Exception $e){
             return $e->getMessage();
         }
-        $query = Consultant::query();
-
-    
-        
-
-        $query = $detailed ? $query->with(['consultant.specialty', 'accounts.bank']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
-        $query = $paginated ? $query->paginate(50) : $query->get();
-        
-        return $query;
     }
 
-    public function consultant_practice_consultant_get_all($type, $specific, $detailed, $paginated){
+    public function consultant_practice_consultant_get_all(string $type, array $specific, bool $detailed, bool $paginated){
         $query = Consultant::query();
 
         switch($type){
@@ -98,7 +85,7 @@ trait ConsultantPracticeTrait{
             }
         }
 
-        $query = $detailed ? $query->with(['creator', 'specialty', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
+        $query = $detailed ? $query->with(['creator', 'company', 'specialty', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
         $query->orderBy('first_name', 'ASC');
         $query = $paginated ? $query->paginate(50) : $query->get();
         
@@ -107,8 +94,8 @@ trait ConsultantPracticeTrait{
 
     public function consultant_practice_consultant_get_by($id, $detailed){
         try{
-            $query = Consultant::where('id', '=', $id)->orWhere('unique_id', '=', $id);
-            $query = $detailed ? $query->with(['creator', 'payments', 'pricelists', 'specialty', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
+            $query = Consultant::where('id', '=', $id);
+            $query = $detailed ? $query->with(['company', 'creator', 'specialty', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title')->with(['company']);
             $query = $query->firstOrFail();
             return $query;
         }
@@ -117,7 +104,7 @@ trait ConsultantPracticeTrait{
         }
     }
 
-    public function consultant_practice_consultant_service_get_all($type, $specific, $detailed, $paginated){
+    public function consultant_practice_consultant_service_get_all(string $type, array $specific, bool $detailed, bool $paginated){
         $query = ConsultantService::query();
 
         switch($type){
@@ -144,7 +131,7 @@ trait ConsultantPracticeTrait{
             }
         }
 
-        $query = $detailed ? $query->with(['consultant.specilty', 'creator', 'service', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
+        $query = $detailed ? $query->with(['consultant', 'creator', 'service', 'updater']) : $query->select('id', 'service_id', 'consultant_id')->with(['service']);
         $query = $paginated ? $query->paginate(50) : $query->get();
         
         return $query;
@@ -153,7 +140,7 @@ trait ConsultantPracticeTrait{
     public function consultant_practice_consultant_service_get_by($id, $detailed){
         try{
             $query = Consultant::where('id', '=', $id)->orWhere('unique_id', '=', $id);
-            $query = $detailed ? $query->with(['creator', 'payments', 'pricelists', 'specialty', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
+            $query = $detailed ? $query->with(['consultant', 'creator', 'payments', 'pricelists', 'service', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
             $query = $query->firstOrFail();
             return $query;
         }
@@ -162,7 +149,7 @@ trait ConsultantPracticeTrait{
         }
     }
     
-    public function consultant_practice_patient_get_all($type, $specific, $paginated, $detailed){
+    public function consultant_practice_patient_get_all(string $type, array $specific, bool $detailed, bool $paginated){
         $query = Patient::query();
 
         switch($type){
@@ -205,7 +192,7 @@ trait ConsultantPracticeTrait{
         }
     }
 
-    public function consultant_practice_payment_get_all($type, $specific, $detailed, $paginated){
+    public function consultant_practice_payment_get_all(string $type, array|null $specific, bool $detailed, bool $paginated){
         $query = Payment::query();
 
         switch($type){
@@ -226,7 +213,8 @@ trait ConsultantPracticeTrait{
 
         }
 
-        $query = $detailed ? $query->with(['creator', 'payments', 'pricelists', 'specialty', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
+        $query = $detailed ? $query->with(['creator', 'account.bank', 'company', 'confirmer', 'reverser', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
+        $query->orderBy('date', 'DESC');
         $query = $paginated ? $query->paginate(50) : $query->get();
         
         return $query;
@@ -234,8 +222,8 @@ trait ConsultantPracticeTrait{
 
     public function consultant_practice_payment_get_by($id, $detailed){
         try{
-            $query = Payment::where('id', '=', $id)->orWhere('unique_id', '=', $id);
-            $query = $detailed ? $query->with(['account', 'confirmer', 'consultant', 'creator', 'session_payments', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
+            $query = Payment::where('id', '=', $id);
+            $query = $detailed ? $query->with(['account.bank', 'confirmer', 'company', 'creator', 'reverser', 'updater']) : $query->select('id', 'date', 'amount', 'company_id', 'status')->with(['company']);
             $query = $query->firstOrFail();
             return $query;
         }
@@ -244,7 +232,7 @@ trait ConsultantPracticeTrait{
         }
     }
 
-    public function consultant_practice_service_get_all($type, $specific, $paginated, $detailed){
+    public function consultant_practice_service_get_all(string $type, array $specific, bool $detailed, bool $paginated){
         $query = Service::query();
 
         switch($type){
@@ -265,12 +253,12 @@ trait ConsultantPracticeTrait{
         if (is_array($specific)){
             if(!empty($specific['query'])){
                 $search = trim($specific['query']);
-                
                 $query = $query->where('name', 'LIKE', "%$search%");
             }
         }
 
         $query = $detailed ? $query->with(['creator', 'deleter', 'updater']) : $query->select('id', 'name');
+        $query->orderBy('name', 'ASC');
         $query = $paginated  ? $query->paginate(50) : $query->get();
 
         return $query;
@@ -278,7 +266,7 @@ trait ConsultantPracticeTrait{
 
     public function consultant_practice_service_get_by($type, $id, $detailed){
         try{
-            $query = Service::where('id', '=', $id)->orWhere('unique_id', '=', $id);
+            $query = Service::where('id', '=', $id);
             $query = $detailed ? $query->with(['creator', 'deleter', 'updater']) : $query->select('id', 'name');
             return $query->firstOrFail();
         }
@@ -316,7 +304,7 @@ trait ConsultantPracticeTrait{
         }
     }
     
-    public function consultant_practice_session_get_all($type, $specific, $detailed, $paginated){
+    public function consultant_practice_session_get_all(string $type, array $specific, bool $detailed, bool $paginated){
         $query = Session::query();
 
         switch($type){
@@ -369,6 +357,7 @@ trait ConsultantPracticeTrait{
         }
 
         $query = $detailed ? $query->with(['consultant.company', 'consultant.specialty', 'patient', 'creator', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
+        $query = $query->orderBy('date', 'DESC');
         $query = $paginated ? $query->paginate(50) : $query->get();
         
         return $query;
@@ -377,7 +366,7 @@ trait ConsultantPracticeTrait{
     public function consultant_practice_session_get_by($id, $detailed){
         try{
             $query = Session::where('id', '=', $id)->orWhere('unique_id', '=', $id);
-            $query = $detailed ? $query->with(['consultant.company', 'consultant.specialty', 'creator', 'patient', 'session_confirm', 'session_items', 'session_payment', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
+            $query = $detailed ? $query->with(['consultant.company', 'consultant.specialty', 'creator', 'patient', 'session_confirm', 'session_items.service', 'session_payment', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
             
             return $query->firstOrFail();
         }
@@ -386,7 +375,7 @@ trait ConsultantPracticeTrait{
         }
     }
 
-    public function consultant_practice_specialty_get_all($type, $specific, $detailed, $paginated){
+    public function consultant_practice_specialty_get_all(string $type, array $specific, bool $detailed, bool $paginated){
         $query = Specialty::query();
 
         switch($type){
@@ -425,5 +414,4 @@ trait ConsultantPracticeTrait{
             return $e->getMessage();
         }
     }
-
 }

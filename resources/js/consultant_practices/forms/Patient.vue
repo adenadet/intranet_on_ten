@@ -63,9 +63,6 @@ export default {
         return  {
             consultants: [],
             loading: false,
-            patients: [],                                                                                                               
-            schedules: [],
-            services: [],
             patientData: new Form({
                 id: '',
                 name: "",

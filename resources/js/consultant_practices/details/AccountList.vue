@@ -18,7 +18,7 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th v-if="source == 'admin' || source == 'finance'">Account </th>
+                <th v-if="source == 'admin' || source == 'finance'">Company </th>
                 <th>Bank Name</th>
                 <th>Account Name</th>
                 <th>Account Number</th>
@@ -29,8 +29,8 @@
         <tbody v-if="accounts.length > 0">
             <tr v-for="(account, index) in accounts" :key="account.id">
                 <td>{{ addOne(index) }}</td>
-                <td v-if="source == 'admin' || source == 'finance'">{{ account.company?.name }}</td>
-                <td>{{ account.bank?.name }}</td>
+                <td v-if="source == 'admin' || source == 'finance'">{{ company?.name }}</td>
+                <td>{{ account.bank?.bank_name }}</td>
                 <td>{{ account.account_name }}</td>
                 <td>{{ account.account_number }}</td>
                 <td>
@@ -50,7 +50,7 @@
             </tr>
         </tbody>
         <tbody v-else>
-            <tr><td colspan="6">No Account meets your requirements</td></tr>
+            <tr><td colspan="7">No Account meets your requirements</td></tr>
         </tbody>
     </table>
 </section>

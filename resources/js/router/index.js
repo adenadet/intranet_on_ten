@@ -64,6 +64,7 @@ import CPMedicalSessions           from '../consultant_practices/MedicalSessions
     import CPFormPatient                    from '../consultant_practices/forms/Patient.vue';
     import CPFormPayment                    from '../consultant_practices/forms/Payment.vue';
     import CPFormPaymentConfirmation        from '../consultant_practices/forms/PaymentConfirmation.vue';
+    import CPFormPaymentReversal            from '../consultant_practices/forms/PaymentReversal.vue';
     import CPFormService                    from '../consultant_practices/forms/Service.vue';
     import CPFormServiceUpload              from '../consultant_practices/forms/ServiceUpload.vue';
     import CPFormSession                    from '../consultant_practices/forms/Session.vue';
@@ -462,6 +463,7 @@ export function registerGlobalComponents(app) {
         app.component('CPFormPatient',                        CPFormPatient);
         app.component('CPFormPayment',                        CPFormPayment);
         app.component('CPFormPaymentConfirmation',            CPFormPaymentConfirmation);
+        app.component('CPFormPaymentReversal',                CPFormPaymentReversal);
         app.component('CPFormService',                        CPFormService);
         app.component('CPFormServiceUpload',                  CPFormServiceUpload);
         app.component('CPFormSession',                        CPFormSession);

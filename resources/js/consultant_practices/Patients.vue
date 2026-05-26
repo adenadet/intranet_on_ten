@@ -35,6 +35,7 @@
 export default {
     data(){
         return  {
+            current_page: 1,
             end_date: '',
             query: '',
             patients:   {data: [], total: 0,},

@@ -4,26 +4,32 @@
 <table class="table table-head-fixed table-striped text-nowrap">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>Date</th>
                 <th v-if="source != 'company'">Company</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Balance</th>
                 <th>Reference</th>
+                <th>Type</th>
+                <th>Credit</th>
+                <th>Debit</th>
+                <th>Balance</th>
             </tr>
         </thead>
         <tbody v-if="ledgers.length > 0">
             <tr v-for="(ledger, index) in ledgers" :key="ledger.id">
                 <td>{{ ExcelDate(ledger.date) }}</td>
                 <td v-if="source != 'company'">{{ ledger.company?.name }}</td>
+                <td>
+                    <router-link v-if="ledger.referenceable" :to="getReferenceLink(ledger)">{{ getReferenceLabel(ledger) }}</router-link>
+                    <span v-else>-</span>
+                </td>
                 <td>{{ firstUp(ledger.type) }}</td>
-                <td>{{ ledger.amount }}</td>
-                <td>{{ ledger.balance }}</td>
-                <td>{{ ledger.reference_type }} - {{ ledger.reference_id }}</td>
+                <td>{{ ledger.type == 'credit' ? currency(ledger.amount) : '-' }}</td>
+                <td>{{ ledger.type == 'debit' ? currency(ledger.amount) : '-' }}</td>
+                <td>{{ currency(ledger.balance) }}</td>
+                
             </tr>
         </tbody>
         <tbody v-else>
-            <tr><td colspan="6">No Consultant meets your requirements</td></tr>
+            <tr><td colspan="6">No Ledger entries meets your requirements</td></tr>
         </tbody>
     </table>
 </section>
@@ -38,60 +44,48 @@ export default {
             loading: false,
         }
     },
-    emits:['refreshConsultantList'],
     methods:{
-        addConsultant(){
-            this.loading = true;
-            this.editMode = false;
-            this.ledger = {services:[],};
-            $('#consultantFormModal').modal('show');
-            this.loading = false; 
+        getReferenceType(referenceType) {
+            if (!referenceType) return null;
+
+            const map = {
+                'App\\Models\\ConsultantPractice\\Payment': 'payment',
+                'App\\Models\\ConsultantPractice\\Invoice': 'invoice',
+                'App\\Models\\ConsultantPractice\\Session': 'invoice',
+                'App\\Models\\Inventory\\PurchaseOrder': 'purchase_orders',
+                'App\\Models\\Inventory\\SalesOrder': 'sales_orders',
+            };
+
+            return map[referenceType] || null;
         },
-        closeModals(){
-            $('#consultantFormModal').modal('hide');
+        getReferenceLink(ledger) {
+            const referenceType = this.getReferenceType(
+                ledger.reference_type
+            );
+
+            if (!referenceType) {
+                return '#';
+            }
+
+            return `/consultant_practices/${this.type}/${referenceType}s/${ledger.reference_id}`;
         },
-        deactivateConsultant(id){
-            this.$swal.fire({
-                title: 'Are you sure?',
-                text: "This Consultant will no longer be available",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, deactivate it!'
-            })
-            .then((result) => {
-                //Send Delete request
-                if(result.value){
-                    this.loading = true;
-                    this.form.delete('/api/consultant_practices/consultants/'+id)
-                    .then(response=>{
-                        this.$swal.fire('Deactivated!', response.data.message, 'success');
-                        this.refreshPage();
-                        this.loading = false;   
-                    })
-                    .catch(()=>{
-                        this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
-                    });
-                }
-            });  
-        },
-        refreshPage(){
-            this.closeModals();
-            this.$emit('refreshConsultantList');
-        },
-        updateConsultant(consultant){
-            this.loading = true;
-            this.editMode = true;
-            this.consultant = consultant;
-            $('#consultantFormModal').modal('show');
-            this.loading = false;
+        getReferenceLabel(ledger) {
+            const referenceType = this.getReferenceType(
+                ledger.reference_type
+            );
+
+            if (!referenceType) {
+                return 'Unknown Reference';
+            }
+
+            return `${this.firstUp(referenceType.replace('_', ' '))} ID: ${ledger.reference_id}`;
         }
     },
     mounted() {},
     props:{
-        ledgers: Array,
-        source: String,
+        ledgers: {type: Array, default: () => []},
+        source: {type: String, default: ''},
+        type: {type: String, default: 'finance'}
     },
     watch:{}
 }

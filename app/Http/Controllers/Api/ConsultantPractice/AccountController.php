@@ -55,7 +55,7 @@ class AccountController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|numeric|exists:consultant_practice_companies,id',
-            'bank_id' => 'required|numeric|exists:finance_all_banks,id',
+            'bank_id' => 'required|numeric|exists:all_banks,id',
             'account_name' => 'required|string|max:255',
             'account_number' => 'required|string|max:25',
         ]);

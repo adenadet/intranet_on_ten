@@ -6,8 +6,8 @@
     <title>St. Nicholas Hospital | @yield('title')</title>
     <link rel="icon" type="image/png" href="{{asset(config('app.logo'))}}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <link rel="stylesheet" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}">
-    <link rel="stylesheet" href="{{asset('dist/css/adminlte.min.css')}}">
+    <link rel="stylesheet" href="{{asset('lte/plugins/fontawesome-free/css/all.min.css')}}">
+    <link rel="stylesheet" href="{{asset('lte/dist/css/adminlte.min.css')}}">
     @vite('resources/css/app.css')
 </head>
 <body class="hold-transition layout-top-nav">
@@ -15,7 +15,7 @@
     <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
         <div class="container">
         <a href="https://saintnicholashospital.com" class="navbar-brand">
-            <img src="{{asset('dist/img/snh_logo.png')}}" alt="St. Nicholas Hospital" class="brand-image img-fluid">
+            <img src="{{asset('img/background/SNH_logo.png')}}" alt="St. Nicholas Hospital" class="brand-image img-fluid">
             <span class="brand-text font-weight-light">St. Nicholas Hospital</span>
         </a>
         <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,8 +54,8 @@
     </footer>
 </div>
 @vite('resources/js/app.js')
-<script src="{{asset('plugins/jquery/jquery.min.js')}}"></script>
-<script src="{{asset('plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-<script src="{{asset('dist/js/adminlte.min.js')}}"></script>
+<script src="{{asset('lte/plugins/jquery/jquery.min.js')}}"></script>
+<script src="{{asset('lte/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+<script src="{{asset('lte/dist/js/adminlte.min.js')}}"></script>
 </body>
 </html>

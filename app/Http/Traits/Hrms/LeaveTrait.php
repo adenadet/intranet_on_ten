@@ -367,53 +367,75 @@ trait LeaveTrait{
         
     }
 
-    public function hrms_leave_request_number_of_days($leave_request){
+   public function hrms_leave_request_number_of_days($leave_request)
+    {
         $leave_type = LeaveType::find($leave_request->leave_type_id);
+
         $start_date = new DateTime($leave_request->start_date);
-        $end_date = new DateTime($leave_request->to_date);
+        $end_date   = new DateTime($leave_request->to_date);
+
         $days = 0;
-        if ($leave_type->leave_category == 'Working'){
+
+        if ($leave_type->leave_category == 'Working') {
+
             if (!defined('SATURDAY')) define('SATURDAY', 6);
             if (!defined('SUNDAY')) define('SUNDAY', 0);
 
-            // Array of all public festivities
-            $publicHolidays = PublicHoliday::whereDate('date', '>=', $start_date)->whereDate('date', '<=', $end_date)->pluck('date')->toArray();
+            $publicHolidays = PublicHoliday::whereDate('date', '>=', $leave_request->start_date)
+                ->whereDate('date', '<=', $leave_request->to_date)
+                ->pluck('date')
+                ->map(fn($date) => date('Y-m-d', strtotime($date)))
+                ->toArray();
 
             $yearStart = date('Y', strtotime($leave_request->start_date));
-            $yearEnd   = date('Y', strtotime($leave_request->end_date));
+            $yearEnd   = date('Y', strtotime($leave_request->to_date));
+
+            $easterMondays = [];
 
             for ($i = $yearStart; $i <= $yearEnd; $i++) {
+
                 $easter = date('Y-m-d', easter_date($i));
+
                 list($y, $m, $g) = explode("-", $easter);
-                $monday = mktime(0,0,0, date($m), date($g)+1, date($y));
-                $easterMondays[] = $monday;
+
+                $easterMondays[] = date(
+                    'Y-m-d',
+                    mktime(0, 0, 0, $m, $g + 1, $y)
+                );
             }
 
             $start = strtotime($leave_request->start_date);
-            $end   = strtotime($leave_request->end_date);
+            $end   = strtotime($leave_request->to_date);
+
             $workdays = 0;
+
             for ($i = $start; $i <= $end; $i = strtotime("+1 day", $i)) {
-                $day = date("w", $i);  // 0=sun, 1=mon, ..., 6=sat
-                $mmgg = date('m-d', $i);
-                if ($day != SUNDAY &&
-                !in_array($mmgg, $publicHolidays) &&
-                !in_array($i, $easterMondays) &&
-                !($day == SATURDAY)) {
+
+                $day = date("w", $i);
+
+                $currentDate = date('Y-m-d', $i);
+
+                if (
+                    $day != SUNDAY &&
+                    $day != SATURDAY &&
+                    !in_array($currentDate, $publicHolidays) &&
+                    !in_array($currentDate, $easterMondays)
+                ) {
                     $workdays++;
                 }
             }
 
             $days = intval($workdays);
-        }
-        else if ($leave_type->leave_category == 'Calendar'){
+
+        } else {
+
             $interval = $start_date->diff($end_date);
-            $days = $leave_request->is_half_day ? (($interval->format('%a') + 1) / 2):($interval->format('%a') + 1);
+
+            $days = $leave_request->is_half_day
+                ? (($interval->format('%a') + 1) / 2)
+                : ($interval->format('%a') + 1);
         }
-        else{
-            $interval = $start_date->diff($end_date);
-            $days = $leave_request->is_half_day ? (($interval->format('%a') + 1) / 2):($interval->format('%a') + 1);    
-        }
- 
+
         return $days;
     }
 

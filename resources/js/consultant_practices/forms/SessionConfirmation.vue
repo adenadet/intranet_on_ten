@@ -61,14 +61,13 @@ export default {
             loading: false,
         }
     },
-
+    emits:[],
     methods: {
         async submit() {
             if (this.confirmationData.decision === 'reject' && !this.confirmationData.description) {
-                alert('Description is required for rejection')
+                this.$swal.fire({icon:'warning', title:'Incomplete Details', text:'Description is required for rejection'});
                 return
             }
-
             this.loading = true;
             this.confirmationData.post('/api/consultant_practices/sessions/confirm_service')
             .then(response => {
@@ -77,7 +76,7 @@ export default {
                     title: 'Successful',
                     text: 'The Session Service was '+ (this.confirmationData.decision === 'reject' ? 'rejected' : 'confirmed') +' successfully',
                 });
-                this.$emit('refreshSession', response);
+                this.$emit('refreshSessionConfirmation', response);
             })
             .catch(()=>{
                 this.$swal.fire({

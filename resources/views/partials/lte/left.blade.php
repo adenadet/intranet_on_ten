@@ -65,7 +65,7 @@
                         @if(Auth::user()->hasRole('Consultant Practice Med') || Auth::user()->hasRole('Super Admin'))
                         <li class="nav-item">
                             <a href="/consultant_practices/medical" class="nav-link">
-                            <i class="fas fa-user-md nav-icon"></i><p>Medical Officer</p>
+                            <i class="fas fa-user-md nav-icon"></i><p>Medical Team</p>
                             </a>
                         </li>
                         @endif

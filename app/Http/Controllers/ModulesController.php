@@ -47,7 +47,7 @@ class ModulesController extends Controller
         
         $params = [
             'page' => 'consultant_practices',
-            'page_title' => 'Consultant Practice | Medical Officer',
+            'page_title' => 'Consultant Practice | Medical Team',
         ];
         return view('app')->with($params);
     }

@@ -36,7 +36,7 @@
                 </div>
                 <div class="content">
                     <div class="row">
-                    @if (in_array($page_title,  ['Consultant Practice | Administrator', 'Consultant Practice | Finance', 'Consultant Practice | Front Office', 'Consultant Practice | Medical Officer', 'E-Services | Administrator', 'E-Services | Front Admin', 'E-Services | Front Office', 'E-Services | Medical Officer', 'E-Services | Radiologist','Notice Board', 'Policies', 'Staff of the Month'  ]))
+                    @if (in_array($page_title,  ['Consultant Practice | Administrator', 'Consultant Practice | Finance', 'Consultant Practice | Front Office', 'Consultant Practice | Medical Team', 'E-Services | Administrator', 'E-Services | Front Admin', 'E-Services | Front Office', 'E-Services | Medical Officer', 'E-Services | Radiologist','Notice Board', 'Policies', 'Staff of the Month'  ]))
                         @if( $page_title == 'Notice Board')
                         <div class="col-md-3">
                             <div class="card">
@@ -53,10 +53,10 @@
                                 </div>
                             </div>
                         </div>
-                        @elseif (($page_title == 'Consultant Practice | Administrator') || ($page_title == 'Consultant Practice | Finance') || ($page_title == 'Consultant Practice | Front Office') || ($page_title == 'Consultant Practice | Medical Officer') || ($page_title == 'Consultant Practice | Radiologist'))
+                        @elseif (($page_title == 'Consultant Practice | Administrator') || ($page_title == 'Consultant Practice | Finance') || ($page_title == 'Consultant Practice | Front Office') || ($page_title == 'Consultant Practice | Medical Team') || ($page_title == 'Consultant Practice | Radiologist'))
                         <div class="col-md-3">
-                            @if($page_title == 'Consultant Practice | Front Office') @include('partials.cp.front')
-                            @elseif($page_title == 'Consultant Practice | Medical Officer') @include('partials.cp.med')
+                                @if($page_title == 'Consultant Practice | Front Office') @include('partials.cp.front')
+                            @elseif($page_title == 'Consultant Practice | Medical Team') @include('partials.cp.med')
                             @elseif($page_title == 'Consultant Practice | Finance') @include('partials.cp.fin')
                             @elseif($page_title == 'Consultant Practice | Administrator') @include('partials.cp.admin')
                             @endif

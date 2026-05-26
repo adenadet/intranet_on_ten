@@ -15,12 +15,12 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <label>Description</label>
-                    <QuillEditor class="form-control" theme="snow" content-type="html" v-model:content="confirmationData.description"/>
+                    <QuillEditor class="form-control" theme="snow" content-type="html" v-model:content="reversalData.description"/>
                 </div>
             </div>
             <div class="col-md-12">
-                <button type="button" @click="confirmPayment()" class="btn btn-primary" :disabled="loading">
-                    <i class="fas fa-check mr-1"></i>{{ loading ? 'Processing...' : 'Confirm Payment' }}
+                <button type="submit" class="btn btn-danger" :disabled="loading" @click="rejectPayment">
+                    <i class="fas fa-times mr-1"></i>{{ loading ? 'Processing...' : 'Reverse Payment' }}
                 </button>
             </div>
         </div>
@@ -31,25 +31,27 @@
 export default {
     data() {
         return {
+            accounts: [],
+            companies: [],
             loading: false,
-            confirmationData: new Form({
+            reversalData: new Form({
                 payment_id: '',
                 description: '',
-            })
+            }),
         };
     },
-    emits:['refreshPaymentConfirmationForm'],
+    emits:['refreshPaymentReversalForm'],
     methods: {
-        confirmPayment(){
+        rejectPayment(){
             this.loading = true;
-            this.confirmationData.put('/api/consultant_practices/payments/'+this.payment.id+'/confirm')
+            this.reversalData.put('/api/consultant_practices/payments/'+this.payment.id+'/reverse')
             .then(response => {
                 this.$swal.fire({
                     icon: 'success',
                     title: 'Reversed',
-                    text: 'The payment was confirmed successfully',
+                    text: 'The payment was reversed successfully',
                 });
-                this.$emit('refreshPaymentConfirmationForm', response);
+                this.$emit('refreshPaymentReversalForm', response);
             })
             .catch(error=>{
                 this.$swal.fire({
@@ -70,7 +72,7 @@ export default {
     watch:{
         payment(){
             if (this.payment != null){
-                this.confirmationData.payment_id = this.payment.id;
+                this.reversalData.payment_id = this.payment.id;
             }
             else{
                 this.resetForm()

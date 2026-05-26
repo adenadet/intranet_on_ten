@@ -33,10 +33,12 @@
             <tr v-for="payment in payments" key="payment.id">
                 <td>{{ ExcelDate(payment.date) }}</td>
                 <td>{{ payment.company?.name || 'General' }}</td>
+                <td>{{ payment.account?.bank?.bank_name+' ['+payment.account?.account_name+'-'+payment.account?.account_number+']' }}</td>
                 <td>{{ payment.account != null ? (payment.account.bank?.bank_new || 'New Bank')+' '+payment.account.account_name+''+payment.account.account_number : 'General' }}</td>
-                <td>{{ curency(payment.amount) }}</td>
+                <td>{{ currency(payment.amount) }}</td>
                 <td :title="payment.description" v-html="readMore(payment.description, 50, '...')"></td>
-                <td><span v-if="payment.status === 1" class="badge badge-success">Active</span>
+                <td><span v-if="payment.status === 1" class="badge badge-dark">Pending</span>
+                    <span v-else-if="payment.status === 10" class="badge badge-success">Confirmed</span>
                     <span v-else class="badge badge-danger">Inactive</span>
                 </td>
                 <td>
@@ -44,16 +46,17 @@
                         <i class="fa fa-ellipsis-v"></i>
                     </span>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <button class="btn btn-block dropdown-item" @click="viewPayment(payment)"><i class="fas fa-eye mr-2 text-success"></i> View Payment</button>
+                        <router-link class="btn btn-block dropdown-item" :to="'/consultant_practices/'+type+'/payments/'+payment.id"><i class="fas fa-eye mr-2 text-success"></i> View Payment</router-link>
                         <button class="btn btn-block dropdown-item" @click="updatePayment(payment)"><i class="fas fa-edit mr-2 text-primary"></i> Update Payment</button>
-                        <button class="btn btn-block dropdown-item" @click="deactivatePayment(payment.id)"><i class="fas fa-times mr-2 text-danger"></i> {{payment.status == 1 ? 'Deactivate' : 'Reactivate'}} Payment</button>
+                        <button v-if="payment.status == 10"class="btn btn-block dropdown-item" @click="reversePayment(payment.id)"><i class="fas fa-times mr-2 text-danger"></i>  Reverse Payment</button>
+                        <button v-if="payment.status == 1"class="btn btn-block dropdown-item" @click="deactivatePayment(payment.id)"><i class="fas fa-times mr-2 text-danger"></i> {{payment.status == 1 ? 'Deactivate' : 'Reactivate'}} Payment</button>
                     </div>
                 </td>
             </tr>
         </tbody>
         <tbody v-else>
             <tr>
-                <td colspan="6">No Payment meets your requirements</td>
+                <td colspan="8">No Payment meets your requirements</td>
             </tr>
         </tbody>
     </table>
@@ -89,7 +92,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, deactivate it!'
+                confirmButtonText: 'Carry On'
             })
             .then((result) => {
                 //Send Delete request
@@ -111,12 +114,31 @@ export default {
             this.closeModals();
             this.$emit('refreshPaymentList');
         },
-        startPayment(payment){
-            this.loading = true;
-            this.editMode = false;
-            this.dispute = dispute;
-            $('#transactionModal').modal('show');
-            this.loading = false;
+        reversePayment(id){
+            this.$swal.fire({
+                title: 'Are you sure?',
+                text: "This Payment will reversed and cancelled",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, reverse it!'
+            })
+            .then((result) => {
+                //Send Delete request
+                if(result.value){
+                    this.loading = true;
+                    this.form.get('/api/consultant_practices/payments/'+id+'/reverse')
+                    .then(response=>{
+                        this.$swal.fire('Deactivated!', response.data.message, 'success');
+                        this.refreshPage(response);
+                        this.loading = false;   
+                    })
+                    .catch(()=>{
+                        this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
+                    });
+                }
+            });  
         },
         updatePayment(payment){
             this.loading = true;
@@ -128,8 +150,9 @@ export default {
     },
     mounted() {},
     props:{
-        payments: Array,
-        source: String,
+        payments: {type: Array, default: () => []},
+        source: {type: String, default:'',},
+        type: {type: String, default: 'finance'},
     },
     watch:{}
 }

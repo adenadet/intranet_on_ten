@@ -41,10 +41,26 @@ class SessionManagerService
         });
     }
 
+    public function delete($id): Session
+    {
+        return DB::transaction(function () use ($id) {
+
+            $session = Session::findOrFail($id);
+
+            $session->update([
+                'updated_by' => auth('api')->id() ?? Auth::id(),
+                'deleted_by' => auth('api')->id() ?? Auth::id(),
+                'deleted_at' => now(),
+            ]);
+            
+            return $session->load('session_items');
+        });
+    }
+
     public function payment_confirm(Session $session, array $data): Session
     {
         if ($session->payment_status === Session::PaymentStatusPaid) {
-            return $session; // idempotent
+            return $session;
         }
 
         if ($session->service_status === Session::ServiceStatusRejected) {
@@ -61,8 +77,26 @@ class SessionManagerService
             ]);
 
             $session->update([
-                'payment_status' => $data['decision'] == 'accept' ? Session::PaymentStatusPaid : Session::PaymentStatusCancelled,
+                'payment_status' => $data['decision'] == 'confirm' ? Session::PaymentStatusPaid : Session::PaymentStatusCancelled,
                 'updated_by' => auth('api')->id() ?? Auth::id(),
+            ]);
+
+            return $session;
+        });
+    }
+
+    public function process(Session $session){
+        if ($session->service_status != Session::ServiceStatusCompleted) {
+            throw new Exception('Completed session cannot be processed');
+        }
+
+        if ($session->payment_status != Session::PaymentStatusPaid) {
+            throw new Exception('Unpaid session cannot be processed');
+        }
+
+        return DB::transaction(function () use ($session) {
+            $session->update([
+                'finance_status' => Session::FinanceStatusProcessing,
             ]);
 
             return $session;
@@ -73,10 +107,6 @@ class SessionManagerService
     {
         if ($session->service_status === Session::ServiceStatusCompleted) {
             throw new Exception('Completed session cannot be rejected');
-        }
-
-        if ($session->payment_status === Session::PaymentStatusPaid) {
-            throw new Exception('Paid session cannot be rejected without refund');
         }
 
         return DB::transaction(function () use ($session, $data) {
@@ -91,13 +121,8 @@ class SessionManagerService
 
     public function service_confirm(Session $session, array $data = []): Session
     {
-        /*if ($session->service_status === Session::ServiceStatusCompleted) {
-            return $session; // idempotent
-        }
-
-        if ($session->service_status === Session::ServiceStatusRejected) {
-            throw new Exception('Rejected session cannot be confirmed');
-        }*/
+        if ($session->service_status === Session::ServiceStatusCompleted) {return $session;}
+        if ($session->service_status === Session::ServiceStatusRejected) {throw new Exception('Rejected session cannot be confirmed');}
 
         return DB::transaction(function () use ($session, $data) {
             SessionConfirmation::create([
@@ -108,7 +133,7 @@ class SessionManagerService
             ]);
 
             $session->update([
-                'service_status' => Session::ServiceStatusCompleted,
+                'service_status' => $data['decision'] == 'confirm' ? Session::ServiceStatusCompleted : Session::ServiceStatusRejected,
                 'updated_by' => auth('api')->id() ?? Auth::id(), 
             ]);
 
@@ -122,7 +147,7 @@ class SessionManagerService
                 'Session completed',
                 date('Y-m-d'),
             );
-            echo $ledger->id; 
+            //echo $ledger->id; 
 
             return $session;
         });

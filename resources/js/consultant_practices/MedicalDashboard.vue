@@ -45,7 +45,7 @@
                     <h3 class="card-title">Sessions</h3>
                 </div>
                 <div class="card-body table-responsive p-0" style="height: 300px;">
-                    <CPDetailSessionList :sessions.sync="sessions.data" :source="type" @refreshConsultantList="getAllInitials" />
+                    <CPDetailSessionList :sessions.sync="sessions.data" :source="type" @refreshSessionList="getAllInitials" />
                 </div>
                 <div class="card-footer">
                     <router-link class="btn btn-tool text-dark" :to="'/consultant_practices/'+type+'/sessions'">See All >>></router-link>
@@ -58,7 +58,7 @@
                     <h3 class="card-title">Patients</h3>
                 </div>
                 <div class="card-body table-responsive p-0" style="height: 300px;">
-                    <CPDetailPatientList :patients.sync="patients.data" source="medical"/>
+                    <CPDetailPatientList :patients.sync="patients.data" source="medical" @refreshPatientList="getAllInitials" />
                 </div>
                 <div class="card-footer">
                     <router-link class="btn btn-tool text-dark" :to="'/consultant_practices/'+type+'/patients'">See All >>></router-link>

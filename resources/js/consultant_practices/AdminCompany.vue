@@ -19,7 +19,7 @@
                     <h3 class="card-title">Accounts</h3>
                 </div>
                 <div class="card-body table-responsive p-0" style="height: 200px;">
-                    <CPDetailAccountList :accounts.sync="company.accounts" :source="type" @refreshAccountList="getAllInitials" />
+                    <CPDetailAccountList :accounts.sync="company.accounts" :company.sync="company" :source="type" @refreshAccountList="getAllInitials" />
                 </div>
             </div>
         </div>

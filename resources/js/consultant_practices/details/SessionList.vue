@@ -8,7 +8,7 @@
                         <button type="button" @click="closeModals" class="close" data-dismiss="modal" aria-label="Close"><span class="text-white" aria-hidden="true">&times;</span></button>
                     </div>
                     <div class="modal-body">
-                        <CPFormSessionPaymentConfirmation :editMode="editMode" :session.sync="session" @refreshSessionForm="refreshSessionList"/>
+                        <CPFormSessionPaymentConfirmation :editMode="editMode" :session.sync="session" @refreshPaymentConfirmation="refreshSessionList"/>
                     </div>
                 </div>
             </div>
@@ -21,7 +21,7 @@
                         <button type="button" @click="closeModals" class="close" data-dismiss="modal" aria-label="Close"><span class="text-white" aria-hidden="true">&times;</span></button>
                     </div>
                     <div class="modal-body">
-                        <CPFormSessionConfirmation :editMode="editMode" :session.sync="session" @refreshSessionForm="refreshSessionList"/>
+                        <CPFormSessionConfirmation :editMode="editMode" :session.sync="session" @refreshSessionConfirmation="refreshSessionList"/>
                     </div>
                 </div>
             </div>
@@ -188,7 +188,7 @@ export default {
                 }
             });  
         },
-        refreshPage(){
+        refreshSessionList(){
             this.closeModals();
             this.$emit('refreshSessionList');
         },

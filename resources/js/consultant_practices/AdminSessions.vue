@@ -34,6 +34,7 @@
 export default {
     data(){
         return  {
+            current_page: 1,
             end_date: '',
             query: '',
             sessions:   {data: [], total: 0,},

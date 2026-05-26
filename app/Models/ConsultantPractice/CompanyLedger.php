@@ -17,4 +17,9 @@ class CompanyLedger extends Model
     public function creator(){
         return $this->belongsTo('App\Models\User', 'created_by', 'id');
     }
+
+    public function referenceable()
+    {
+        return $this->morphTo(__FUNCTION__, 'reference_type', 'reference_id');
+    }
 }

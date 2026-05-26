@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>St. Nicholas Hospital | @yield('title')</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <link rel="stylesheet" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}">
-    <link rel="stylesheet" href="{{asset('dist/css/adminlte.min.css')}}">
+    <link rel="stylesheet" href="{{asset('lte/plugins/fontawesome-free/css/all.min.css')}}">
+    <link rel="stylesheet" href="{{asset('lte/dist/css/adminlte.min.css')}}">
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper" id="corner">
@@ -28,9 +28,9 @@
     </footer>
 </div>
 <script src="{{asset('js/app.js')}}"></script>
-<script src="{{asset('plugins/jquery/jquery.min.js')}}"></script>
-<script src="{{asset('plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-<script src="{{asset('dist/js/adminlte.min.js')}}"></script>
+<script src="{{asset('lte/plugins/jquery/jquery.min.js')}}"></script>
+<script src="{{asset('lte/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+<script src="{{asset('lte/dist/js/adminlte.min.js')}}"></script>
 @yield('extra_script')
 </body>
 </html>

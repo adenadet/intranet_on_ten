@@ -62,7 +62,7 @@ export default {
             submitting: false,
         }
     },
-
+    emits:['refreshPaymentConfirmation'],
     methods: {
         async submit() {
             if (this.confirmationData.decision === 'reject' && !this.confirmationData.description) {
@@ -77,7 +77,7 @@ export default {
                     title: 'Successful',
                     text: 'The Session Payment was '+ (this.confirmationData.decision === 'reject' ? 'rejected' : 'confirmed') +' successfully',
                 });
-                this.$emit('refreshSession', response);
+                this.$emit('refreshPaymentConfirmation', response);
             })
             .catch(()=>{
                 this.$swal.fire({

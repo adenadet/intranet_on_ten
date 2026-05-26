@@ -42,8 +42,8 @@
                             <td>{{ addOne(index) }}</td>
                             <td>{{ assigned_leave_type.leave_type.name }}</td>
                             <td>{{ assigned_leave_type.leave_type.no_of_days }}</td>
-                            <td v-if="source== 'admin'">{{ assigned_leave_type.employee != null ? FullName(assigned_leave_type.employee.user) : 'Not Found' }}</td>
-                            <td v-if="source== 'admin'">{{ assigned_leave_type.employee != null ? assigned_leave_type.employee.department.name : 'No Department' }}</td>
+                            <td v-if="source == 'admin'">{{ assigned_leave_type.employee != null ? FullName(assigned_leave_type.employee.user) : 'Not Found' }}</td>
+                            <td v-if="source == 'admin'">{{ assigned_leave_type.employee != null ? assigned_leave_type.employee.department.name : 'No Department' }}</td>
                             <td>{{assigned_leave_type.days_used}}</td>
                             <td>{{assigned_leave_type.pending_days}}</td>
                             <td>{{assigned_leave_type.balance}}</td>

@@ -29,6 +29,7 @@
 export default {
     data(){
         return  {
+            current_page: 1,
             end_date: '',
             query: '',
             payments:   {data: [], total: 0,},

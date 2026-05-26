@@ -42,8 +42,8 @@
                     <label>Status</label>
                     <select class="form-control" id="status" name="status" v-model="accountData.status">
                         <option value="">Select Status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
                     </select>
                 </div>
             </div>
@@ -73,7 +73,7 @@ export default {
             loading: false,
         }
     },
-    emits:['refreshAccount'],
+    emits:['refreshAccountForm'],
     mounted() {
         this.getAllInitials();
     },
@@ -88,7 +88,7 @@ export default {
                     title: 'Successful',
                     text: 'A new account was created successfully',
                 });
-                this.$emit('refreshAccount', response);
+                this.$emit('refreshAccountForm', response);
             })
             .catch(()=>{
                 this.$swal.fire({
@@ -124,7 +124,7 @@ export default {
             this.accountData.company_id = this.company.id;
             this.accountData.put('/api/consultant_practices/accounts/'+this.accountData.id)
             .then(response =>{
-                this.$emit('refreshAccount', response);
+                this.$emit('refreshAccountForm', response);
                 this.$swal.fire({
                     icon: 'success',
                     title: 'The Account details have been modified',

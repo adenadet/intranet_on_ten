@@ -19,6 +19,7 @@
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Balance</th>
                 <th>Consultants</th>
                 <th>Status</th>
                 <th><button class="btn btn-xs btn-primary float-right" @click="addCompany()"><i class="fa fa-plus"></i></button></th>
@@ -28,6 +29,7 @@
             <tr v-for="(company, index) in companies" :key="company.id">
                 <td>{{ addOne(index) }}</td>
                 <td>{{ company.name }}</td>
+                <td>{{ currency(company.balance) }}</td>
                 <td>{{ company.consultants.length }}</td>
                 <td>
                     <span v-if="company.status == 1" class="badge badge-primary">Active</span>

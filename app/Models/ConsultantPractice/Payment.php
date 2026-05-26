@@ -18,7 +18,7 @@ class Payment extends Structure
     protected $primaryKey = 'id';
     protected $table = 'consultant_practice_payments';
 
-    protected $fillable = array('company_id', 'account_id', 'reference', 'amount', 'notes', 'confirmed_by', 'confirmed_at','reversed_by', 'reversed_at', 'status', 'created_by', 'updated_by', 'deleted_by', 'created_at', 'updated_at', 'deleted_at');
+    protected $fillable = array('company_id', 'account_id', 'amount', 'date', 'description', 'confirmed_by', 'confirmed_at', 'confirmed_note', 'reversed_by', 'reversed_at', 'reversed_note', 'status', 'created_by', 'updated_by', 'deleted_by', 'created_at', 'updated_at', 'deleted_at');
 
     public function account(){
         return $this->belongsTo('App\Models\ConsultantPractice\Account', 'account_id', 'id');

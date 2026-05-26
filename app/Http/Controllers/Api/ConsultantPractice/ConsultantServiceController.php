@@ -49,8 +49,8 @@ class ConsultantServiceController extends Controller
     public function initials()
     {
         return response()->json([
-            'consultants' => $this->consultant_practice_consultant_service_get_all('front', null, false, false),
-            'services' => $this->consultant_practice_consultant_service_get_all('front', null, false, false),
+            'consultants' => $this->consultant_practice_consultant_service_get_all('front', [], false, false),
+            'services' => $this->consultant_practice_consultant_service_get_all('front', [], false, false),
         ]);
     }
 

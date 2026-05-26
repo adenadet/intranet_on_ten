@@ -19,7 +19,7 @@
                     <h3 class="card-title">Ledger</h3>
                 </div>
                 <div class="card-body table-responsive p-0" style="height: 400px;">
-                    <CPDetailLedgerList :ledgers.sync="ledgers" source="company" @refreshLedgerList="getAllInitials" />
+                    <CPDetailLedgerList :ledgers.sync="company.ledgers" source="company" @refreshLedgerList="getAllInitials" />
                 </div>
             </div>
             <div class="card">

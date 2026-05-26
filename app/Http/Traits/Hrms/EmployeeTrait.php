@@ -105,7 +105,7 @@ trait EmployeeTrait{
             }
         }
 
-        $query = $detailed ? $query->has('user')->with(['leave_types.leave_type', 'department', 'designation', 'supervisor.user', 'line_manager.user', 'user.area', 'user.branch', 'user.department', 'user.roles', 'user.state']) : $query->select('id', 'employee_id', 'user_id')->has('user')->with('user');
+        $query = $detailed ? $query->has('user')->with(['leave_types.leave_type', 'department', 'designation', 'supervisor.user', 'line_manager.user', 'user.area', 'user.branch', 'user.department', 'user.roles', 'user.state']) : $query->select('id', 'employee_id', 'user_id', 'username')->has('user')->with(['user', 'leave_types.leave_type']);
         $query = $query->orderBy('username', 'ASC');
         $query = $paginated ? $query->paginate(52) : $query->get();
         

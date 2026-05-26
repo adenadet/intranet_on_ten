@@ -120,6 +120,10 @@ export const globalMethods = {
         shortDate(text) {
             return moment(text).format('MMM Do, YY');
         },
+        timeAgo(value){
+            if (!value) return '';
+            return moment(value).fromNow();
+        },
         timeDifference(start, end, format, category = 'Calendar') {
             /*var timeBegin = moment(start);
             var timeEnd = moment(end);

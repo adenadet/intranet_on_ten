@@ -10,13 +10,18 @@ class Session extends Structure
 {
     use HasFactory;
 
+    public const FinanceStatusPending = 0;
+    public const FinanceStatusProcessing = 10;
+    public const FinanceStatusCompleted = 20;
+
+    public const PaymentStatusAwaiting = 0;
+    public const PaymentStatusPaid = 10;
+    public const PaymentStatusCancelled = 20;
+
     public const ServiceStatusCompleted = 1;
     public const ServiceStatusCreated = 0;
     public const ServiceStatusRejectedConsultant = 100;
     public const ServiceStatusRejected = 200;
-    public const PaymentStatusAwaiting = 0;
-    public const PaymentStatusPaid = 10;
-    public const PaymentStatusCancelled = 20;
     
     protected $primaryKey = 'id';
     protected $table = 'consultant_practice_sessions';

@@ -15,6 +15,10 @@ use App\Services\ConsultantPractice\SessionManagerService;
 class SessionController extends Controller
 {
     use ConsultantPracticeTrait;
+
+    public function __construct(
+        protected SessionManagerService $session_manager_service,
+    ){}
     
     public function confirm_payment(Request $request)
     {
@@ -31,14 +35,10 @@ class SessionController extends Controller
 
     public function confirm_service(Request $request)
     {
-        $session = Session::find($request->input('session_id'));
-        $session_manager = new SessionManagerService();
-        
-        $session = $request->input('decision') === 'reject' ? $session_manager->reject($session, $request->all()) : $session_manager->service_confirm($session, $request->all());
-        return response()->json([
-            'sessions' => $session
-        ], is_string($session) ? 500 : 200);
-        
+        $session = Session::findOrFail($request->input('session_id'));
+    
+        $this->session_manager_service->service_confirm($session, $request->all());
+        return response()->json(['sessions' => $session]);
     }
 
     public function destroy(string $id)
@@ -62,9 +62,19 @@ class SessionController extends Controller
     public function initials()
     {
         return response()->json([
-            'consultants' => $this->consultant_practice_consultant_get_all('active', null, true, false),
+            'consultants' => $this->consultant_practice_consultant_get_all('active', $_GET, true, false),
             'patients' => Patient::select('id', 'unique_id', 'name')->get(), 
             'specialties' => Specialty::with('consultants')->select('id', 'name')->get(),
+        ]);
+    }
+
+    public function process($id){
+        $session = Session::findOrFail($id);
+
+        $invoice = $this->session_manager_service->process($session);
+
+        return response()->json([
+            'session' => $invoice,
         ]);
     }
 

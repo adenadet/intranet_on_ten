@@ -19,25 +19,28 @@
     <table class="table table-head-fixed text-nowrap table-striped ">
         <thead>
             <tr>
+                <th>S/N</th>
+                <th>Name</th>
                 <th>Unique ID</th>
-                <th>Patient</th>
-                <th>Type</th>
-                <th>Sex</th>
+                <th>Patient Type</th>
+                <th>Gender</th>
                 <th>Status</th>
                 <th><button class="btn btn-sm btn-primary float-right" @click="addPatient"><i class="fa fa-plus"></i></button></th>
             </tr>
         </thead>
         <tbody v-if="patients.length > 0">
-            <tr v-for="patient in patients">
-                <td>{{ patient.unique_id }}</td>
+            <tr v-for="(patient, index) in patients">
+                <td>{{ addOne(index) }}</td>
                 <td>{{ patient.name }}</td>
-                <td>{{ patient.patient_type == 'hmo' ? "Insurance" : "Private" }}</td>
-                <td>{{ firstUp(patient.sex) }}</td>
+                <td>{{ patient.unique_id }}</td>
+                <td>
+                    <span v-if="patient.patient_type == 'hmo'">Credit</span>
+                    <span v-else>Cash</span>
+                </td>
+                <td><span v-html="patient.sex == 'male' ? 'Male' : 'Female'"></span></td>
                 <td><span :class="{'badge badge-success': patient.status == 1, 'badge badge-danger': patient.status == 0}">{{ patient.status == 1 ? 'Active' : 'Inactive' }}</span></td>
                 <td>
-                    <span class="nav-link" data-toggle="dropdown" href="#">
-                        <i class="fa fa-ellipsis-v"></i>
-                    </span>
+                    <span class="nav-link" data-toggle="dropdown" href="#"><i class="fa fa-ellipsis-v"></i></span>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" >
                         <router-link v-if="source == 'admin'" class="btn btn-block dropdown-item" :to="'/consultant_practices/admin/patients/' + patient.id"><i class="fas fa-eye mr-2 text-success"></i> View Patient</router-link>
                         <router-link v-else-if="source == 'finance'" class="btn btn-block dropdown-item" :to="'/consultant_practices/finance/patients/' + patient.id"><i class="fas fa-eye mr-2 text-success"></i> View Patient</router-link>
@@ -50,9 +53,7 @@
             </tr>
         </tbody>
         <tbody v-else>
-            <tr>
-                <td colspan="6">No Patient meets your requirements</td>
-            </tr>
+            <tr><td colspan="7">No Patient meets your requirements</td></tr>
         </tbody>
     </table>
 </section>

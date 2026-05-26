@@ -1,151 +1,63 @@
 <template>
 <section class="overlay-wrapper">
     <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
-
     <form @submit.prevent="editMode ? updatePayment() : createPayment()">
         <div class="row">
-            <!-- Company -->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>
-                        Company
-                    </label>
-
-                    <select
-                        class="form-control"
-                        :class="{ 'is-invalid': paymentData.errors.has('company_id') }"
-                        v-model="paymentData.company_id"
-                        @change="onCompanyChange"
-                    >
-                        <option value="">
-                            Select Company
-                        </option>
-
-                        <option
-                            v-for="company in companies"
-                            :key="company.id"
-                            :value="company.id"
-                        >
-                            {{ company.name }}
-                        </option>
+                    <label>Company</label>
+                    <select class="form-control" :class="{ 'is-invalid': paymentData.errors.has('company_id') }" v-model="paymentData.company_id" @change="onCompanyChange">
+                        <option value="">Select Company</option>
+                        <option v-for="company in companies" :key="company.id" :value="company.id">{{ company.name }}</option>
                     </select>
 
-                    <has-error
-                        :form="paymentData"
-                        field="company_id"
-                    />
+                    <has-error :form="paymentData" field="company_id"/>
                 </div>
             </div>
-
-            <!-- Account -->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>
-                        Account
-                    </label>
-
-                    <select
-                        class="form-control"
-                        :class="{ 'is-invalid': paymentData.errors.has('account_id') }"
-                        v-model="paymentData.account_id"
-                    >
-                        <option value="">
-                            Select Account
-                        </option>
-
-                        <option
-                            v-for="account in accounts"
-                            :key="account.id"
-                            :value="account.id"
-                        >
-                            {{ account.name }}
-                        </option>
+                    <label>Account</label>
+                    <select class="form-control" :class="{ 'is-invalid': paymentData.errors.has('account_id') }" v-model="paymentData.account_id">
+                        <option value="">--Select Account--</option>
+                        <option v-for="account in accounts" :key="account.id" :value="account.id">{{ account.bank?.bank_name }} [{{account.account_name}} - {{ account.account_number }}]</option>
                     </select>
-
-                    <has-error
-                        :form="paymentData"
-                        field="account_id"
-                    />
+                    <has-error :form="paymentData" field="account_id"/>
                 </div>
             </div>
-
-            <!-- Amount -->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>
-                        Amount
-                    </label>
-
-                    <input
-                        type="number"
-                        step="0.01"
-                        class="form-control"
-                        placeholder="Enter Amount"
-                        :class="{ 'is-invalid': paymentData.errors.has('amount') }"
-                        v-model="paymentData.amount"
-                    >
-
-                    <has-error
-                        :form="paymentData"
-                        field="amount"
-                    />
+                    <label>Amount</label>
+                    <input type="number" step="0.01" class="form-control" placeholder="Enter Amount" :class="{ 'is-invalid': paymentData.errors.has('amount') }" v-model="paymentData.amount">
+                    <has-error :form="paymentData" field="amount"/>
                 </div>
             </div>
-
-            <!-- Date -->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>
-                        Payment Date
-                    </label>
-
-                    <input
-                        type="date"
-                        class="form-control"
-                        :class="{ 'is-invalid': paymentData.errors.has('date') }"
-                        v-model="paymentData.date"
-                    >
-
-                    <has-error
-                        :form="paymentData"
-                        field="date"
-                    />
+                    <label>Payment Date</label>
+                    <input type="date" class="form-control" :class="{ 'is-invalid': paymentData.errors.has('date') }" v-model="paymentData.date">
+                    <has-error :form="paymentData" field="date"/>
                 </div>
             </div>
 
             <!-- Description -->
             <div class="col-md-12">
                 <div class="form-group">
-                    <label>
-                        Description
-                    </label>
-
-                    <textarea
-                        rows="4"
-                        class="form-control"
-                        placeholder="Enter Description"
-                        :class="{ 'is-invalid': paymentData.errors.has('description') }"
-                        v-model="paymentData.description"
-                    ></textarea>
-
-                    <has-error
-                        :form="paymentData"
-                        field="description"
-                    />
+                    <label>Description</label>
+                    <textarea rows="4" class="form-control" placeholder="Enter Description" :class="{ 'is-invalid': paymentData.errors.has('description') }" v-model="paymentData.description"></textarea>
+                    <has-error :form="paymentData" field="description"/>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
                 <button type="submit" class="btn btn-primary" :disabled="loading">
-                    <i class="fas fa-save"></i>{{ submitting ? 'Processing...' : (editMode ? 'Update Payment' : 'Create Payment') }}
+                    <i class="fas fa-save mr-1"></i>{{ loading ? 'Processing...' : (editMode ? 'Update Payment' : 'Create Payment') }}
                 </button>
             </div>
         </div>
     </form>
 </section>
 </template>
-
 <script>
 export default {
     data() {
@@ -154,6 +66,7 @@ export default {
             companies: [],
             loading: false,
             paymentData: new Form({
+                id: '',
                 company_id: '',
                 account_id: '',
                 amount: '',
@@ -244,6 +157,9 @@ export default {
                 this.loading = false;
             });
         },
+    },
+    mounted(){
+        this.getAllInitials();
     },
     props:{
         payment: {type: Object, default: null},

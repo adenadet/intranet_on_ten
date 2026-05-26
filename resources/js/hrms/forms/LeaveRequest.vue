@@ -250,7 +250,7 @@ export default {
                 this.loading = false;
             })
             .catch(() => {
-                toast.fire({icon: 'error', title: 'Your appointments did not loaded successfully',})
+                this.$toast.fire({icon: 'error', title: 'Your appointments did not loaded successfully',})
                 this.loading = false;
             });
         },
