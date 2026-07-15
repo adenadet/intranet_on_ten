@@ -184,7 +184,7 @@ trait AppointmentTrait{
                 $appointment->patient_id = $patient->id;
                 $appointment->service_id = $data['service_id'];
                 $appointment->date       = $data['date'];
-                $appointment->amount     = $age_in_years < 11 ? 50000 : 100000;
+                $appointment->amount     = $age_in_years < 11 ? 60000 : 120000;
                 $appointment->schedule   = $data['schedule'];
 
                 $appointment->save();
@@ -194,7 +194,7 @@ trait AppointmentTrait{
                     'patient_id' => $patient->id,
                     'service_id' => $data['service_id'],
                     'date'       => $data['date'],
-                    'amount'     => $age_in_years < 11 ? 50000 : 100000,
+                    'amount'     => $age_in_years < 11 ? 60000 : 120000,
                     'schedule'   => $data['schedule'],
                     'status'     => 0,
                     'created_by' => auth('api')->id() ?? Auth::id() ?? 0,
@@ -203,7 +203,6 @@ trait AppointmentTrait{
 
             DB::commit();
             return $appointment;
-
         }
         catch(Exception $e){
             DB::rollback();

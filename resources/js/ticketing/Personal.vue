@@ -41,20 +41,6 @@
 </section>
 </template>
 <script>
-import Form from 'vform';
-import Swal from 'sweetalert2/dist/sweetalert2.js';
-import 'sweetalert2/src/sweetalert2.scss';
-const toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-    }
-});
 export default {
     data(){
         return {
@@ -71,7 +57,7 @@ export default {
     },
     methods:{
         closeTicket(id){
-            Swal.fire({
+            this.$swal.fire({
                 title: 'Are you sure?',
                 text: "This ticket would only be closed, you can reopen by updating it!",
                 icon: 'warning',
@@ -83,14 +69,17 @@ export default {
             .then((result) => {
                 //Send Delete request
                 if(result.value){
+                    this.loading = true;
                     this.form.delete('/api/tickets/ticket/'+id)
                     .then(response=>{
                         this.ticketReload(response);
-                        this.$Progress.finish();
-                        Swal.fire('Deleted!', 'Ticket has been closed.', 'success');  
+                        this.$swal.fire('Deleted!', 'Ticket has been closed.', 'success');  
                     })
                     .catch(()=>{
                         Swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
+                    })
+                    .finally(()=>{
+                        this.loading = false;
                     });
                 }
             }); 

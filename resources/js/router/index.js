@@ -61,6 +61,7 @@ import CPMedicalSessions           from '../consultant_practices/MedicalSessions
     import CPFormConsultant                 from '../consultant_practices/forms/Consultant.vue';
     import CPFormConsultantService          from '../consultant_practices/forms/ConsultantService.vue';
     import CPFormConsultantServiceMultiple  from '../consultant_practices/forms/ConsultantServiceMultiple.vue';
+    import CPFormConsultantServiceUpload    from '../consultant_practices/forms/ConsultantServiceUpload.vue';
     import CPFormPatient                    from '../consultant_practices/forms/Patient.vue';
     import CPFormPayment                    from '../consultant_practices/forms/Payment.vue';
     import CPFormPaymentConfirmation        from '../consultant_practices/forms/PaymentConfirmation.vue';
@@ -146,6 +147,10 @@ import ExternalDone                         from '../external/Done.vue';
     import ExternalFormDirect                   from '../external/forms/Direct.vue';
     import ExternalFormReschedule               from '../external/forms/Reschedule.vue';
 
+
+import HrmsBranches                     from '../hrms/Branches.vue';
+import HrmsDepartment                   from '../hrms/Department.vue';
+import HrmsDepartments                  from '../hrms/Departments.vue';
 import HrmsDesignations                 from '../hrms/Designations.vue';
 import HrmsEmployee                     from '../hrms/Employee.vue';
 import HrmsEmployeeContact              from '../hrms/EmployeeContact.vue';
@@ -162,6 +167,9 @@ import HrmsLeaveUserLeaveTypes          from '../hrms/leaves/UserLeaveTypes.vue'
 import HrmsPublicHolidays               from '../hrms/PublicHolidays.vue';
 
     import HrmsDetailAssignedEmployeeLeaveType  from '../hrms/details/AssignedEmployeeLeaveType.vue';
+    import HrmsDetailBranchList                 from '../hrms/details/BranchList.vue';
+    import HrmsDetailDepartment                 from '../hrms/details/Department.vue';
+    import HrmsDetailDepartmentList             from '../hrms/details/DepartmentList.vue';
     import HrmsDetailDesignation                from '../hrms/details/Designation.vue';
     import HrmsDetailEmployee                   from '../hrms/details/Employee.vue';
     import HrmsDetailEmployeeLeaveType          from '../hrms/details/EmployeeLeaveType.vue';
@@ -351,6 +359,9 @@ const routes = [
     {path: '/home',                                         component: DashboardMain},
     
     //HRMS
+    {path: '/hrms/admin/branches',                          component: HrmsBranches},
+    {path: '/hrms/admin/departments',                       component: HrmsDepartments},
+    {path: '/hrms/admin/departments/:id',                   component: HrmsDepartment},
     {path: '/hrms/admin/designations',                      component: HrmsDesignations},
     {path: '/hrms/admin/employees',                         component: HrmsEmployees},
     {path: '/hrms/admin/employees/:id',                     component: HrmsEmployee},
@@ -460,6 +471,7 @@ export function registerGlobalComponents(app) {
         app.component('CPFormConsultant',                     CPFormConsultant);
         app.component('CPFormConsultantService',              CPFormConsultantService);
         app.component('CPFormConsultantServiceMultiple',      CPFormConsultantServiceMultiple);
+        app.component('CPFormConsultantServiceUpload',        CPFormConsultantServiceUpload);
         app.component('CPFormPatient',                        CPFormPatient);
         app.component('CPFormPayment',                        CPFormPayment);
         app.component('CPFormPaymentConfirmation',            CPFormPaymentConfirmation);
@@ -535,6 +547,9 @@ export function registerGlobalComponents(app) {
         app.component('ExternalFormDirect',             ExternalFormDirect);
         app.component('ExternalFormReschedule',         ExternalFormReschedule);
 
+    app.component('HrmsBranches',               HrmsBranches);
+    app.component('HrmsDepartment',             HrmsDepartment);
+    app.component('HrmsDepartments',            HrmsDepartments);
     app.component('HrmsDesignations',           HrmsDesignations);
     app.component('HrmsEmployee',               HrmsEmployee);
     app.component('HrmsEmployeeContact',        HrmsEmployeeContact);
@@ -550,7 +565,10 @@ export function registerGlobalComponents(app) {
     app.component('HrmsLeaveUserLeaveTypes',    HrmsLeaveUserLeaveTypes);
     app.component('HrmsPublicHolidays',         HrmsPublicHolidays);
     
-        app.component('HrmsDetailAssignedEmployeeLeaveType', HrmsDetailAssignedEmployeeLeaveType);
+        app.component('HrmsDetailAssignedEmployeeLeaveType',HrmsDetailAssignedEmployeeLeaveType);
+        app.component('HrmsDetailBranchList',               HrmsDetailBranchList);
+        app.component('HrmsDetailDepartment',               HrmsDetailDepartment);
+        app.component('HrmsDetailDepartmentList',           HrmsDetailDepartmentList);
         app.component('HrmsDetailDesignation',              HrmsDetailDesignation);
         app.component('HrmsDetailEmployee',                 HrmsDetailEmployee);
         app.component('HrmsDetailEmployeeLeaveType',        HrmsDetailEmployeeLeaveType);

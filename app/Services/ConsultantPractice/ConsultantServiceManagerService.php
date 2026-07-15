@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ConsultantServiceManagerService
 {
-    public function create($consultantId, $serviceId, float $price): ConsultantService
+    public function create(int $consultantId, int $serviceId, float $price): ConsultantService
     {
         return DB::transaction(function () use ($consultantId, $serviceId, $price) {
             $existing = ConsultantService::withTrashed()
@@ -17,10 +17,7 @@ class ConsultantServiceManagerService
                 ->first();
 
             if ($existing) {
-                if ($existing->trashed()) {
-                    $existing->restore();
-                    $existing->status = ConsultantService::StatusActive;
-                }
+                if ($existing->trashed()) {$existing->restore(); $existing->status = ConsultantService::StatusActive;}
 
                 $existing->price = $price;
                 $existing->save();

@@ -10,7 +10,7 @@
                 <div class="icon">
                     <i class="fa fa-user-md text-white"></i>
                 </div>
-                <a href="/consultant_pratices/admin/consultants" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="/consultant_practices/admin/consultants" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <div class="col-lg-3 col-6">
@@ -22,7 +22,7 @@
                 <div class="icon">
                     <i class="fa fa-user-injured text-white"></i>
                 </div>
-                <a href="/consultant_pratices/admin/patients" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="/consultant_practices/admin/patients" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <div class="col-lg-3 col-6">
@@ -34,7 +34,7 @@
                 <div class="icon">
                     <i class="fa fa-calendar-check text-white"></i>
                 </div>
-                <a href="/consultant_pratices/admin/sessions" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="/consultant_practices/admin/sessions" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <div class="col-lg-3 col-6">
@@ -46,7 +46,7 @@
                 <div class="icon">
                     <i class="fa fa-cash-register text-white"></i>
                 </div>
-                <a href="/consultant_pratices/admin/payments" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="/consultant_practices/admin/payments" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
     </div>

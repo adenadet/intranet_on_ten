@@ -16,7 +16,7 @@ class CompanyService
             'address' => $data['address'] ?? null,
             'email' => $data['email'] ?? null,
             'phone' => $data['phone'] ?? null,
-            'status' => $data['phone'] ?? Company::StatusActive,
+            'status' => $data['status'] ?? Company::StatusActive,
             'created_by' => auth('api')->id() ?? auth()->id(),
             'updated_by' => auth('api')->id() ?? auth()->id(),
         ]);

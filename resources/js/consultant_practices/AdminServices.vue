@@ -22,16 +22,15 @@
                     <h3 class="card-title">Services</h3>
                     <div class="card-tools">
                         <div class="input-group" style="width: 350px;">
-                            <input type="text" name="query" v-model="query" class="form-control float-right" placeholder="Search">
-
+                            <input type="text" name="query" v-model="filters.query" class="form-control float-right" placeholder="Search">
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-default" @click="getAllInitials"><i class="fas fa-search"></i></button>
-                                <select class="form-control" v-model="status" @change="getAllInitials">
+                                <select class="form-control" v-model="filters.status" @change="getAllInitials">
                                     <option value="all">All</option>
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
                                 </select>
-                                <button type="button" class="btn btn-default" @click="uploadServices"><i class="fas fa-file-upload text-dark"></i></button>
+                                <button type="button" class="btn btn-primary" @click="uploadServices"><i class="fas fa-upload"></i></button>
                             </div>
                         </div>
                     </div>
@@ -53,10 +52,12 @@ export default {
     data(){
         return  {
             current_page: 1,
-            query: '',
+            filters: {
+                query: '',
+                status: ''
+            },
             services:   {data: [], total: 0,},
-            status: '',
-            type: '',
+            type: 'admin',
         }
     },
     mounted() {
@@ -64,12 +65,19 @@ export default {
     },
     methods:{
         closeModals(){
-            $('#uploadServiceFormModal').modal('hide');
+            $('#serviceUploadFormModal').modal('hide');
         },
         getAllInitials(){
             this.loading = true;
             this.closeModals();
-            axios.get('/api/consultant_practices/services?status='+this.status+'&query='+this.query)
+            axios.get('/api/consultant_practices/services', {
+                params: {
+                    page: this.current_page,
+                    query: this.filters.query,
+                    status: this.filters.status,
+                    type: this.type,
+                }
+            })
             .then(response => {
                 this.services = response.data.services ?? {data: [], total: 0,};
             })
@@ -82,7 +90,7 @@ export default {
         },
         uploadServices(){
             this.loading = true;
-            $('#uploadServiceFormModal').modal('show');
+            $('#serviceUploadFormModal').modal('show');
             this.loading = false;
         }
     },

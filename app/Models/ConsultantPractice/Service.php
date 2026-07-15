@@ -16,7 +16,7 @@ class Service extends Structure
     protected $primaryKey = 'id';
     protected $table = 'consultant_practice_services';
 
-    protected $fillable = array('description', 'name', 'specialty_id', 'status', 'created_at', 'updated_at', 'deleted_at');
+    protected $fillable = array('description', 'name', 'icp_code', 'specialty_id', 'status', 'created_at', 'updated_at', 'deleted_at');
 
     public function specialty(){
         return $this->belongsTo('App\Models\ConsultantPractice\Specialty', 'specialty_id', 'id');

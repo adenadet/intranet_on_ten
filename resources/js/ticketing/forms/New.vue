@@ -1,8 +1,9 @@
 <template>
 <div class="card">
     <h5 class="card-header d-flex justify-content-between align-items-baseline flex-wrap"><span>Create New Ticket</span></h5>
-    <div class="card-body ">
-        <form method="POST" action="http://localhost:8000/tickets" accept-charset="UTF-8">
+    <div class="card-body">
+        <form class="overlay-wrapper p-0">
+            <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
             <div class="row">
                 <div class="col-md-12 col-sm-12">
                     <div class="form-group">
@@ -51,25 +52,25 @@
 export default {
     data(){
         return  {
+            loading: false,
             ticketData: new Form({
-                'id': '',
-                'subject': '',
-                'description': '',
-                'agent_id': 0,
-                'category_id': '',
-                'priority_id': '',                
+                id: '',
+                subject: '',
+                description: '',
+                agent_id: 0,
+                category_id: '',
+                priority_id: '',                
             }),
         }
     },
     mounted() {},
     methods:{
         createTicket(){
-            this.$Progress.start();
+            this.loading = true;
             this.ticketData.post('/api/tickets/ticket')
             .then(response =>{
-                this.$Progress.finish();
-                Fire.$emit('ticketReload', response);
-                Swal.fire({
+                this.$emit('ticketReload', response);
+                this.$swal.fire({
                     icon: 'success',
                     title: 'The Ticket has been created',
                     showConfirmButton: false,
@@ -79,37 +80,40 @@ export default {
                 this.ticketData.clear();
             })
             .catch(()=>{
-                Swal.fire({
+                this.$swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Something went wrong!',
                     footer: 'Please try again later!'
                 });
-                this.$Progress.fail();
+            })
+            .finally(() => {
+                this.loading = false;
             });
         },
         updateTicket(){
-            console.log("Tested");
-            this.$Progress.start();
-            this.BioData.put('/api/ums/users/'+ this.BioData.id)
+            this.loading = true;
+            this.ticketData.put('/api/tickets/ticket'+ this.ticketData.id)
             .then(response =>{
                 this.$Progress.finish();
-                Fire.$emit('Reload', response);
-                Swal.fire({
+                this.$swal.fire({
                     icon: 'success',
-                    title: 'The User'+ response.data.user.first_name+' '+  response.data.user.last_name+' has been updated',
+                    title: 'The Ticket has been updated',
                     showConfirmButton: false,
                     timer: 1500
                 });
             })
             .catch(()=>{
-                Swal.fire({
+                this.$swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Something went wrong!',
                     footer: 'Please try again later!'
                 });
                 this.$Progress.fail();
+            })
+            .finally(() => {
+                this.loading = false;
             });            
         },
         getProfilePic(){

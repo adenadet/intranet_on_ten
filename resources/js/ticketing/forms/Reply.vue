@@ -30,62 +30,55 @@ export default {
     data(){
         return {  
             updateData: new Form({
-                department_id: '', 
                 agent_id:'', 
-                ticket_id:'', 
-                content: '',
-            }), 
-            course:{},
-            updateData: new Form({
-                status_id: '',
-                ticket_id: '',
-                user_id: '',
-                content: '',
                 close: false,
+                content: '',
+                department_id: '', 
+                status_id: '',
+                ticket_id:'',
                 ticket_status: '',
+                user_id: '',
             }),
             departments: [],
+            loading: false,
             route: '',
             users: [],
         }
     },
+    emits:['refreshReplyForm'],
     methods:{
-        submitUpdate(){
-            
-        },
         closeTicket(){
-            this.$Progress.start();
+            this.loading = true;
             this.submitUpdate();
-            Swal.fire({icon: 'success',title: 'Ticket has been updated',});
+            this.$swal.fire({icon: 'success',title: 'Ticket has been updated',});
         },
         updateTicket(){
-            this.$Progress.start();
+            this.loading = true;
             this.updateData.ticket_id = this.ticket.id;
             this.updateData.post('/api/tickets/comments')
             .then(response=>{
-                Fire.$emit('ticketReload', response);
-                Swal.fire({icon: 'success',title: 'Ticket has been updated',});
-                this.updateData.clear();
+                this.$emit('refreshReplyForm');
                 this.updateData.reset();
             })
             .catch(()=>{
-                this.$Progress.fail();
-                Swal.fire({icon: 'error',title: 'Your form was not sent try again later!',});
+                this.$swal.fire({icon: 'error',title: 'Your form was not sent try again later!',});
             })
-            
-            this.$Progress.finish();
+            .finally(() => {
+                this.loading = false;
+            })
         },    
         assignUsers(){
-            this.$Progress.start();
+            this.loading = true;
             this.AssignData.post('/api/lms/assign_users')
             .then(response=>{
-                Fire.$emit('AssignUsers', response.data.assignees);
-                Fire.$emit('CourseUpdate', response.data.course );
-                this.$Progress.finish();
+                this.$emit('refreshReplyForm');
+                this.AssignData.reset();        
             })
             .catch(()=>{
-                this.$Progress.fail();
-                Swal.fire({icon: 'error',title: 'Your form was not sent try again later!',});
+                this.$swal.fire({icon: 'error',title: 'Your form was not sent try again later!',});
+            })
+            .finally(()=>{
+                this.loading = false;
             })
         },
         getInitials(){
@@ -123,16 +116,6 @@ export default {
     },
     mounted() {
         this.getInitials();
-        Fire.$on('AssignData', () =>{
-            this.AssignData.type = this.aspire;
-            this.AssignData.ref_id = this.reference.id;        
-            });
-        Fire.$on('CourseRefresh', course =>{this.course = course;});
-        Fire.$on('ExamDataFill', exam =>{
-            this.ExamData.reset();
-            this.ExamData.fill(exam)
-            //this.examData.course_id = typeof exam.course != 'undefined' ? exam.course.id : this.course.id;
-        });
     },
     props: {
         'editMode': Boolean,

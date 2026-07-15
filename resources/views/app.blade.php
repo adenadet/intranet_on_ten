@@ -55,7 +55,7 @@
                         </div>
                         @elseif (($page_title == 'Consultant Practice | Administrator') || ($page_title == 'Consultant Practice | Finance') || ($page_title == 'Consultant Practice | Front Office') || ($page_title == 'Consultant Practice | Medical Team') || ($page_title == 'Consultant Practice | Radiologist'))
                         <div class="col-md-3">
-                                @if($page_title == 'Consultant Practice | Front Office') @include('partials.cp.front')
+                            @if($page_title == 'Consultant Practice | Front Office') @include('partials.cp.front')
                             @elseif($page_title == 'Consultant Practice | Medical Team') @include('partials.cp.med')
                             @elseif($page_title == 'Consultant Practice | Finance') @include('partials.cp.fin')
                             @elseif($page_title == 'Consultant Practice | Administrator') @include('partials.cp.admin')

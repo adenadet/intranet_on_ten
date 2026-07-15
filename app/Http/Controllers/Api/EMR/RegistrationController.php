@@ -129,7 +129,7 @@ class RegistrationController extends Controller
         //
     }
 
-    public function resend($id)
+    public function resend(int|string $id)
     {
         $appointment = Appointment::where('id', '=', $id)->first();
         $payment = Payment::where('appointment_id', '=', $id)->first();

@@ -14,6 +14,19 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="consultantServiceUploadFormModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-navy">
+                    <h4 class="modal-title">Upload Consultant Service</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="text-white" aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <CPFormConsultantServiceUpload :editMode="editMode" :consultant_id.sync="consultant.id" @refreshConsultantServiceMultipleForm="getAllInitials" />
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="col-md-3">
         <CPDetailConsultant :consultant.sync="consultant" @refreshConsultantDetail="getAllInitials()" />
         <CPDetailCompany class="mt-3" :company.sync="consultant.company" @refreshCompanyDetail="getAllInitials()" />
@@ -24,18 +37,6 @@
                 <h3 class="card-title">Services</h3>
                 <div class="card-tools">
                     <button type="submit" class="btn btn-warning btn-sm" @click="editMultiServices"><i class="fas fa-edit"></i></button>    
-                    <!--div class="input-group" style="width: 450px;">
-                        <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-default mr-1"><i class="fas fa-search"></i></button>
-                            <select class="form-control" v-model="status">
-                                <option value="">All</option>
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i></button>
-                        </div>
-                    </div-->
                 </div>
             </div>
             <div class="card-body table-responsive p-0" style="height: 600px;">

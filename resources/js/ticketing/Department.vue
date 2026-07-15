@@ -13,9 +13,9 @@
                             </thead>
                             <tbody>
                                 <tr v-for="(ticket, index) in dept_tickets.data" :key="ticket.id" :class="ticket.status_id == 1 ? 'bg-warning': (ticket.status_id == 2 ? 'bg-yellow' : (ticket.status_id == 3 ? 'bg-purple': 'bg-success'))">
-                                    <td>{{index | addOne}}</td>
-                                    <td :title="ticket.subject">{{ticket.subject | readMore(40, '...')}}</td>
-                                    <td>{{ticket.creator.first_name}} {{ticket.creator.last_name}}</td>
+                                    <td>{{addOne(index) }}</td>
+                                    <td :title="ticket.subject">{{readMore(ticket.subject, 40, '...')}}</td>
+                                    <td>{{FullName(ticket.creator)}}</td>
                                     <td>{{ticket.priority !== null ? ticket.priority.name : 'No Priority Chosen'}}</td>
                                     <td>{{ticket.category !== null ? ticket.category.name : 'No Priority Chosen'}}</td>
                                     <td>{{ticket.agent != null ? ticket.agent.first_name+' '+ticket.agent.last_name : 'Not Yet Assigned'}}</td>

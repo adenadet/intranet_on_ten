@@ -3,10 +3,16 @@
     <div class="overlay dark" v-if="loading"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>
     <form>
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-8">
                 <div class="form-group">
                     <label>Name</label>
-                    <input type="text" class="form-control" id="name" v-model="serviceData.name" placeholder="Enter service name">
+                    <input required type="text" class="form-control" id="name" v-model="serviceData.name" placeholder="Enter service name">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>ICP Code</label>
+                    <input required type="text" class="form-control" id="icp_code" v-model="serviceData.icp_code" placeholder="Enter ICP code">
                 </div>
             </div>
             <div class="col-md-6">
@@ -55,6 +61,7 @@ export default {
             loading: false,
             serviceData: new Form({
                 id: '',
+                icp_code: '',
                 name: "",
                 specialty_id: "",
                 description: "",

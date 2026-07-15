@@ -4,12 +4,8 @@
         <div class="card-header">
             <h3 class="card-title">Consultant Services & Pricing</h3>
         </div>
-
         <div class="card-body">
-
-            <!-- Add New Row -->
             <div class="row mb-3">
-
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Select Service</label>
@@ -26,8 +22,6 @@
                     <button class="btn btn-primary btn-block" @click="addService">Add Service</button>
                 </div>
             </div>
-
-            <!-- Table -->
             <div class="table-responsive" style="height: 250px;">
                 <table class="table table-bordered table-striped">
                     <thead>
@@ -52,7 +46,6 @@
                 </table>
             </div>
         </div>
-
         <div class="card-footer text-right">
             <button class="btn btn-success" @click="submit">Save Services</button>
         </div>

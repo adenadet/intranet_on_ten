@@ -38,6 +38,7 @@
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link"><i class="fa fa-users-cog nav-icon"></i><p>Human Resources<i class="right fas fa-angle-left"></i></p></a>
                     <ul class="nav nav-treeview">
+                        <li class="nav-item"><a href="/hrms/admin/departments" class="nav-link"><i class="fa fa-house-user nav-icon"></i><p>Departments</p></a></li>
                         <li class="nav-item"><a href="/hrms/admin/designations" class="nav-link"><i class="fa fa-user-tag nav-icon"></i><p>Designations</p></a></li>
                         <li class="nav-item"><a href="/hrms/admin/employees" class="nav-link"><i class="fa fa-users nav-icon"></i><p>Employees</p></a></li>
                         <li class="nav-item"><a href="/hrms/admin/leaves/types" class="nav-link"><i class="fa fa-copy nav-icon"></i><p>Leave Types</p></a></li>

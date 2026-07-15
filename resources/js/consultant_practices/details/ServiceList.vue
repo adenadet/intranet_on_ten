@@ -21,6 +21,7 @@
             <tr>
                 <th>S/N</th>
                 <th>Name</th>
+                <th>Code</th>
                 <th>Specialty</th>
                 <th>Description</th>
                 <th>Status</th>
@@ -30,7 +31,8 @@
         <tbody v-if="services.length > 0">
             <tr v-for="(service,index) in services">
                 <td>{{ addOne(index) }}</td>
-                <td>{{ service.name }}</td>
+                <td :title="service.name">{{ readMore(service.name, 50, '...') }}</td>
+                <td>{{service.icp_code}}</td>
                 <td>{{ service.specialty?.name || 'General' }}</td>
                 <td :title="service.description" v-html="readMore(service.description, 50, '...')"></td>
                 <td><span v-if="service.status === 1" class="badge badge-success">Active</span>
@@ -50,7 +52,7 @@
         </tbody>
         <tbody v-else>
             <tr>
-                <td colspan="6">No Service meets your requirements</td>
+                <td colspan="7">No Service meets your requirements</td>
             </tr>
         </tbody>
     </table>

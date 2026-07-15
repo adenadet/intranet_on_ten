@@ -13,7 +13,7 @@ class DepartmentController extends Controller
     public function index()
     {
         return response()->json([
-            'departments' => Department::with('users')->with('hod')->orderBy('name', 'ASC')->paginate(10),       
+            'departments' => Department::with('users')->with('hod')->orderBy('name', 'ASC')->paginate(30),       
             'users'       => User::orderBy('first_name', 'ASC')->get(),       
         ]);        
     }

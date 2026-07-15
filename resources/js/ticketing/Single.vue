@@ -63,7 +63,7 @@
                     <div v-for="update in updates" :key="update.id">
                         <i class="fas" :class="'bg-'+update.stat.color+' fa-'+update.stat.icon"></i>
                         <div class="timeline-item">
-                            <span class="time"><i class="fas fa-clock"></i> {{update.created_at | FullDate}}</span>
+                            <span class="time"><i class="fas fa-clock"></i> {{ExcelDate(update.created_at) }}</span>
                             <h3 class="timeline-header"><a href="#">{{update.user !== null ? update.user.first_name+' '+update.user.last_name: 'System Administrator'}} </a> {{update.subject}}</h3>
                             <div class="timeline-body" v-show="update.stat.id < '2' || update.stat.id > '3'">{{update.content}}</div>
                         </div>
@@ -102,7 +102,7 @@ export default {
     },
     methods:{
         closeTicket(id){
-            Swal.fire({
+            this.$swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
@@ -110,33 +110,32 @@ export default {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, close it!'
-                })
+            })
             .then((result) => {
-                //Send Delete request
                 if(result.value){
                     this.form.delete('/api/tickets/ticket/'+id)
                     .then(response=>{
                         this.ticketReload(response);
-                        this.$Progress.finish();
-                        Swal.fire('Closed!', 'Ticket has been closed.', 'success');   
+                        this.$swal.fire('Closed!', 'Ticket has been closed.', 'success');   
                     })
                     .catch(()=>{
-                        Swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
+                        this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
                     });
                 }
             });
         },
         getAllInitials(){
-            this.$Progress.start();
+            this.loading = true;
             axios.get('/api/tickets/ticket/'+this.$route.params.id)
             .then(response =>{
                 this.ticketReload(response);
-                this.$Progress.finish();
-                toast.fire({icon: 'success', title: 'Ticket was loaded successfully',});
+                this.$toast.fire({icon: 'success', title: 'Ticket was loaded successfully',});
             })
             .catch(()=>{
-                this.$Progress.fail();
-                toast.fire({icon: 'error', title: 'Ticket was not loaded successfully',})
+                this.$toast.fire({icon: 'error', title: 'Ticket was not loaded successfully',})
+            })
+            .finally(()=>{
+                this.loading = false;
             });
         },
         reassign(){
@@ -153,10 +152,6 @@ export default {
     },
     mounted() {
         this.getAllInitials();
-        Fire.$on('ticketReload', response =>{
-            this.ticketReload(response);
-            $('#reassignModal').modal('hide');
-        });
     }
 }
 </script>

@@ -26,6 +26,16 @@ class PatientController extends Controller
             $search = $_GET['query'];
             $query = $query->where('unique_id', 'LIKE', "%$search%")->orWhere('name', 'LIKE', "%$search%");
         }
+        if (!empty($_GET['sex'])){
+            $query = $query->where('sex', '=', $_GET['sex']); 
+        }
+        if (!empty($_GET['patient_type'])){
+            $query = $query->where('patient_type', '=', $_GET['patient_type']); 
+        }
+        if( !empty($_GET['unique_id'])){
+            $set = $_GET['unique_id'];
+            $query = $query->where('unique_id', 'LIKE', "%$set%"); 
+        }
 
         $query = $query->paginate(50);
 

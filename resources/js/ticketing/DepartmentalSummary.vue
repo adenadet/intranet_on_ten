@@ -26,8 +26,8 @@
                                         <tbody>
                                             <tr v-for="(ticket, index) in by_tickets.data" :key="ticket.id">
                                                 <td>{{addOne(index)}}</td>
-                                                <td :title="ticket.subject">{{ticket.subject | readMore(40, '...')}}</td>
-                                                <td>{{ticket.creator.first_name}} {{ticket.creator.last_name}}</td>
+                                                <td :title="ticket.subject">{{readMore(ticket.subject, 40, '...')}}</td>
+                                                <td>{{FullName(ticket.creator)}}</td>
                                                 <td>{{ticket.priority !== null ? ticket.priority.name : 'No Priority Chosen'}}</td>
                                                 <td>{{ticket.category !== null ? ticket.category.name : 'No Priority Chosen'}}</td>
                                                 <td>{{ticket.agent != null ? ticket.agent.first_name+' '+ticket.agent.last_name : 'Not Yet Assigned'}}</td>
@@ -66,9 +66,9 @@
                                         </thead>
                                         <tbody>
                                             <tr v-for="(ticket, index) in my_tickets.data" :key="ticket.id">
-                                                <td>{{index | addOne}}</td>
-                                                <td :title="ticket.subject">{{ticket.subject | readMore(40, '...')}}</td>
-                                                <td>{{ticket.creator.first_name}} {{ticket.creator.last_name}}</td>
+                                                <td>{{addOne(index)}}</td>
+                                                <td :title="ticket.subject">{{readMore(ticket.subject, 40, '...')}}</td>
+                                                <td>{{FullName(ticket.creator)}}</td>
                                                 <td>{{ticket.priority !== null ? ticket.priority.name : 'No Priority Chosen'}}</td>
                                                 <td>{{ticket.category !== null ? ticket.category.name : 'No Priority Chosen'}}</td>
                                                 <td>{{ticket.agent != null ? ticket.agent.first_name+' '+ticket.agent.last_name : 'Not Yet Assigned'}}</td>
@@ -102,91 +102,6 @@
         </div>
     </div>
 </div>
-<!--
-<div class="row clearfix">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header"><h3 class="card-title">My Created Tickets</h3></div>
-            <div class="card-body pt-0">
-                <div class="table-responsive">
-                    <table class="table m-b-0">
-                        <thead>
-                            <tr>
-                                <th>S/N</th><th>Subject</th><th>Created By</th><th>Priority</th><th>Category</th><th>Assigned To</th><th>Status</th><th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(ticket, index) in by_tickets.data" :key="ticket.id">
-                                <td>{{index | addOne}}</td>
-                                <td :title="ticket.subject">{{ticket.subject | readMore(40, '...')}}</td>
-                                <td>{{ticket.creator.first_name}} {{ticket.creator.last_name}}</td>
-                                <td>{{ticket.priority !== null ? ticket.priority.name : 'No Priority Chosen'}}</td>
-                                <td>{{ticket.category !== null ? ticket.category.name : 'No Priority Chosen'}}</td>
-                                <td>{{ticket.agent != null ? ticket.agent.first_name+' '+ticket.agent.last_name : 'Not Yet Assigned'}}</td>
-                                <td>{{ticket.status != null ? ticket.status.name : 'No Status Assigned'}}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <router-link :to="'/ticketing/'+ticket.id" class="btn btn-sm btn-success"><i class="fa fa-eye"></i></router-link>
-                                        <button class="btn btn-sm btn-danger" @click="closeTicket(ticket.id)"><i class="fa fa-trash"></i></button>
-                                    </div>         
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer">
-                <div class="text-right">
-                    <pagination :data="by_tickets" @pagination-change-page="getByTickets">
-                        <span slot="prev-nav">&lt; Previous </span>
-                        <span slot="next-nav">Next &gt;</span>
-                    </pagination>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header"><h3 class="card-title">My Assigned Tickets</h3></div>
-            <div class="card-body pt-0">
-                <div class="table-responsive">
-                    <table class="table m-b-0">
-                        <thead>
-                            <tr>
-                                <th>S/N</th><th>Subject</th><th>Created By</th><th>Priority</th><th>Category</th><th>Assigned To</th><th>Status</th><th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(ticket, index) in my_tickets.data" :key="ticket.id">
-                                <td>{{index | addOne}}</td>
-                                <td :title="ticket.subject">{{ticket.subject | readMore(40, '...')}}</td>
-                                <td>{{ticket.creator.first_name}} {{ticket.creator.last_name}}</td>
-                                <td>{{ticket.priority !== null ? ticket.priority.name : 'No Priority Chosen'}}</td>
-                                <td>{{ticket.category !== null ? ticket.category.name : 'No Priority Chosen'}}</td>
-                                <td>{{ticket.agent != null ? ticket.agent.first_name+' '+ticket.agent.last_name : 'Not Yet Assigned'}}</td>
-                                <td>{{ticket.status != null ? ticket.status.name : 'No Status Assigned'}}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <router-link :to="'/ticketing/'+ticket.id" class="btn btn-sm btn-success"><i class="fa fa-eye"></i></router-link>
-                                        <button class="btn btn-sm btn-danger" @click="closeTicket(ticket.id)"><i class="fa fa-trash"></i></button>
-                                    </div>         
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer">
-                <div class="text-right">
-                    <pagination :data="by_tickets" @pagination-change-page="getMyTickets">
-                        <span slot="prev-nav">&lt; Previous </span>
-                        <span slot="next-nav">Next &gt;</span>
-                    </pagination>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>-->
 </template>
 <script>
     export default {

@@ -50,21 +50,18 @@ export default {
             users: [],
         }
     },
+    emits:['refreshAssignForm'],
     methods:{
-        assignUsers(){
-            this.$Progress.start();
+        assignUsers(){     
             this.updateData.ticket_id = this.ticket.id;
             this.updateData.type_id = 3;
             this.updateData.status_id = 3;
             this.updateData.post('/api/tickets/comments')
             .then(response=>{
-                Fire.$emit('updateUsers', response.data.assignees);
-                Fire.$emit('ticketReload', response);
-                this.$Progress.finish();
+                this.$emit('refreshAssignForm');
             })
             .catch(()=>{
-                this.$Progress.fail();
-                Swal.fire({icon: 'error',title: 'Your form was not sent try again later!',});
+                this.$swal.fire({icon: 'error',title: 'Your form was not sent try again later!',});
             })
         },
         getInitials(){
@@ -73,7 +70,7 @@ export default {
                 this.users = response.data.users;
             })
             .catch(()=>{
-                toast.fire({
+                this.$toast.fire({
                     icon: 'error',
                     title: 'Departments were not loaded successfully',
                 })

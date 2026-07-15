@@ -21,7 +21,7 @@
                             <tbody>
                                 <tr v-for="ticket in tickets.data" :key="ticket.id">
                                     <td>{{course.name}}</td>
-                                    <td :title="course.description">{{course.description | readMore(25, '...')}}</td>
+                                    <td :title="course.description">{{readMore(course.description, 25, '...')}}</td>
                                     <td>{{course.category_id !== null ? course.category.name : ''}}</td>
                                     <td>{{course.sub_category_id !== null? course.sub_category.name: ''}}</td>
                                     <td>
