@@ -1,36 +1,38 @@
 <template>
 <section>
     <div class="card-header bg-navy">
-        <h3 class="card-title">{{source == 'assigned' ? 'My Assigned Tickets' : 'My Created Tickets'}}</h3>\
+        <h3 class="card-title">{{source == 'assigned' ? 'My Assigned Tickets' : 'My Created Tickets'}}</h3>
     </div>
-    <div class="card-body p-0" style="height:400px;">
-        <div class="table-responsive table-striped p-0">
-            <table class="table m-b-0">
-                <thead class="thead">
-                    <tr><th>S/N</th><th>Subject</th><th>Created By</th><th>Priority</th><th>Category</th><th>Assigned To</th><th>Status</th><th></th></tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(ticket, index) in tickets.data" :key="ticket.id" :class="ticket.status_id == 1 ? 'bg-warning disabled': (ticket.status_id == 2 ? 'bg-yellow disabled' : (ticket.status_id == 3 ? 'bg-purple disabled': 'bg-success disabled'))">
-                        <td>{{addOne(index)}}</td>
-                        <td :title="ticket.subject">{{ readMore(ticket.subject, 40, '...')}}</td>
-                        <td>{{ticket.creator.first_name}} {{ticket.creator.last_name}}</td>
-                        <td>{{ticket.priority !== null ? ticket.priority.name : 'No Priority Chosen'}}</td>
-                        <td>{{ticket.category !== null ? ticket.category.name : 'No Priority Chosen'}}</td>
-                        <td>{{ticket.agent != null ? ticket.agent.first_name+' '+ticket.agent.last_name : 'Not Yet Assigned'}}</td>
-                        <td>{{ticket.status != null ? ticket.status.name : 'No Status Assigned'}}</td>
-                        <td>
-                            <button class="nav-link btn btn-sm btn-default" data-toggle="dropdown" type="button">
-                                <i class="fa fa-ellipsis-v"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                                <router-link :to="'/ticketing/'+ticket.id" class="btn-success dropdown-item btn btn-block btn-sm"><i class="fa fa-eye"></i> View Ticket</router-link>
-                                <button v-if="source == 'created'" class="btn-sm btn-danger dropdown-item btn btn-block" @click="closeTicket(ticket.id)"><i class="fa fa-trash"></i> Close Ticket</button>
-                            </div>         
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <div class="card-body table-responsive p-0" style="height:400px;">
+        <table class="table table-striped m-b-0">
+            <thead class="thead">
+                <tr><th>S/N</th><th>Subject</th><th>Created By</th><th>Priority</th><th>Category</th><th>Assigned To</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+                <tr v-for="(ticket, index) in tickets.data" :key="ticket.id">
+                    <td>{{addOne(index)}}</td>
+                    <td :title="ticket.subject">{{ readMore(ticket.subject, 40, '...')}}</td>
+                    <td>{{ticket.creator.first_name}} {{ticket.creator.last_name}}</td>
+                    <td>{{ticket.priority !== null ? ticket.priority.name : 'No Priority Chosen'}}</td>
+                    <td>{{ticket.category !== null ? ticket.category.name : 'No Priority Chosen'}}</td>
+                    <td>{{ticket.agent != null ? ticket.agent.first_name+' '+ticket.agent.last_name : 'Not Yet Assigned'}}</td>
+                    <td>
+                        <span class="badge" :class="ticket.status_id == 1 ? 'bg-warning disabled': (ticket.status_id == 2 ? 'bg-yellow disabled' : (ticket.status_id == 3 ? 'bg-purple disabled': 'bg-success disabled'))">
+                            {{ticket?.status?.name || 'No Status Assigned'}}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="nav-link btn btn-sm btn-default" data-toggle="dropdown" type="button">
+                            <i class="fa fa-ellipsis-v"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                            <router-link :to="'/ticketing/'+ticket.id" class="btn-success dropdown-item btn btn-block btn-sm"><i class="fa fa-eye"></i> View Ticket</router-link>
+                            <button v-if="source == 'created'" class="btn-sm btn-danger dropdown-item btn btn-block" @click="closeTicket(ticket.id)"><i class="fa fa-trash"></i> Close Ticket</button>
+                        </div>         
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </section>
 </template>
