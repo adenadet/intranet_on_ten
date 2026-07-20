@@ -25,6 +25,7 @@ class ConsentController extends Controller
             'service_id'     => 'required',
         ]);
 
+        $destination = $_SERVER['DOCUMENT_ROOT'].'/img/consents';
         $signaturePad = 10;
         $signaturePad1 = null;
         $signaturePad2 = null;
@@ -33,31 +34,31 @@ class ConsentController extends Controller
         $appointment = Appointment::find($request->input('appointment_id'));
         if (!is_null($request->input('signaturePad'))){
             $signature_pad = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad'), 0, strpos($request->input('signaturePad'), ';')))[1])[1];
-            \Image::make($request->input('signaturePad'))->save(public_path('img/consents/').$signature_pad);
+            \Image::make($request->input('signaturePad'))->save($destination.'/'.$signature_pad);
             $signaturePad = $signature_pad;
         }
 
         if (!is_null($request->input('signaturePad1'))){
             $signature_pad1 = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad1'), 0, strpos($request->input('signaturePad1'), ';')))[1])[1];
-            \Image::make($request->input('signaturePad_1'))->save(public_path('img/consents/').$signature_pad1);
+            \Image::make($request->input('signaturePad_1'))->save($destination.'/'.$signature_pad1);
             $signaturePad1 = $signature_pad1;
         }
 
         if (!is_null($request->input('signaturePad2'))){
             $signature_pad2 = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad2'), 0, strpos($request->input('signaturePad2'), ';')))[1])[1];
-            \Image::make($request->input('signaturePad_2'))->save(public_path('img/consents/').$signature_pad2);
+            \Image::make($request->input('signaturePad_2'))->save($destination.'/'.$signature_pad2);
             $signaturePad2 = $signature_pad2;
         }
         
         if (!is_null($request->input('signaturePad3'))){
             $signature_pad3 = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad3'), 0, strpos($request->input('signaturePad3'), ';')))[1])[1];
-            \Image::make($request->input('signaturePad3'))->save(public_path('img/consents/').$signature_pad3);
+            \Image::make($request->input('signaturePad3'))->save($destination.'/'.$signature_pad3);
             $signaturePad3 = $signature_pad3;
         }
 
         if (!is_null($request->input('signaturePad4'))){
             $signature_pad4 = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad4'), 0, strpos($request->input('signaturePad4'), ';')))[1])[1];
-            \Image::make($request->input('signaturePad4'))->save(public_path('img/consents/').$signature_pad4);
+            \Image::make($request->input('signaturePad4'))->save($destination.'/'.$signature_pad4);
             $signaturePad4 = $signature_pad4;
         }
 
@@ -101,31 +102,31 @@ class ConsentController extends Controller
         $appointment = Appointment::find($request->input('appointment_id'));
         if (!is_null($request->input('signaturePad'))){
             $signature_pad = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad'), 0, strpos($request->input('signaturePad'), ';')))[1])[1];
-            \Image::make($request->input('signaturePad'))->save(public_path('img/consents/').$signature_pad);
+            \Image::make($request->input('signaturePad'))->save($destination.'/'.$signature_pad);
             $signaturePad = $signature_pad;
         }
 
         if (!is_null($request->input('signaturePad1'))){
             $signature_pad1 = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad1'), 0, strpos($request->input('signaturePad1'), ';')))[1])[1];
-            \Image::make($request->input('signaturePad_1'))->save(public_path('img/consents/').$signature_pad1);
+            \Image::make($request->input('signaturePad_1'))->save($destination.'/'.$signature_pad1);
             $signaturePad1 = $signature_pad1;
         }
 
         if (!is_null($request->input('signaturePad2'))){
             $signature_pad2 = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad2'), 0, strpos($request->input('signaturePad2'), ';')))[1])[1];
-            \Image::make($request->input('signaturePad_2'))->save(public_path('img/consents/').$signature_pad2);
+            \Image::make($request->input('signaturePad_2'))->save($destination.'/'.$signature_pad2);
             $signaturePad2 = $signature_pad2;
         }
         
         if (!is_null($request->input('signaturePad3'))){
             $signature_pad3 = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad3'), 0, strpos($request->input('signaturePad3'), ';')))[1])[1];
-            \Image::make($request->input('signaturePad3'))->save(public_path('img/consents/').$signature_pad3);
+            \Image::make($request->input('signaturePad3'))->save($destination.'/'.$signature_pad3);
             $signaturePad3 = $signature_pad3;
         }
 
         if (!is_null($request->input('signaturePad4'))){
             $signature_pad4 = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad4'), 0, strpos($request->input('signaturePad4'), ';')))[1])[1];
-            \Image::make($request->input('signaturePad4'))->save(public_path('img/consents/').$signature_pad4);
+            \Image::make($request->input('signaturePad4'))->save($destination.'/'.$signature_pad4);
             $signaturePad4 = $signature_pad4;
         }
 

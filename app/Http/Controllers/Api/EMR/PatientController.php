@@ -41,12 +41,12 @@ class PatientController extends Controller
 
         $image_url = $currentPhoto = null;
         $passport_image_url = $currentPassportPhoto = null;
-
+        $destination = $_SERVER['DOCUMENT_ROOT'].'/img/applicants';
         if (($request['image'] != $currentPhoto) && ($request['image'] != '')){
             $image = $request['id']."-".time().".".explode('/',explode(':', substr( $request['image'], 0, strpos($request['image'], ';')))[1])[1];
-            Image::make($request['image'])->save(public_path('img/applicants/').$image);
+            Image::make($request['image'])->save($destination.'/'.$image);
             $image_url = $image;
-            $old_image = public_path('img/applicants/').$currentPhoto;
+            $old_image = $destination.'/'.$currentPhoto;
 
             if (file_exists($old_image)){ @unlink($old_image); }
         }
@@ -111,11 +111,12 @@ class PatientController extends Controller
         $image_url = $currentPhoto = $patient->image;
         $passport_image_url = $currentPassportPhoto = $patient->passport_image;
 
+        $destination = $_SERVER['DOCUMENT_ROOT'].'/img/applicants';
         if (($request['image'] != $currentPhoto) && ($request['image'] != '')){
             $image = $request['id']."-".time().".".explode('/',explode(':', substr( $request['image'], 0, strpos($request['image'], ';')))[1])[1];
-            Image::make($request['image'])->save(public_path('img/applicants/').$image);
+            Image::make($request['image'])->save($destination.'/'.$image);
             $image_url = $image;
-            $old_image = public_path('img/applicants/').$currentPhoto;
+            $old_image = $destination.'/'.$currentPhoto;
 
             if (file_exists($old_image)){ @unlink($old_image); }
         }

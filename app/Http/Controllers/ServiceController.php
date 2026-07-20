@@ -48,30 +48,31 @@ class ServiceController extends Controller
         ]);
 
         $signaturePad = 10;
-
+        $destination = $_SERVER['DOCUMENT_ROOT'].'/img/consents';
         $appointment = Appointment::find($request->input('appointment_id'));
+
 
         if (!is_null($request->input('signaturePad'))){
             $signature_pad = $request->input('appointment_id')."-".time().".".explode('/',explode(':', substr( $request->input('signaturePad'), 0, strpos($request->input('signaturePad'), ';')))[1])[1];
-            Image::make($request->input('signaturePad'))->save(public_path('img/consents/').$signature_pad);
+            Image::make($request->input('signaturePad'))->save($destination.'/'.$signature_pad);
             $signaturePad = $signature_pad;
         }
 
         Consent::create([
-            'service_id'        => $request->input('service_id'),
-            'appointment_id'    => $request->input('appointment_id'),
-            'signaturePad'      => $signaturePad ?? null,
-            'signaturePad_1'    => $signaturePad1 ?? null,
-            'signaturePad_2'    => $signaturePad2 ?? null,
-            'signaturePad_3'    => $signaturePad3 ?? null,
-            'signaturePad_4'    => $signaturePad4 ?? null,
-            'guardian'          => $request->input('guardian') ?? null,
+            'service_id'            => $request->input('service_id'),
+            'appointment_id'        => $request->input('appointment_id'),
+            'signaturePad'          => $signaturePad ?? null,
+            'signaturePad_1'        => $signaturePad1 ?? null,
+            'signaturePad_2'        => $signaturePad2 ?? null,
+            'signaturePad_3'        => $signaturePad3 ?? null,
+            'signaturePad_4'        => $signaturePad4 ?? null,
+            'guardian'              => $request->input('guardian') ?? null,
             'guardian_relationship' => $request->input('guardian_relationship') ?? null,
-            'interpreter'       => $request->input('interpreter') ?? null,
-            'pregnancy'         => $request->input('pregnancy') ?? null,
-            'physician_id'      => Auth::id(),
-            'created_by'        => Auth::id(),
-            'updated_by'        => Auth::id(),
+            'interpreter'           => $request->input('interpreter') ?? null,
+            'pregnancy'             => $request->input('pregnancy') ?? null,
+            'physician_id'          => Auth::id(),
+            'created_by'            => Auth::id(),
+            'updated_by'            => Auth::id(),
         ]);
 
         $appointment->status = 5;
