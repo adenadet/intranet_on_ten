@@ -7,7 +7,7 @@ use App\Models\Hrms\LeaveAllowance;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-class LeaveAllowanceService
+class AllowanceService
 {
     public function createRequest(int $employeeId, int $leaveRequestId) {
         return LeaveAllowance::create([

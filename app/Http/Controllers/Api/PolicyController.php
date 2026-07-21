@@ -41,8 +41,6 @@ class PolicyController extends Controller
     {
         $fileName = (!is_null($request->input('file')))  ? "upload/policies/".$this->file_upload($request->input('file'), 'pdf', "upload/policies", 5) : null;
 
-
-        
         $policy = Policy::create([
             'name' =>  $request->input('name'),
             'file' => $fileName ?? NULL,
@@ -66,9 +64,7 @@ class PolicyController extends Controller
 
         return response()->json([
             'policies'      => $policies,           
-        ]);
-
-         
+        ]);         
     }
 
     public function assign(Request $request)

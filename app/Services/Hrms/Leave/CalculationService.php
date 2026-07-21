@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\HRMS\Leave;
+namespace App\Services\Hrms\Leave;
 
 use App\Models\Hrms\LeaveRequest;
 use App\Models\Hrms\LeaveType;
@@ -8,7 +8,7 @@ use App\Models\Hrms\PublicHoliday;
 use Carbon\Carbon;
 use DateTime;
 
-class LeaveCalculationService
+class CalculationService
 {
     public function calculateDays(LeaveRequest $leaveRequest): float
     {

@@ -11,7 +11,7 @@ use App\Models\Hrms\Employee;
 use App\Models\Hrms\LeaveRequest;
 use Illuminate\Support\Facades\Mail;
 
-class LeaveNotificationService
+class NotificationService
 {
     public function sendLeaveRequestNotification(
         LeaveRequest $leaveRequest
