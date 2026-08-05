@@ -46,20 +46,30 @@ class PatientManagerService
         return $patient;
     }
 
-    public function delete($patient_id)
+    public function delete(int|string $patient_id)
     {
-        $patient = Patient::find($patient_id);
+        $patient = Patient::withTrashed()->find($patient_id);
 
         if (!$patient) {
             throw ValidationException::withMessages(['message' => 'Patient not found.']);
         }
 
-        $patient->update([
-            'status' => Patient::StatusInactive,
-            'updated_by' => auth('api')->id() ?? Auth::id(),
-            'deleted_by' => auth('api')->id() ?? Auth::id(),
-            'deleted_at' => now(),
-        ]);
+        if ($patient->status == Patient::StatusActive){
+            $patient->update([
+                'status' => Patient::StatusInactive,
+                'updated_by' => auth('api')->id() ?? Auth::id(),
+                'deleted_by' => auth('api')->id() ?? Auth::id(),
+                'deleted_at' => now(),
+            ]);
+        }
+        else{
+            $patient->update([
+                'status' => Patient::StatusActive,
+                'updated_by' => auth('api')->id() ?? Auth::id(),
+                'deleted_by' => null,
+                'deleted_at' => null,
+            ]);
+        }
 
         return $patient;
     }

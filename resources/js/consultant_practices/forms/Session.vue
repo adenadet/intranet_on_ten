@@ -11,11 +11,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label>Patient</label>
-                    <model-list-select class="form-control" :list="patients" v-model="sessionData.patient_id" option-value="id" optiontext="name" placeholder="Select Patient" />
-                    <!--select v-model="sessionData.patient_id" class="form-control">
-                        <option value="">--Select Patient--</option>
-                        <option v-for="p in patients" :key="p.id" :value="p.id">{{ p.name }}</option>
-                    </select-->
+                    <model-list-select class="form-control" :list="patients" v-model="sessionData.patient_id" option-value="id" option-text="name" placeholder="Select Patient" />
                 </div>
             </div>
             <div class="col-md-4">
@@ -151,23 +147,38 @@ export default {
                 this.loading = false;
             });   
         },
-        fetchConsultantServices() {
-            this.loading= true;
+        fetchConsultantServices(consultantId) {
             this.selectedServices = [];
-            axios.get('/api/consultant_practices/consultant_services/consultant/'+this.sessionData.consultant_id)
-            .then(response =>{
-                this.consultantServices = response.data.consultant_services
-                this.consultantPaymentType = response.data.consultant_payment_type
-            })
-            .catch(()=>{
-                this.$toast.fire({
-                    icon: 'error',
-                    title: 'Session form not loaded successfully',
+            this.consultantServices = [];
+            this.consultantPaymentType = null;
+
+            if (!consultantId) {
+                return;
+            }
+
+            this.loading = true;
+
+            axios.get(`/api/consultant_practices/consultant_services/consultant/${consultantId}`)
+                .then(response => {
+                    // Ignore an older request if the user selected another consultant.
+                    if (String(this.sessionData.consultant_id) !== String(consultantId)) {
+                        return;
+                    }
+
+                    this.consultantServices = response.data.consultant_services || [];
+                    this.consultantPaymentType = response.data.consultant_payment_type || null;
                 })
-            })
-            .finally(()=>{
-                this.loading = false;
-            });    
+                .catch(() => {
+                    this.$toast.fire({
+                        icon: 'error',
+                        title: 'Consultant services could not be loaded',
+                    });
+                })
+                .finally(() => {
+                    if (String(this.sessionData.consultant_id) === String(consultantId)) {
+                        this.loading = false;
+                    }
+                });
         },
         getAllInitials(){
             this.loading= true;

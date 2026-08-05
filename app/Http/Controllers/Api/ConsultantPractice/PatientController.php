@@ -15,29 +15,17 @@ class PatientController extends Controller
     use ConsultantPracticeTrait;
     public function destroy(string $id)
     {
-        //
+        $patient_manager = new PatientManagerService();
+        $patient = $patient_manager->delete($id);
+
+        return response()->json([
+            'patient' => $patient,
+        ]);
     }
 
     public function index()
     {
-        $query = Patient::query();
-
-        if (!empty($_GET['query'])){
-            $search = $_GET['query'];
-            $query = $query->where('unique_id', 'LIKE', "%$search%")->orWhere('name', 'LIKE', "%$search%");
-        }
-        if (!empty($_GET['sex'])){
-            $query = $query->where('sex', '=', $_GET['sex']); 
-        }
-        if (!empty($_GET['patient_type'])){
-            $query = $query->where('patient_type', '=', $_GET['patient_type']); 
-        }
-        if( !empty($_GET['unique_id'])){
-            $set = $_GET['unique_id'];
-            $query = $query->where('unique_id', 'LIKE', "%$set%"); 
-        }
-
-        $query = $query->paginate(50);
+        $query = $this->consultant_practice_patient_get_all($_GET['type'] ?? 'all', $_GET, true, true);
 
         return response()->json([
             'patients' => $query,
@@ -66,7 +54,7 @@ class PatientController extends Controller
         ]);
 
         $patient_manager = new PatientManagerService();
-        $patient = $patient_manager->create($request);
+        $patient = $patient_manager->create($request->all());
 
         return response()->json([
             'patient' => $patient,
