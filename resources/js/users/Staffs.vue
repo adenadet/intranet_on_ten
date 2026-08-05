@@ -9,7 +9,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <UserFormStaff :areas="areas" :branches="branches" :departments="departments" :editMode="editMode" :states="states" :user.sync="user"/>
+                    <UserFormStaff :areas="areas" :branches="branches" :departments="departments" :editMode="editMode" :states="states" :user.sync="user" @refreshPage="getAllInitials"/>
                 </div>
             </div>
         </div>
@@ -167,14 +167,13 @@ export default {
             this.loading = true
             axios.get('/api/ums/staffs?page='+page).then(response =>{
                 this.refreshPage(response);
-                this.loading = false;
                 toast.fire({icon: 'success', title: 'Users loaded successfully',
                 });
             })
             .catch(()=>{
-                this.loading = false;
                 toast.fire({icon: 'error', title: 'Users not loaded successfully',})
-            });
+            })
+            .finally(()=>{this.loading = false;});
         },
         refreshPage(response){
             this.areas = response.data.areas;

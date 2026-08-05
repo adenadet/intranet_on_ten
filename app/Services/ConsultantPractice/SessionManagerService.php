@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class SessionManagerService
 {
-    public function create($data): Session
+    public function create(array $data): Session
     {
         return DB::transaction(function () use ($data) {
 
@@ -41,7 +41,7 @@ class SessionManagerService
         });
     }
 
-    public function delete($id): Session
+    public function delete(int|string $id): Session
     {
         return DB::transaction(function () use ($id) {
 

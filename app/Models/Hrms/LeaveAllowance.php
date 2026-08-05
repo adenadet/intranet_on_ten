@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class LeaveAllowance extends Structure
 {
+    public const StatusUnprocessed = 1;
+    public const StatusApproved = 2;
+    public const StatusProcessed = 10;
+    public const StatusRejected = 100;
+    public const StatusCancelled = 200;
     protected $primaryKey = 'id';
     protected $table = 'hrms_leave_allowances';
     protected $fillable = array('employee_id', 'leave_request_id', 'status', 'amount', 'approved_by', 'approved_at', 'approval_remark', 'created_by', 'created_at', 'updated_by', 'updated_at', 'deleted_by', 'deleted_at');

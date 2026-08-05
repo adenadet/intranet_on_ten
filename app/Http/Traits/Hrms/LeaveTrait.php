@@ -40,7 +40,7 @@ trait LeaveTrait{
 
         $leave_types = 
     }*/
-    public function hrms_leave_employee_assign_leave_types($employee_id, $leave_types){
+    public function hrms_leave_employee_assign_leave_types(int|string $employee_id, array $leave_types){
         DB::beginTransaction();
 
         try{
@@ -83,11 +83,10 @@ trait LeaveTrait{
             DB::rollBack();
             return $e->getMessage();
             //$this->log_user_activity('leave_request_confirm', $leave_types, false);
-            
         } 
     }
 
-    public function hrms_leave_request_confirm_leave($data, $id){
+    public function hrms_leave_request_confirm_leave(array $data, string|int $id){
         DB::beginTransaction();
         try{
             $leave_request = LeaveRequest::where('id', '=', $id)->first();
@@ -162,7 +161,7 @@ trait LeaveTrait{
             return $e->getMessage();
         }    
     }
-    public function hrms_leave_request_create_leave($data){
+    public function hrms_leave_request_create_leave(array $data){
         DB::beginTransaction();
         try{
             if (isset($data['employee_id'])){

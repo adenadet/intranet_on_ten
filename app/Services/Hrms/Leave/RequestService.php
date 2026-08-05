@@ -24,7 +24,7 @@ class RequestService
         return DB::transaction(function () use ($id, $data) {
             $leaveRequest = LeaveRequest::findOrFail($id);
             $leaveRequest->update([
-                'status' => 1,
+                'status' => LeaveRequest::StatusApproved,
                 'approval_remark' => $data['remark'] ?? null,
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
@@ -41,7 +41,6 @@ class RequestService
     public function create(array $data): LeaveRequest
     {
         return DB::transaction(function () use ($data) {
-
             $employee = isset($data['employee_id']) ? Employee::findOrFail($data['employee_id']) : Employee::where('user_id', '=', auth('api')->id() ?? Auth::id())->firstOrFail();
             $employeeLeaveType = EmployeeLeaveType::findOrFail($data['leave_type_id']);
             $leaveRequest = LeaveRequest::create([
@@ -72,9 +71,9 @@ class RequestService
         return DB::transaction(function () use ($id, $data){
             $leaveRequest = LeaveRequest::findOrFail($id);
             $leaveRequest->update([
-                'status' => 10,
+                'status' => LeaveRequest::StatusCancelled,
                 'approval_remark' => $data['remark'] ?? null,
-                'approved_by' => auth()->id(),
+                'approved_by' => auth('api')->id() ?? Auth::id(),
                 'approved_at' => now(),
             ]);
 
@@ -87,13 +86,11 @@ class RequestService
 
     public function cancel(int $id): LeaveRequest
     {
-        return DB::transaction(function () use ($id) {
-
+        return DB::transaction(function () use ($id) { 
             $leaveRequest = LeaveRequest::findOrFail($id);
-
             $leaveRequest->update([
-                'status' => 2,
-                'deleted_by' => auth()->id(),
+                'status' => LeaveRequest::StatusCancelled,
+                'deleted_by' => auth('api')->id() ?? Auth::id(),
                 'deleted_at' => now(),
             ]);
 
@@ -101,78 +98,17 @@ class RequestService
         });
     }
 
-    public function find(int $id)
-    {
-        return LeaveRequest::with([
-            'approver.user',
-            'employee.user',
-            'leave_type'
-        ])->findOrFail($id);
-    }
-
-    public function getAll(string $type = 'all', ?array $filters = null, bool $detailed = false, bool $paginated = true) {
-        $query = LeaveRequest::query();
-        switch ($type) {
-            case 'approved':
-                $query->where('status', 1);
-            break;
-            case 'pending':
-                $query->where('status', 0);
-            break;
-            case 'rejected':
-                $query->where('status', 10);
-            break;
-            case 'mine':
-                $employee = Employee::where(
-                    'user_id',
-                    auth()->id()
-                )->first();
-
-                $query->where(
-                    'employee_id',
-                    $employee->id
-                );
-
-            break;
-        }
-
-        if (!empty($filters['query'])) {
-
-            $search = $filters['query'];
-
-            $users = User::where(function ($q) use ($search) {
-
-                $q->where('first_name', 'LIKE', "%$search%")
-                    ->orWhere('middle_name', 'LIKE', "%$search%")
-                    ->orWhere('last_name', 'LIKE', "%$search%")
-                    ->orWhere('email', 'LIKE', "%$search%");
-            })->pluck('id');
-
-            $employees = Employee::whereIn(
-                'user_id',
-                $users
-            )->pluck('id');
-
-            $query->whereIn(
-                'employee_id',
-                $employees
-            );
-        }
-
-        if ($detailed) {
-
-            $query->with([
-                'employee.user',
-                'leave_type',
-                'approver'
+    public function delete(int|string $id){
+        return DB::transaction(function () use ($id) {
+            $leaveRequest = LeaveRequest::findOrFail($id);
+            $leaveRequest->update([
+                'status' => LeaveRequest::StatusDeleted,
+                'deleted_by' => auth('api')->id() ?? Auth::id(),
+                'deleted_at' => now(),
             ]);
-        }
 
-        $query->latest();
-
-        return $paginated
-            ? $query->paginate(50)
-            : $query->get();
+            return $leaveRequest->fresh();
+        });
     }
 
     public function update(array $data, int|string $id){
@@ -184,7 +120,7 @@ class RequestService
             $leaveRequest->update([
                 'status' => 10,
                 'approval_remark' => $data['remark'] ?? null,
-                'approved_by' => auth()->id(),
+                'approved_by' => auth('api')->id() ?? Auth::id(),
                 'approved_at' => now(),
             ]);
             $days = $this->calculationService->calculateDays($leaveRequest);

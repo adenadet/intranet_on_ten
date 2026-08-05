@@ -48,7 +48,7 @@ trait ConsultantPracticeTrait{
         return $query;
     }
 
-    public function consultant_practice_company_get_by($id, $detailed){
+    public function consultant_practice_company_get_by(int|string $id, bool $detailed){
         try{
             $query = Company::where('id', '=', $id);
             $query = $detailed ? $query->with(['consultants.specialty', 'accounts.bank', 'ledgers.referenceable']) : $query->select('id', 'name',)->with(['accounts.bank']);
@@ -92,7 +92,7 @@ trait ConsultantPracticeTrait{
         return $query;
     }
 
-    public function consultant_practice_consultant_get_by($id, $detailed){
+    public function consultant_practice_consultant_get_by(int|string $id, bool $detailed){
         try{
             $query = Consultant::where('id', '=', $id);
             $query = $detailed ? $query->with(['company', 'creator', 'specialty', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title')->with(['company']);
@@ -137,7 +137,7 @@ trait ConsultantPracticeTrait{
         return $query;
     }
 
-    public function consultant_practice_consultant_service_get_by($id, $detailed){
+    public function consultant_practice_consultant_service_get_by(int|string $id, bool $detailed){
         try{
             $query = Consultant::where('id', '=', $id)->orWhere('unique_id', '=', $id);
             $query = $detailed ? $query->with(['consultant', 'creator', 'payments', 'pricelists', 'service', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
@@ -176,12 +176,13 @@ trait ConsultantPracticeTrait{
         }
 
         $query = $detailed ? $query->with(['creator', 'deleter', 'updater']) : $query->select('id', 'unique_id', 'name');
+        $query = $query->orderBy('name', 'ASC');
         $query = $paginated  ? $query->paginate(50) : $query->get();
 
         return $query;
     }
 
-    public function consultant_practice_patient_get_by($type, $id, $detailed){
+    public function consultant_practice_patient_get_by($type, string|int $id, bool $detailed){
         try{
             $query = Patient::where('id', '=', $id)->orWhere('unique_id', '=', $id);
             $query = $detailed ? $query->with(['creator', 'deleter', 'updater']) : $query->select('id', 'unique_id', 'name');
@@ -220,7 +221,7 @@ trait ConsultantPracticeTrait{
         return $query;
     }
 
-    public function consultant_practice_payment_get_by($id, $detailed){
+    public function consultant_practice_payment_get_by(int|string $id, bool $detailed){
         try{
             $query = Payment::where('id', '=', $id);
             $query = $detailed ? $query->with(['account.bank', 'confirmer', 'company', 'creator', 'reverser', 'updater']) : $query->select('id', 'date', 'amount', 'company_id', 'status')->with(['company']);
@@ -264,7 +265,7 @@ trait ConsultantPracticeTrait{
         return $query;
     }
 
-    public function consultant_practice_service_get_by($type, $id, $detailed){
+    public function consultant_practice_service_get_by($type, int|string $id, bool $detailed){
         try{
             $query = Service::where('id', '=', $id);
             $query = $detailed ? $query->with(['creator', 'deleter', 'updater']) : $query->select('id', 'name');
@@ -275,7 +276,7 @@ trait ConsultantPracticeTrait{
         }
     }
 
-    public function consultant_practice_session_deactivate($id){
+    public function consultant_practice_session_deactivate(int|string $id){
         DB::beginTransaction();
 
         try{
@@ -363,7 +364,7 @@ trait ConsultantPracticeTrait{
         return $query;
     }
 
-    public function consultant_practice_session_get_by($id, $detailed){
+    public function consultant_practice_session_get_by(int|string $id, bool $detailed){
         try{
             $query = Session::where('id', '=', $id)->orWhere('unique_id', '=', $id);
             $query = $detailed ? $query->with(['consultant.company', 'consultant.specialty', 'creator', 'patient', 'session_confirm', 'session_items.service', 'session_payment', 'updater']) : $query->select('id', 'first_name', 'last_name', 'title', 'company_name');
@@ -403,7 +404,7 @@ trait ConsultantPracticeTrait{
         return $query;
     }
 
-    public function consultant_practice_specialty_get_by($id, $detailed){
+    public function consultant_practice_specialty_get_by(int|string $id, bool $detailed){
         try{
             $query = Payment::where('id', '=', $id)->orWhere('unique_id', '=', $id);
             $query = $detailed ? $query->with(['creator', 'deleter', 'updater']) : $query->select('id', 'name');

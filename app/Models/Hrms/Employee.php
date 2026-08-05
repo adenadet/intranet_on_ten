@@ -11,6 +11,10 @@ class Employee extends Structure
     use HasFactory;
     protected $primaryKey = 'id';
     protected $table = 'hrms_employees';
+
+    const EmploymentStatusActive = 1;
+    const EmploymentStatusInactive = 100;
+    
     protected $fillable = array('user_id', 'employee_id', 'office_shift_id', 'reports_to', 'supervisor_id', 'username', 'email', 'department_id', 'sub_department_id', 'designation_id', 'date_of_joining', 'date_of_leaving', 'employment_status', 'created_by', 'updated_by', 'deleted_by', 'created_at', 'updated_at', 'deleted_at');
     
     public function department(){

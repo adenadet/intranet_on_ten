@@ -58,6 +58,11 @@ export default {
             this.updateData.status_id = 3;
             this.updateData.post('/api/tickets/comments')
             .then(response=>{
+                this.$swal.fire({
+                    icon: 'success',
+                    title: 'Ticket Assigned',
+                    text: 'Ticket has been assigned successfully'
+                })
                 this.$emit('refreshAssignForm');
             })
             .catch(()=>{

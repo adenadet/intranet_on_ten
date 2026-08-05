@@ -1,97 +1,3 @@
-<!--template>
-<section class="overlay-wrapper p-0">
-    <div class="container-fluid">
-        <form @submit.prevent="editMode ? updateSession() : createSession()">
-            <alert-error :form="sessionData"></alert-error> 
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label>Patient Type</label>
-                        <select class="form-control" v-model="sessionData.patient_type" placeholder="Select Patient Type">
-                            <option value="">--Patient Type--</option>
-                            <option value="existing">Existing</option>
-                            <option value="new">New</option> 
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-8" v-if="sessionData.patient_type == 'existing'">
-                    <div class="form-group">
-                        <label>Patient</label>
-                        <select class="form-control" v-model="sessionData.patient_id" placeholder="Select Patient Type">
-                            <option value="">--Select Patient--</option> 
-                            <option v-for="patient in patients" :value="patient.id">{{ patient.name+' ['+patient.unique_id+']' }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4" v-if="sessionData.patient_type != 'existing'">
-                    <div class="form-group">
-                        <label>Patient Name</label>
-                        <input type="text" class="form-control" placeholder="first name & last name" v-model="sessionData.patient.name" id="patient_name" name="patient_name" />
-                    </div>
-                </div>
-                <div class="col-md-4" v-if="sessionData.patient_type != 'existing'">
-                    <div class="form-group">
-                        <label>Patient EMR ID</label>
-                        <input type="text" placeholder="SNH-12345" class="form-control" v-model="sessionData.patient.name" id="patient_name" name="patient_name" />
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Specialty</label>
-                        <select class="form-control" id="specialty_id" name="specialty_id" v-model="sessionData.specialty_id" required>
-                            <option value="">--Select Specialty--</option>
-                            <option v-for="specialty in specialties" :key="specialty.id" :value="specialty.id">{{specialty.name}}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Consultant</label>
-                        <select class="form-control" id="consultant_id" name="consultant_id" v-model="sessionData.consultant_id" required>
-                            <option value="">--Select Consultant--</option>
-                            <option v-for="consultant in filtered_consultant" :key="consultant.id" :value="consultant.id">{{consultant.first_name}} {{consultant.last_name}}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label>Service</label>
-                        <select class="form-control" id="specialty_id" name="specialty_id" v-model="sessionData.service_id" required>
-                            <option value="">--Select Service--</option>
-                            <option v-for="service in filtered_services" :key="service.id" :value="service.id">{{service.name}}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-12">
-                    <div class="form-group">
-                        <label>Date</label>
-                        <input class="form-control" type="date" name="date" id="date" v-model="sessionData.date" @change="searchSchedule()"/>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-12">
-                    <div class="form-group">
-                        <label>Session Payment Type</label>
-                        <select class="form-control" name="payment_type" id="payment_type" v-model="sessionData.payment_type" required>
-                            <option value="">--Select Payment Type--</option>
-                            <option value="Cash">Cash</option>
-                            <option value="Credit">Credit</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label>Amount</label>
-                        <input class="form-control" id="amount" name="amount" v-model="sessionData.amount" required disabled/>
-                    </div>
-                </div>
-            </div>
-            <input type="submit" name="submit" class="submit btn btn-success" value="Submit" />
-        </form>
-    </div>
-</section>
-</template-->
 <template>
 <section class="overlay-wrapper p-0">
     <form @submit.prevent="submit">
@@ -105,18 +11,17 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label>Patient</label>
-                    <select v-model="sessionData.patient_id" class="form-control">
+                    <model-list-select class="form-control" :list="patients" v-model="sessionData.patient_id" option-value="id" optiontext="name" placeholder="Select Patient" />
+                    <!--select v-model="sessionData.patient_id" class="form-control">
                         <option value="">--Select Patient--</option>
                         <option v-for="p in patients" :key="p.id" :value="p.id">{{ p.name }}</option>
-                    </select>
+                    </select-->
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label>Consultant</label>
-                    <select v-model="sessionData.consultant_id" class="form-control" @change="fetchConsultantServices">
-                        <option v-for="c in consultants" :key="c.id" :value="c.id">{{ c.title }}. {{ c.first_name }} {{ c.last_name }}</option>
-                    </select>
+                    <model-list-select class="form-control" :list="consultants" v-model="sessionData.consultant_id" option-value="id" :custom-text="codeAndNameAndDesc" placeholder="Select Applicant" />
                 </div>        
             </div>
             <div class="col-12">
@@ -129,7 +34,6 @@
                 <label class="form-check-label">{{ service.service?.name }} - ₦{{ service.price }}</label>
             </div>
         </div>
-
         <div v-if="selectedServices.length">
             <h5>Selected Services</h5>
             <table class="table table-sm table-striped">
@@ -214,13 +118,13 @@ export default {
             specialties: [],
         }
     },
-    emits:['refreshSession'],
+    emits:['refreshSessionForm'],
     mounted() {
         this.getAllInitials();
     },
     methods:{
         codeAndNameAndDesc(item){
-            return `${item.last_name}, ${item.first_name} ${item.middle_name}`
+            return `Dr. ${item.first_name} ${item.last_name}`
         },
         createSession(){
             this.loading = true;
@@ -233,13 +137,13 @@ export default {
                     title: 'Successful',
                     text: 'A new session was created successfully',
                 });
-                this.$emit('refreshSession', response);
+                this.$emit('refreshSessionForm', response);
             })
-            .catch(()=>{
+            .catch(error=>{
                 this.$swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Something went wrong!',
+                    text: error?.response?.data?.message || 'Something went wrong!',
                     footer: 'Please try again later!'
                 });
             })
@@ -290,7 +194,7 @@ export default {
             this.sessionData.put('/api/consultant_practices/sessions/'+this.sessionData.id)
             .then(response =>{
                 this.loading = false;
-                this.$emit('refreshSession', response);
+                this.$emit('refreshSessionForm');
                 this.$swal.fire({
                     icon: 'success',
                     title: 'The Session details has been modified',
@@ -298,14 +202,17 @@ export default {
                     timer: 1500
                 });
             })
-            .catch(()=>{
+            .catch(error=>{
                 this.loading = false;
                 this.$swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Something went wrong!',
+                    text: error?.response?.data?.message || 'Something went wrong!',
                     footer: 'Please try again later!'
                 });
+            })
+            .finally(()=>{
+                this.loading = false;
             });          
         },
     },
@@ -314,6 +221,9 @@ export default {
         session: Object,
     },
     watch:{
+        'sessionData.consultant_id'(consultantId) {
+            this.fetchConsultantServices(consultantId);
+        },
         session(){
             this.sessionData.fill(this.session);
         }

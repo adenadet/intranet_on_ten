@@ -16,6 +16,7 @@ use App\Models\NextOfKin;
 use App\Models\Staff;
 use App\Models\State;
 use App\Models\User;
+use App\Services\Hrms\EmployeeService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,38 +26,27 @@ class EmployeeController extends Controller
 {
     use EmployeeTrait, UserTrait;
 
-    public function assign_manager(Request $request, $id)
+    public function __construct(
+        protected EmployeeService $es, 
+    ) {}
+
+    public function assign_manager(Request $request, int|string $id)
     {
         $this->validate($request, [
             'supervisor_id' => 'required|numeric',
             'reports_to' => 'required|numeric',
         ]);
 
-        DB::beginTransaction();
-        try{
-            $employee = Employee::find($id);
-            $employee->supervisor_id = $request->input('supervisor_id');
-            $employee->reports_to = $request->input('reports_to');
+        $employee = $this->es->assign_manager($request->all(), $id);
+        return response()->json([
+            'employee' => $employee,
+            'staff' => $this->hrms_employee_get_by_id($id, $_GET['viewer'] ?? null),       
+        ]);
 
-            $employee->save();
-            DB::commit();
-            //$this->log_user_activity('employee_update', $id, true);
-            return response()->json([
-                'employee' => $this->hrms_employee_get_by_id($id, $_GET['viewer'] ?? null),
-                'staff' => $this->hrms_employee_get_by_id($id, $_GET['viewer'] ?? null),       
-            ]);
-        }
-        catch(Exception $e){
-            DB::rollback();
-            //$this->log_user_activity('employee_update', $id, false);
-            return $e->getMessage();
-        }
-        
     }
 
-    public function destroy($id)
-    {
-        $staff = $this->user_staff_deactivate_by_id($id);
+    public function destroy(int|string $id){
+
         $areas = Area::select('id', 'name')->where('state_id', 25)->orderBy('name', 'ASC')->get();
         $branches = Branch::select('id', 'name')->orderBy('name', 'ASC')->get();
         $departments = Department::select('id', 'name')->orderBy('name', 'ASC')->get();
@@ -64,10 +54,10 @@ class EmployeeController extends Controller
         $states = State::orderBy('name', 'ASC')->get();
         
         return response()->json([
-            'staff' => $staff,
             'areas' => $areas,
             'branches' => $branches,
             'departments' => $departments,
+            'employee' => $this->es->deactivate($id),
             'nok' => $nok,
             'states' => $states,       
             'users' => $this->user_get_all(),
@@ -137,8 +127,7 @@ class EmployeeController extends Controller
         ]);
     }
 
-    public function initials()
-    {
+    public function initials(){
         $employees = Employee::pluck('user_id');
         return response()->json([
             'areas' => Area::select('id', 'name')->orderBy('name', 'ASC')->get(),
@@ -156,24 +145,21 @@ class EmployeeController extends Controller
         ]);
     }
 
-    public function search($id)
-    {
+    public function search(int|string $id){
         return response()->json([
             'employees' => $this->hrms_employee_search_by_query($id, true, true, $_GET['page'] ?? 1),
         ]);
     }
 
 
-    public function show(string $id)
-    {
+    public function show(int|string $id){
         return response()->json([
             'employee' => $this->hrms_employee_get_by_id($id, $_GET['viewer'] ?? null),
             'staff' => $this->hrms_employee_get_by_id($id, $_GET['viewer'] ?? null),       
         ]);
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         if (is_null($request->input('user_id'))){
             $this->validate($request, [
                 'user.first_name' => 'required',
@@ -199,10 +185,9 @@ class EmployeeController extends Controller
             ]);
         }
 
-        $employee = $this->hrms_employee_create_employee($request);
+        $employee = $this->es->create($request->all());
 
         return response()->json([
-            // This are the required for User page
             'areas' => Area::select('id', 'name')->where('state_id', 25)->orderBy('name', 'ASC')->get(),
             'branches' => Branch::select('id', 'name')->orderBy('name', 'ASC')->get(),
             'departments' => Department::select('id', 'name')->orderBy('name', 'ASC')->get(),
@@ -210,50 +195,39 @@ class EmployeeController extends Controller
             'nok' => NextOfKin::where('user_id', auth('api')->id())->get(),
             'states' => State::orderBy('name', 'ASC')->get(),       
             'message' => 'Your password has been changed successfully',
-            'status' => 'success', 
+            'status' => 'success',
         ]);
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, int|string $id)
     {
-        /*$this->validate($request, [
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'street' => 'sometimes',
-            'street2' => 'sometimes',
-            'city' => 'required',
-            'state_id' => 'numeric',
-            'area_id' => 'numeric',
-            'phone' => 'numeric',
-            'alt_phone' => 'nullable|numeric',
-            'branch_id' => 'required|numeric',
-            'sex' => 'required|string',
-            'dob' => 'required|date',
-        ]);*/
-
-        /*$user = $this->user_update_user($request, $id);*/
+        $this->validate($request, [
+            'date_of_joining' => 'sometimes|date',
+            'date_of_leaving' => 'sometimes|date',
+            'department_id' => 'sometimes|numeric',
+            'designation_id' => 'sometimes|numeric',
+            'email' => 'sometimes|email',
+            'employee_id' => 'sometimes|numeric',
+            'office_shift_id' => 'sometimes|numeric',
+        ]);
 
         return response()->json([
-            'employee' => $this->hrms_employee_update($request, $id),
+            'employee' => $this->es->update($request->all(), $id),
         ]);
     }
 
-    public function update_status(Request $request, string $id)
+    public function update_status(Request $request, int|string $id)
     {
-        $employee = Employee::find($id);
-        $employee->employment_status = $request->input('employment_status');
-        $employee->date_of_leaving = ($request->input('employment_status') == 1) ? null : $request->input('date_of_leaving');
-        
-        $employee->save();
+        $employee = $this->es->changeStatus($request->all(), $id);
 
         return response()->json([
+            'employee' => $employee,
             'message' => 'Employment status has been changed successfully',
             'status' => 'success', 
         ]);
-
     }
 
-    public function user($id)
+    public function user(int|string $id)
     {
         return response()->json([
             'employee' => $this->hrms_employee_get_single('user_id', $id, true), 

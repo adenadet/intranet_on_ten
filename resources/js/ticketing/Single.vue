@@ -8,7 +8,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <TicketFormAssign :ticket="ticket" />
+                    <TicketFormAssign :ticket="ticket" @refreshAssignForm="getAllInitials"/>
                 </div>
             </div>
         </div>
@@ -21,7 +21,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <TicketFormReply :ticket="ticket"/>
+                    <TicketFormReply :ticket="ticket" :statuses="statuses" @refreshReplyForm="getAllInitials"/>
                 </div>
             </div>
         </div>
@@ -65,14 +65,14 @@
                         <div class="timeline-item">
                             <span class="time"><i class="fas fa-clock"></i> {{ExcelDate(update.created_at) }}</span>
                             <h3 class="timeline-header"><a href="#">{{update.user !== null ? update.user.first_name+' '+update.user.last_name: 'System Administrator'}} </a> {{update.subject}}</h3>
-                            <div class="timeline-body" v-show="update.stat.id < '2' || update.stat.id > '3'">{{update.content}}</div>
+                            <div class="timeline-body" v-show="update.stat.id < '2' || update.stat.id > '3'" v-html="update.content"></div>
                         </div>
                     </div>
                     <div>
                         <i class="fa fa-question bg-yellow"></i>
                         <div class="timeline-item">
                             <h3 class="timeline-header"><a href="#"> </a> Add Update</h3>
-                            <div class="card-body"><TicketFormReply :ticket="ticket" :statuses="statuses" /></div>
+                            <div class="card-body"><TicketFormReply :ticket="ticket" :statuses="statuses" @refreshReplyForm="getAllInitials" /></div>
                         </div>
                     </div>
                     <div>
@@ -101,6 +101,9 @@ export default {
         }
     },
     methods:{
+        closeModals(){
+            $('#reassignModal').modal('hide');
+        },
         closeTicket(id){
             this.$swal.fire({
                 title: 'Are you sure?',
@@ -126,6 +129,7 @@ export default {
         },
         getAllInitials(){
             this.loading = true;
+            this.closeModals();
             axios.get('/api/tickets/ticket/'+this.$route.params.id)
             .then(response =>{
                 this.ticketReload(response);

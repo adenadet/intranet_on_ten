@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Ums;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\Hrms\EmployeeTrait;
+use App\Services\Ums\UserService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,12 @@ use App\Http\Traits\Ums\UserTrait;
 class StaffController extends Controller
 {
     use EmployeeTrait, UserTrait;
-    public function destroy($id)
+
+    public function __construct(
+        protected UserService $ums, 
+    ) {}
+
+    public function destroy(int|string $id)
     {
         $staff = $this->user_staff_deactivate_by_id($id);
         $areas = Area::select('id', 'name')->where('state_id', 25)->orderBy('name', 'ASC')->get();
@@ -68,7 +74,7 @@ class StaffController extends Controller
             'staffs' => User::where('user_type', '!=', 'Applicant')->orderBy('created_at', 'DESC')->limit(8)->get(),
         ]);
     }
-    public function show($id)
+    public function show(int|string $id)
     {
         return response()->json([
             'employee' => $this->hrms_employee_get_by_id($id, $_GET['viewer'] ?? null),
@@ -93,10 +99,11 @@ class StaffController extends Controller
             'supervisor_id' => 'sometimes|numeric',
         ]);
 
-        $user = $this->user_create_new($request, null);
+        $user = $this->ums->create($request->all());
+        $role = Role::select('id')->where('name', '=', 'Staff')->first();
+        $user->syncRoles([$role['id']]);
 
         return response()->json([
-            // This are the required for User page
             'areas' => Area::select('id', 'name')->where('state_id', 25)->orderBy('name', 'ASC')->get(),
             'branches' => Branch::select('id', 'name')->orderBy('name', 'ASC')->get(),
             'departments' => Department::select('id', 'name')->orderBy('name', 'ASC')->get(),
@@ -109,7 +116,7 @@ class StaffController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int|string $id)
     {
         $this->validate($request, [
             'first_name' => 'required',

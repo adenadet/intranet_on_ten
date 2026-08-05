@@ -18,48 +18,64 @@ use Illuminate\Support\Facades\Mail;
 class RegistrationController extends Controller
 {
     use AppointmentTrait;
-    public function index()
-    {
-        // inputs          // service id to search for
-        $daysToSearch = 30;                           // how many days ahead to search
-        $public_holidays = PublicHoliday::where('date', '>=', date('Y-m-d'))->where('date', '<=', date('Y-m-d', strtotime('+'.$daysToSearch.' days')))->pluck('date')->toArray();                          // array of ‘YYYY-MM-DD’ strings
+    public function index(){
+        $daysToSearch = 30;
+        $public_holidays = PublicHoliday::where('date', '>=', date('Y-m-d'))->where('date', '<=', date('Y-m-d', strtotime('+'.$daysToSearch.' days')))->pluck('date')->toArray();
 
-        // build public holidays clause only if array not empty
         if (!empty($public_holidays)) {
             $phPlaceholders = implode(',', array_fill(0, count($public_holidays), '?'));
             $phClause = "AND d.date NOT IN ($phPlaceholders)";
-            // binding order: serviceId (for s), serviceId (for a), daysToSearch, then public holidays...
             $bindings = array_merge([1, 1, $daysToSearch], $public_holidays);
         } else {
             $phClause = ""; 
-            $bindings = [1, 1, $daysToSearch];
+            $bindings = [$daysToSearch, 1];
         }
 
-        $sql = " SELECT d.date, s.schedule
-        FROM ( SELECT DATE_ADD(CURDATE(), INTERVAL (u.n + t.n*10) DAY) AS date, (u.n + t.n*10) AS offset
-        FROM ( SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4  UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) u
-        CROSS JOIN (SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t
-        ) d
-        JOIN emr_service_schedules s
-        ON s.service_id = ?
-        LEFT JOIN emr_appointments a
-        ON a.service_id = ?
-        AND a.date = d.date
-        AND a.schedule = s.schedule
-        AND a.deleted_at IS NULL
-        AND a.status != 'cancelled'   -- treat cancelled appointments as not blocking
-        WHERE d.offset BETWEEN 1 AND ?
-        AND DAYOFWEEK(d.date) NOT IN (1,7)   -- exclude Sundays(1) and Saturdays(7)
-        {$phClause}
-        AND a.id IS NULL                      -- only slots without an active appointment
-        ORDER BY d.date ASC, s.schedule ASC
-        LIMIT 5
-        ";
+        $sql = "SELECT d.date, s.schedule FROM(
+            SELECT DATE_ADD(CURDATE(), INTERVAL seq.day_number DAY) AS date, seq.day_number FROM
+            (
+                SELECT (u.n + t.n * 10) AS day_number
+                FROM (
+                        SELECT 0 AS n UNION ALL
+                        SELECT 1 UNION ALL
+                        SELECT 2 UNION ALL
+                        SELECT 3 UNION ALL
+                        SELECT 4 UNION ALL
+                        SELECT 5 UNION ALL
+                        SELECT 6 UNION ALL
+                        SELECT 7 UNION ALL
+                        SELECT 8 UNION ALL
+                        SELECT 9
+                    ) u
+                CROSS JOIN
+                    (
+                        SELECT 0 AS n UNION ALL
+                        SELECT 1 UNION ALL
+                        SELECT 2 UNION ALL
+                        SELECT 3 UNION ALL
+                        SELECT 4 UNION ALL
+                        SELECT 5 UNION ALL
+                        SELECT 6 UNION ALL
+                        SELECT 7 UNION ALL
+                        SELECT 8 UNION ALL
+                        SELECT 9
+                    ) t
+                ) seq
+                WHERE seq.day_number BETWEEN 1 AND ?
+            ) d
+        
+            INNER JOIN emr_service_schedules s ON s.service_id = ?
+            LEFT JOIN emr_appointments a
+                ON a.service_id = s.service_id
+                AND a.date = d.date
+                AND a.schedule = s.schedule
+                AND a.deleted_at IS NULL
+                AND a.status <> 'cancelled'
+            WHERE DAYOFWEEK(d.date) NOT IN (1,7) {$phClause} AND a.id IS NULL
+            ORDER BY d.date, s.schedule
+            LIMIT 5";
 
         $uk_tb_slots = DB::select($sql, $bindings);
-
-        //return response()->json($slot);
-
 
         return response()->json([
             'nations'  => Country::orderBy('name', 'ASC')->get(),   

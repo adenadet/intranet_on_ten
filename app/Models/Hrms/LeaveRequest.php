@@ -19,6 +19,7 @@ class LeaveRequest extends Structure
     public const StatusPending = 1;
     public const StatusApproved = 5;
     public const StatusCancelled = 10;
+    public const StatusDeleted = 400;
     
     public function approver(){
         return $this->belongsTo('App\Models\Hrms\Employee', 'approved_by', 'employee_id');

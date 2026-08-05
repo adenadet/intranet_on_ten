@@ -79,14 +79,14 @@ export default {
             .then((result) => {
                 //Send Delete request
                 if(result.value){
+                    this.loading = true;
                     this.form.delete('/api/tickets/ticket/'+id)
-                    .then(response=>{
+                    .then(response=>{  
                         this.ticketReload(response);
-                        this.$Progress.finish();
-                        Swal.fire('Deleted!', 'Ticket has been closed.', 'success');  
+                        this.$swal.fire('Deleted!', 'Ticket has been closed.', 'success');  
                     })
                     .catch(()=>{
-                        Swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
+                        this.$swal.fire({icon: 'error', title: 'Oops...', text: 'Something went wrong!', footer: '<a href>Why do I have this issue?</a>'});
                     });
                 }
             }); 

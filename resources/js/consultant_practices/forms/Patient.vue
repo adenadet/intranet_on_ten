@@ -89,11 +89,11 @@ export default {
                 });
                 this.$emit('refreshPatientForm', response);
             })
-            .catch(()=>{
+            .catch(error=>{
                 this.$swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Something went wrong!',
+                    text: error?.response?.data?.message || 'Something went wrong!',
                     footer: 'Please try again later!'
                 });
             })
@@ -113,11 +113,11 @@ export default {
                     timer: 1500
                 });
             })
-            .catch(()=>{
+            .catch(error=>{
                 this.$swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Something went wrong!',
+                    text: error?.response?.data?.message || 'Something went wrong!',
                     footer: 'Please try again later!'
                 });
             })

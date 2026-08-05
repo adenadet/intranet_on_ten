@@ -15,7 +15,7 @@
             <div class="col-md-12 col-sm-12">
                 <div class="form-group">
                     <label>Update</label>
-                    <textarea rows="6" class="form-control" v-model="updateData.content"></textarea>
+                    <QuillEditor rows="6" class="form-control" v-model:content="updateData.content" theme="snow" content-type="html"/>
                 </div>
             </div>
             <div class="col-md-6 col-sm-12">
@@ -58,6 +58,7 @@ export default {
             this.updateData.post('/api/tickets/comments')
             .then(response=>{
                 this.$emit('refreshReplyForm');
+                this.$swal.fire({icon:'success', title: 'Replied', text: 'Your Reply has been sent'})
                 this.updateData.reset();
             })
             .catch(()=>{
@@ -114,9 +115,7 @@ export default {
         },
          
     },
-    mounted() {
-        this.getInitials();
-    },
+    mounted() {},
     props: {
         'editMode': Boolean,
         'statuses': Array,
